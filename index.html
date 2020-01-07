@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>跳转页面</title>
+</head>
+<body>
+    <script>
+        let main=async ()=>{
+            let res=await fetch({
+                url:"./config.json",
+                method:"GET"
+            });
+            let config=await res.json()
+            let url=config.url;
+            window.location.href=url;
+        }
+        
+    </script>
+</body>
+</html>
