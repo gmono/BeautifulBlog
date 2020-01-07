@@ -1,0 +1,21 @@
+{
+  "name": "blogsystem",
+  "version": "0.0.1",
+  "description": "博客系统，可自定义整个网站",
+  "main": "generate.js",
+  "scripts": {
+    "build": " node generate.js",
+    "dev": "node server.js",
+    "testtrans": "node transform.js"
+  },
+  "author": "gmono",
+  "license": "MIT",
+  "dependencies": {
+    "@types/marked": "^0.7.2",
+    "front-matter": "^3.0.2",
+    "marked": "^0.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^13.1.4"
+  }
+}
