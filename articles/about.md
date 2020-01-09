@@ -15,3 +15,40 @@ draft: false
 2. 也有可能用来记录一些非技术方面的结论，不过重要内容我是不会公开的（大概）
 3. 顺便还可以发布一下自己的开源项目或框架库什么的
 4. 写个人网站时更有逼格
+
+# 代码测试
+```js
+window.location.href="hello world";
+let a=async ()=>{
+    class test extends hello{
+        constructor(){
+
+        }
+        member1=1;
+        member2="fadfasdf";
+        mem=`${this},hello`;
+    }
+    return await new test();
+}
+
+```
+
+```tsx
+class Control extends React.Component<{x:string,y:string},{},{}>{
+    constructor(public test:string="hello"){
+
+    }
+    render(props){
+        //这里代码大概是错误的
+        return (
+            <div>
+                <p>文章内容</p><br/>
+                <Control name="test">mynameis hello</Control>
+            </div>
+        )
+            
+    }
+}
+```
+
+测试一下    

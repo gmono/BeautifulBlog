@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="https://cdn.bootcss.com/prism/1.15.0/themes/prism.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="./node_modules/highlight.js/styles/default.css">
+    <link rel="stylesheet" href="./node_modules/highlight.js/styles/solarized-light.css"> -->
+</head>
+<body>
+    <!--模板引擎 arttemplate  -->
+    <p><strong>头一次用Hugo构建博客，速度确实快</strong></p>
+<h1 id="原因">原因</h1>
+<p>本来是用onenote记录日记的，然后想用它记录技术日志，但不支持代码高亮和markdown，写起来很不方便<br>而网上的onenote插件都是只支持桌面版的onenote，而我用的是uwp版本，虽然感觉uwp版本丝般顺滑，很适合画画记笔记，写日记之类，但用于记录复杂内容还是很不够<br>后考虑到使用简书记录，但这种内容托管到一个网站说不定什么时候就倒了的感觉还是不太好，因此考虑使用static博客系统来构建托管到github，看了一下使用go语言的hugo似乎不错，hexo以前是感受到了它的慢，不可理解</p>
+<h1 id="内容">内容</h1>
+<ol>
+<li>首先主要是用来记录技术博客的</li>
+<li>也有可能用来记录一些非技术方面的结论，不过重要内容我是不会公开的（大概）</li>
+<li>顺便还可以发布一下自己的开源项目或框架库什么的</li>
+<li>写个人网站时更有逼格</li>
+</ol>
+<h1 id="代码测试">代码测试</h1>
+<pre><code class="language-js">window.location.href=<span class="hljs-string">"hello world"</span>;
+let a=async ()=&gt;{
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">test</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">hello</span></span>{
+        constructor(){
+
+        }
+        member1=<span class="hljs-number">1</span>;
+        member2=<span class="hljs-string">"fadfasdf"</span>;
+        mem=`${<span class="hljs-keyword">this</span>},hello`;
+    }
+    <span class="hljs-keyword">return</span> await <span class="hljs-keyword">new</span> test();
+}
+</code></pre>
+<pre><code class="language-tsx"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Control</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component&lt;</span></span>{x:string,y:string},{},{}&gt;{
+    constructor(public test:string=<span class="hljs-string">"hello"</span>){
+
+    }
+    render(props){
+        <span class="hljs-comment">//这里代码大概是错误的</span>
+        <span class="hljs-keyword">return</span> (
+            &lt;div&gt;
+                &lt;p&gt;文章内容&lt;/p&gt;&lt;br/&gt;
+                &lt;<span class="hljs-type">Control</span> name=<span class="hljs-string">"test"</span>&gt;mynameis hello&lt;/<span class="hljs-type">Control</span>&gt;
+            &lt;/div&gt;
+        )
+
+    }
+}</code></pre>
+<p>测试一下    </p>
+
+    <script src="https://cdn.bootcss.com/prism/1.15.0/prism.js"></script>
+  <script src="https://cdn.bootcss.com/prism/1.15.0/components/prism-javascript.js"></script>
+</body>
+</html>

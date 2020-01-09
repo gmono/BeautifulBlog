@@ -4,9 +4,43 @@
 import * as fm from "front-matter"
 import * as fs from "fs"
 import * as mk from "marked"
+import * as h from "highlight.js"
+import * as template from "art-template"
+let readAsync=async (fpath:string)=>{
+  return new Promise<Buffer>((r)=>{
+    fs.readFile(fpath,(e,d)=>{
+      r(d);
+    })
+  })
+};
 
-let str=fs.readFileSync("./articles/about.md").toString();
-let res=fm(str);
-console.log(res);
-console.log(mk(res.body));
-fs.writeFileSync("./test.html",mk(res.body));
+async function transform(filepath:string){
+    
+    let str=(await readAsync(filepath)).toString();
+    let res=fm(str);
+    // console.log(res);
+    mk.setOptions({
+        renderer:new mk.Renderer(),
+    
+        highlight: (code,lang,cbk)=>{
+            return h.highlightAuto(code).value;
+          },
+          pedantic: false,
+          gfm: true,
+          breaks: false,
+          sanitize: false,
+          smartLists: true,
+          smartypants: false,
+          xhtml: false
+    })
+    let content=mk(res.body);
+    let html=template(__dirname+"/test_transform.html",{
+        content:content
+    });
+    return html;
+  
+}
+fs.writeFileSync("test.html",transform("./articles/about.md"));
+//打开浏览器查看
+
+export default transform;
