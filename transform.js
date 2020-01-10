@@ -41,7 +41,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var fm = require("front-matter");
 var fs = require("fs");
 var mk = require("marked");
-var h = require("highlight.js");
+// import * as h from "highlight.js"
+var Prism = require("prismjs");
+var loadLanguages = require("prismjs/components/");
+loadLanguages(['tsx']);
 var template = require("art-template");
 var readAsync = function (fpath) { return __awaiter(_this, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -65,7 +68,9 @@ function transform(filepath) {
                     mk.setOptions({
                         renderer: new mk.Renderer(),
                         highlight: function (code, lang, cbk) {
-                            return h.highlightAuto(code).value;
+                            var ret = Prism.highlight(code, Prism.languages[lang], lang);
+                            // console.log(ret)
+                            return ret;
                         },
                         pedantic: false,
                         gfm: true,

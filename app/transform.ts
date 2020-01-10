@@ -4,7 +4,12 @@
 import * as fm from "front-matter"
 import * as fs from "fs"
 import * as mk from "marked"
-import * as h from "highlight.js"
+// import * as h from "highlight.js"
+import * as Prism from "prismjs"
+import * as loadLanguages from 'prismjs/components/'
+loadLanguages(['tsx']);
+
+
 import * as template from "art-template"
 let readAsync=async (fpath:string)=>{
   return new Promise<Buffer>((r)=>{
@@ -23,7 +28,9 @@ async function transform(filepath:string){
         renderer:new mk.Renderer(),
     
         highlight: (code,lang,cbk)=>{
-            return h.highlightAuto(code).value;
+            const ret=Prism.highlight(code,Prism.languages[lang],lang);
+            // console.log(ret)
+            return ret;
           },
           pedantic: false,
           gfm: true,

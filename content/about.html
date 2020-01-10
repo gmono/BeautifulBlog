@@ -22,37 +22,38 @@
 <li>写个人网站时更有逼格</li>
 </ol>
 <h1 id="代码测试">代码测试</h1>
-<pre><code class="language-js">window.location.href=<span class="hljs-string">"hello world"</span>;
-let a=async ()=&gt;{
-    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">test</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">hello</span></span>{
-        constructor(){
+<pre><code class="language-js">window<span class="token punctuation">.</span>location<span class="token punctuation">.</span>href<span class="token operator">=</span><span class="token string">"hello world"</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> <span class="token function-variable function">a</span><span class="token operator">=</span><span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=></span><span class="token punctuation">{</span>
+    <span class="token keyword">class</span> <span class="token class-name">test</span> <span class="token keyword">extends</span> <span class="token class-name">hello</span><span class="token punctuation">{</span>
+        <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
 
-        }
-        member1=<span class="hljs-number">1</span>;
-        member2=<span class="hljs-string">"fadfasdf"</span>;
-        mem=`${<span class="hljs-keyword">this</span>},hello`;
-    }
-    <span class="hljs-keyword">return</span> await <span class="hljs-keyword">new</span> test();
-}
+        <span class="token punctuation">}</span>
+        member1<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span>
+        member2<span class="token operator">=</span><span class="token string">"fadfasdf"</span><span class="token punctuation">;</span>
+        mem<span class="token operator">=</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token keyword">this</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">,hello</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token keyword">await</span> <span class="token keyword">new</span> <span class="token class-name">test</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 </code></pre>
-<pre><code class="language-tsx"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Control</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component&lt;</span></span>{x:string,y:string},{},{}&gt;{
-    constructor(public test:string=<span class="hljs-string">"hello"</span>){
+<pre><code class="language-tsx"><span class="token keyword">class</span> <span class="token class-name">Control</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span><span class="token operator">&lt;</span><span class="token punctuation">{</span>x<span class="token operator">:</span><span class="token builtin">string</span><span class="token punctuation">,</span>y<span class="token operator">:</span><span class="token builtin">string</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token operator">></span><span class="token punctuation">{</span>
+    <span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token keyword">public</span> test<span class="token operator">:</span><span class="token builtin">string</span><span class="token operator">=</span><span class="token string">"hello"</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
 
-    }
-    render(props){
-        <span class="hljs-comment">//这里代码大概是错误的</span>
-        <span class="hljs-keyword">return</span> (
-            &lt;div&gt;
-                &lt;p&gt;文章内容&lt;/p&gt;&lt;br/&gt;
-                &lt;<span class="hljs-type">Control</span> name=<span class="hljs-string">"test"</span>&gt;mynameis hello&lt;/<span class="hljs-type">Control</span>&gt;
-            &lt;/div&gt;
-        )
+    <span class="token punctuation">}</span>
+    <span class="token function">render</span><span class="token punctuation">(</span><span class="token parameter">props</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token comment">//这里代码大概是错误的</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span><span class="token plain-text">
+                </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span><span class="token plain-text">文章内容</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">/></span></span><span class="token plain-text">
+                </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">Control</span></span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>test<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token plain-text">mynameis hello</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token class-name">Control</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+            </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+        <span class="token punctuation">)</span>
 
-    }
-}</code></pre>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
 <p>测试一下    </p>
 
-    <script src="https://cdn.bootcss.com/prism/1.15.0/prism.js"></script>
-  <script src="https://cdn.bootcss.com/prism/1.15.0/components/prism-javascript.js"></script>
+    
+    <script src="https://myCDN.com/prism@v1.x/components/prism-core.min.js"></script>
+	<script src="https://myCDN.com/prism@v1.x/plugins/autoloader/prism-autoloader.min.js"></script>
 </body>
 </html>
