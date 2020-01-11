@@ -63,8 +63,41 @@ function getArticleFile(root:string,filestat:walk.WalkStats){
 import transform from "./transform";
 import * as fs from "fs"
 import * as ensurePath from '@wrote/ensure-path'
+import { IArticleMeta } from './IArticleMeta';
+import { IContentMeta } from './IContentMeta';
 
-console.log(ensurePath)
+import * as format from "dateformat"
+
+/**
+ * 
+ * @param articlemeta 元信息
+ * @param from_dir 来源目录 为完整的article base目录（不包括文件名）
+ * @param html 内容字符串
+ * @param text 文章原文
+ */
+function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,text:string){
+    //从文章信息提取得到内容附加信息
+    //去掉最前面的 ./articles
+    from_dir=getRel(from_dir);
+    let cmeta=JSON.parse(JSON.stringify(articlemeta)) as IContentMeta;
+    cmeta.datetime_str={
+        date:format(articlemeta.date,"yyyy-mm-dd"),
+        datetime:format(articlemeta.date,"yyyy-mm-dd hh:mm:ss"),
+        time:format(articlemeta.date,"hh:mm:ss")
+    }
+    cmeta.time_order={
+        time_ticks:articlemeta.date.getTime(),
+        year:articlemeta.date.getFullYear(),
+        month:articlemeta.date.getMonth(),
+        day:articlemeta.date.getDate(),
+        wday:articlemeta.date.getDay()
+    }
+    cmeta.from_dir=from_dir.split("/");
+    cmeta.article_length=text.length;
+    cmeta.content_length=html.length;
+    return cmeta;
+}
+// console.log(ensurePath)
 //ensurePath(string)->Promise
 async function main()
 {
@@ -75,11 +108,21 @@ async function main()
         let contentpath=getContentFile(base,names);
         contentpath=changeExt(contentpath);
         console.log(articlepath,contentpath);
+        
         //开始转换
-        let html=await transform(articlepath);
+        let {html,meta,text}=await transform(articlepath);
+        //得到contentmeta
+        let cmeta=getContentMeta(meta,base,html,text);
+        //输出转换进度
+        console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`)
         await ensurePath(contentpath);
         fs.writeFile(contentpath,html,(e)=>{
-            console.log(e);
+            e&&console.log(e);
+        });
+        //写入配置文件
+        let confpath=changeExt(contentpath,".json");
+        fs.writeFile(confpath,JSON.stringify(cmeta),(e)=>{
+            e&&console.log(e);
         });
         next();
     });

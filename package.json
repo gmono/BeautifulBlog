@@ -11,6 +11,8 @@
   "author": "gmono",
   "license": "MIT",
   "dependencies": {
+    "@types/cheerio": "^0.22.15",
+    "@types/dateformat": "^3.0.1",
     "@types/highlight.js": "^9.12.3",
     "@types/marked": "^0.7.2",
     "@types/prismjs": "^1.16.0",
@@ -18,6 +20,8 @@
     "@types/watch": "^1.0.1",
     "@wrote/ensure-path": "^1.1.0",
     "art-template": "^4.13.2",
+    "cheerio": "^1.0.0-rc.3",
+    "dateformat": "^3.0.3",
     "front-matter": "^3.0.2",
     "highlight": "^0.2.4",
     "highlight.js": "^9.17.1",

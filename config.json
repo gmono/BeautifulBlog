@@ -1,3 +1,11 @@
 {
-    "url":"./test.html"
+    "test_url":"./test.html",
+    "code_languages":[
+        "js","html","css",
+        "ts","tsx","jsx",
+        "csharp","cpp","c","java","fsharp",
+        "python","lua","ruby",
+        "shell","powershell",
+        "sql","markdown"
+    ]
 }

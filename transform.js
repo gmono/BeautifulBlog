@@ -44,7 +44,14 @@ var mk = require("marked");
 // import * as h from "highlight.js"
 var Prism = require("prismjs");
 var loadLanguages = require("prismjs/components/");
-loadLanguages(['tsx']);
+// import * as config from "../config.json"
+//如果使用ts加载config会直接被编译到js文件里 这里使用node加载json模块
+var config = require("./config.json");
+var langs = config.code_languages;
+//加载语言高亮支持
+console.log("\u8BBE\u5B9A\u8BED\u8A00\u652F\u6301\uFF1A" + langs);
+console.log("加载语言中.....");
+loadLanguages(langs);
 var template = require("art-template");
 var readAsync = function (fpath) { return __awaiter(_this, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -55,9 +62,21 @@ var readAsync = function (fpath) { return __awaiter(_this, void 0, void 0, funct
             })];
     });
 }); };
+var cheerio = require("cheerio");
+function htmlProcessing(html) {
+    //解析html并在code的pre标签添加class
+    var $ = cheerio.load(html);
+    var codeblocks = $("code[class]");
+    codeblocks.each(function (i, e) {
+        //对每个code节点
+        var parent = $(e).parent("pre");
+        parent.attr("class", ($(e).attr("class")));
+    });
+    return $.html();
+}
 function transform(filepath) {
     return __awaiter(this, void 0, void 0, function () {
-        var str, res, content, html;
+        var str, res, content, html, meta;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, readAsync(filepath)];
@@ -84,7 +103,10 @@ function transform(filepath) {
                     html = template(__dirname + "/test_transform.html", {
                         content: content
                     });
-                    return [2 /*return*/, html];
+                    //添加html处理
+                    html = htmlProcessing(html);
+                    meta = res.attributes;
+                    return [2 /*return*/, { html: html, meta: meta, text: res.body }];
             }
         });
     });

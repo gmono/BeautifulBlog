@@ -94,7 +94,37 @@ function getArticleFile(root, filestat) {
 var transform_1 = require("./transform");
 var fs = require("fs");
 var ensurePath = require("@wrote/ensure-path");
-console.log(ensurePath);
+var format = require("dateformat");
+/**
+ *
+ * @param articlemeta 元信息
+ * @param from_dir 来源目录 为完整的article base目录（不包括文件名）
+ * @param html 内容字符串
+ * @param text 文章原文
+ */
+function getContentMeta(articlemeta, from_dir, html, text) {
+    //从文章信息提取得到内容附加信息
+    //去掉最前面的 ./articles
+    from_dir = getRel(from_dir);
+    var cmeta = JSON.parse(JSON.stringify(articlemeta));
+    cmeta.datetime_str = {
+        date: format(articlemeta.date, "yyyy-mm-dd"),
+        datetime: format(articlemeta.date, "yyyy-mm-dd hh:mm:ss"),
+        time: format(articlemeta.date, "hh:mm:ss")
+    };
+    cmeta.time_order = {
+        time_ticks: articlemeta.date.getTime(),
+        year: articlemeta.date.getFullYear(),
+        month: articlemeta.date.getMonth(),
+        day: articlemeta.date.getDate(),
+        wday: articlemeta.date.getDay()
+    };
+    cmeta.from_dir = from_dir.split("/");
+    cmeta.article_length = text.length;
+    cmeta.content_length = html.length;
+    return cmeta;
+}
+// console.log(ensurePath)
 //ensurePath(string)->Promise
 function main() {
     return __awaiter(this, void 0, void 0, function () {
@@ -103,9 +133,9 @@ function main() {
         return __generator(this, function (_a) {
             walker = walk.walk("./articles");
             walker.on("file", function (base, names, next) { return __awaiter(_this, void 0, void 0, function () {
-                var articlepath, contentpath, html;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
+                var articlepath, contentpath, _a, html, meta, text, cmeta, confpath;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
                         case 0:
                             articlepath = getArticleFile(base, names);
                             contentpath = getContentFile(base, names);
@@ -113,12 +143,19 @@ function main() {
                             console.log(articlepath, contentpath);
                             return [4 /*yield*/, transform_1.default(articlepath)];
                         case 1:
-                            html = _a.sent();
+                            _a = _b.sent(), html = _a.html, meta = _a.meta, text = _a.text;
+                            cmeta = getContentMeta(meta, base, html, text);
+                            //输出转换进度
+                            console.log("\u6587\u7AE0:" + meta.title + "\n\u8F6C\u6362" + articlepath + "\u5230" + contentpath);
                             return [4 /*yield*/, ensurePath(contentpath)];
                         case 2:
-                            _a.sent();
+                            _b.sent();
                             fs.writeFile(contentpath, html, function (e) {
-                                console.log(e);
+                                e && console.log(e);
+                            });
+                            confpath = changeExt(contentpath, ".json");
+                            fs.writeFile(confpath, JSON.stringify(cmeta), function (e) {
+                                e && console.log(e);
                             });
                             next();
                             return [2 /*return*/];

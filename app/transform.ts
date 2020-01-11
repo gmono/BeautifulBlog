@@ -1,3 +1,4 @@
+
 //转换器，用于把一个markdown转换为一个指定格式内容
 //html内容+json对象
 
@@ -7,7 +8,16 @@ import * as mk from "marked"
 // import * as h from "highlight.js"
 import * as Prism from "prismjs"
 import * as loadLanguages from 'prismjs/components/'
-loadLanguages(['tsx']);
+import { IConfig } from "./IConfig";
+
+// import * as config from "../config.json"
+//如果使用ts加载config会直接被编译到js文件里 这里使用node加载json模块
+let config=require("./config.json")  as IConfig;
+let langs=config.code_languages;
+//加载语言高亮支持
+console.log(`设定语言支持：${langs}`)
+console.log("加载语言中.....");
+loadLanguages(langs);
 
 
 import * as template from "art-template"
@@ -19,10 +29,24 @@ let readAsync=async (fpath:string)=>{
   })
 };
 
+import * as cheerio from "cheerio"
+import { IArticleMeta } from "./IArticleMeta";
+
+function htmlProcessing(html:string):string{
+  //解析html并在code的pre标签添加class
+  let $=cheerio.load(html);
+  let codeblocks=$("code[class]");
+  codeblocks.each((i,e)=>{
+    //对每个code节点
+    let parent=$(e).parent("pre");
+    parent.attr("class",($(e).attr("class")));
+  });
+  return $.html();
+}
 async function transform(filepath:string){
     
     let str=(await readAsync(filepath)).toString();
-    let res=fm(str);
+    let res=fm<IArticleMeta>(str);
     // console.log(res);
     mk.setOptions({
         renderer:new mk.Renderer(),
@@ -40,11 +64,17 @@ async function transform(filepath:string){
           smartypants: false,
           xhtml: false
     })
+    //实际内容
     let content=mk(res.body);
+    //模板化
     let html=template(__dirname+"/test_transform.html",{
         content:content
-    });
-    return html;
+    }) as string;
+    //添加html处理
+    html=htmlProcessing(html);
+    //提取文章元信息
+    let meta=res.attributes;
+    return {html,meta,text:res.body};
   
 }
 fs.writeFileSync("test.html",transform("./articles/about.md"));
