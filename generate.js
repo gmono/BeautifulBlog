@@ -35,6 +35,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __values = (this && this.__values) || function (o) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+    if (m) return m.call(o);
+    return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 //遍历articles目录 生成content目录的文章文件
 //每个文章一个html内容文件和一个json信息文件（从frontmatter提取）
@@ -64,7 +74,7 @@ function getRel(p) {
  */
 function getContentPath(p, content) {
     var np = getRel(p);
-    np = content + "/" + np;
+    np = np != "" ? content + "/" + np : content;
     return np;
 }
 function getContentFile(root, filestat) {
@@ -95,6 +105,7 @@ var transform_1 = require("./transform");
 var fs = require("fs");
 var ensurePath = require("@wrote/ensure-path");
 var format = require("dateformat");
+var IDirMeta_1 = require("./IDirMeta");
 /**
  *
  * @param articlemeta 元信息
@@ -124,16 +135,51 @@ function getContentMeta(articlemeta, from_dir, html, text) {
     cmeta.content_length = html.length;
     return cmeta;
 }
+var config = require("./config.json");
 // console.log(ensurePath)
 //ensurePath(string)->Promise
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         var _this = this;
-        var walker;
+        var walker, dirtable;
         return __generator(this, function (_a) {
             walker = walk.walk("./articles");
+            dirtable = {};
+            walker.on("directories", function (base, names, next) {
+                //前置 生成各种路径 以及确保存在表项
+                var tbase = getContentPath(base, "./content");
+                if (!(tbase in dirtable)) {
+                    //记录
+                    dirtable[tbase] = IDirMeta_1.newDirMeta();
+                }
+                //相对baseurl的路径（内容)
+                var curl = config.base_url + "content";
+                //添加
+                var obj = dirtable[tbase];
+                obj.dirs = {};
+                try {
+                    for (var names_1 = __values(names), names_1_1 = names_1.next(); !names_1_1.done; names_1_1 = names_1.next()) {
+                        var v = names_1_1.value;
+                        //得到目录相对于content的目录
+                        var contpath = getContentFile(base, v);
+                        //得到相对于baseurl的path
+                        obj.dirs[v.name] = getContentPath(contpath, curl);
+                    }
+                }
+                catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                finally {
+                    try {
+                        if (names_1_1 && !names_1_1.done && (_a = names_1.return)) _a.call(names_1);
+                    }
+                    finally { if (e_1) throw e_1.error; }
+                }
+                obj.num_dirs = names.length;
+                obj.self_path = getContentPath(base, curl);
+                next();
+                var e_1, _a;
+            });
             walker.on("file", function (base, names, next) { return __awaiter(_this, void 0, void 0, function () {
-                var articlepath, contentpath, _a, html, meta, text, cmeta, confpath;
+                var articlepath, contentpath, _a, html, meta, text, cmeta, confpath, tbase, curl;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
@@ -157,11 +203,31 @@ function main() {
                             fs.writeFile(confpath, JSON.stringify(cmeta), function (e) {
                                 e && console.log(e);
                             });
+                            tbase = getContentPath(base, "./content");
+                            if (!(tbase in dirtable)) {
+                                //记录
+                                dirtable[tbase] = IDirMeta_1.newDirMeta();
+                            }
+                            curl = config.base_url + "content";
+                            dirtable[tbase].self_path = getContentPath(base, curl);
+                            //不带后缀名的 
+                            dirtable[tbase].files[names.name] = {
+                                path: getContentPath(confpath, curl),
+                                title: meta.title,
+                                contentpath: getContentPath(contentpath, curl)
+                            };
                             next();
                             return [2 /*return*/];
                     }
                 });
             }); });
+            walker.on("end", function () {
+                //写入dirmetafadsf
+                console.log("fadf");
+                for (var k in dirtable) {
+                    fs.writeFile(k + "/files.json", JSON.stringify(dirtable[k]), function (e) { return console.log(e); });
+                }
+            });
             return [2 /*return*/];
         });
     });

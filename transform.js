@@ -106,6 +106,11 @@ function transform(filepath) {
                     //添加html处理
                     html = htmlProcessing(html);
                     meta = res.attributes;
+                    /**
+                     * 分别为 html内容
+                     * 文章元数据
+                     * 文章markdown原文
+                     */
                     return [2 /*return*/, { html: html, meta: meta, text: res.body }];
             }
         });

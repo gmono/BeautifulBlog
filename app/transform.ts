@@ -74,6 +74,11 @@ async function transform(filepath:string){
     html=htmlProcessing(html);
     //提取文章元信息
     let meta=res.attributes;
+    /**
+     * 分别为 html内容
+     * 文章元数据
+     * 文章markdown原文
+     */
     return {html,meta,text:res.body};
   
 }

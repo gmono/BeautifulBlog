@@ -1,5 +1,5 @@
 {
-    "test_url":"./test.html",
+    "base_url":"/",
     "code_languages":[
         "js","html","css",
         "ts","tsx","jsx",

@@ -3,6 +3,6 @@
 export interface IConfig{
     //文章内支持的语言列表
     code_languages:string[];
-    //transform测试文件输出位置
-    test_url:string;
+    //网站相对路径 如果直接在域名下 则为/
+    base_url:string;
 }
