@@ -17,11 +17,12 @@ export interface IDirMeta
         contentpath:string;
     }};
     //本目录和下级目录的所有文章
+    //尚未完成
     all_files:{
         title:string;
         path:string;
     }[];
-    //总字数
+    //总字数 尚未完成
     all_words:number;
     //自己的路径
     self_path:string;

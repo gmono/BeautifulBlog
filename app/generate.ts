@@ -109,6 +109,7 @@ async function main()
     let walker=walk.walk("./articles");
     //这里同时记录每个目录的元信息 
     let dirtable:{[index:string]:IDirMeta}={};
+    //得到目录
     walker.on("directories",(base,names,next)=>{
         //前置 生成各种路径 以及确保存在表项
         let tbase=getContentPath(base,"./content");
@@ -133,47 +134,56 @@ async function main()
         obj.self_path=getContentPath(base,curl);
         next();
     })
-    walker.on("file",async (base,names,next)=>{
+    //得到文件
+    walker.on("files",async (base,names,next)=>{
         
-
-        let articlepath=getArticleFile(base,names);
-        let contentpath=getContentFile(base,names);
-        contentpath=changeExt(contentpath);
-        console.log(articlepath,contentpath);
-        
-        //开始转换
-        let {html,meta,text}=await transform(articlepath);
-        //得到contentmeta
-        let cmeta=getContentMeta(meta,base,html,text);
-        //输出转换进度
-        console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`)
-        await ensurePath(contentpath);
-        fs.writeFile(contentpath,html,(e)=>{
-            e&&console.log(e);
-        });
-        //写入配置文件
-        let confpath=changeExt(contentpath,".json");
-        fs.writeFile(confpath,JSON.stringify(cmeta),(e)=>{
-            e&&console.log(e);
-        });
-        //记录 元信息
-        //对于网站来说是相对于根目录
-        //记录dir元信息
-        //写入路径
         let tbase=getContentPath(base,"./content");
         if(!(tbase in dirtable)){
             //记录
             dirtable[tbase]=newDirMeta();
         }
-        //相对baseurl的路径（内容)
-        const curl=`${config.base_url}content`;
-        dirtable[tbase].self_path=getContentPath(base,curl);
-        //不带后缀名的 
-        dirtable[tbase].files[names.name]={
-            path:getContentPath(confpath,curl),
-            title:meta.title,
-            contentpath:getContentPath(contentpath,curl)
+        
+        let dealwith_file=async (name)=>{
+            let articlepath=getArticleFile(base,name);
+            let contentpath=getContentFile(base,name);
+            contentpath=changeExt(contentpath);
+            console.log(articlepath,contentpath);
+            
+            //开始转换
+            let {html,meta,text}=await transform(articlepath);
+            //得到contentmeta
+            let cmeta=getContentMeta(meta,base,html,text);
+            //输出转换进度
+            console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`)
+            await ensurePath(contentpath);
+            fs.writeFile(contentpath,html,(e)=>{
+                e&&console.log(e);
+            });
+            //写入配置文件
+            let confpath=changeExt(contentpath,".json");
+            fs.writeFile(confpath,JSON.stringify(cmeta),(e)=>{
+                e&&console.log(e);
+            });
+            //记录 元信息
+            //对于网站来说是相对于根目录
+            //记录dir元信息
+            //写入路径
+            
+            //相对baseurl的路径（内容)
+            const curl=`${config.base_url}content`;
+            dirtable[tbase].self_path=getContentPath(base,curl);
+            //不带后缀名的 
+            dirtable[tbase].files[name.name]={
+                path:getContentPath(confpath,curl),
+                title:meta.title,
+                contentpath:getContentPath(contentpath,curl)
+            };
         };
+        for(let v of names){
+            await dealwith_file(v);
+        }
+        dirtable[tbase].num_files=names.length;
+        
         next();
     });
     walker.on("end",()=>{

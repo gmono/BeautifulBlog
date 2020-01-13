@@ -145,6 +145,7 @@ function main() {
         return __generator(this, function (_a) {
             walker = walk.walk("./articles");
             dirtable = {};
+            //得到目录
             walker.on("directories", function (base, names, next) {
                 //前置 生成各种路径 以及确保存在表项
                 var tbase = getContentPath(base, "./content");
@@ -178,44 +179,83 @@ function main() {
                 next();
                 var e_1, _a;
             });
-            walker.on("file", function (base, names, next) { return __awaiter(_this, void 0, void 0, function () {
-                var articlepath, contentpath, _a, html, meta, text, cmeta, confpath, tbase, curl;
+            //得到文件
+            walker.on("files", function (base, names, next) { return __awaiter(_this, void 0, void 0, function () {
+                var _this = this;
+                var tbase, dealwith_file, names_2, names_2_1, v, e_2_1, e_2, _a;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
-                            articlepath = getArticleFile(base, names);
-                            contentpath = getContentFile(base, names);
-                            contentpath = changeExt(contentpath);
-                            console.log(articlepath, contentpath);
-                            return [4 /*yield*/, transform_1.default(articlepath)];
-                        case 1:
-                            _a = _b.sent(), html = _a.html, meta = _a.meta, text = _a.text;
-                            cmeta = getContentMeta(meta, base, html, text);
-                            //输出转换进度
-                            console.log("\u6587\u7AE0:" + meta.title + "\n\u8F6C\u6362" + articlepath + "\u5230" + contentpath);
-                            return [4 /*yield*/, ensurePath(contentpath)];
-                        case 2:
-                            _b.sent();
-                            fs.writeFile(contentpath, html, function (e) {
-                                e && console.log(e);
-                            });
-                            confpath = changeExt(contentpath, ".json");
-                            fs.writeFile(confpath, JSON.stringify(cmeta), function (e) {
-                                e && console.log(e);
-                            });
                             tbase = getContentPath(base, "./content");
                             if (!(tbase in dirtable)) {
                                 //记录
                                 dirtable[tbase] = IDirMeta_1.newDirMeta();
                             }
-                            curl = config.base_url + "content";
-                            dirtable[tbase].self_path = getContentPath(base, curl);
-                            //不带后缀名的 
-                            dirtable[tbase].files[names.name] = {
-                                path: getContentPath(confpath, curl),
-                                title: meta.title,
-                                contentpath: getContentPath(contentpath, curl)
-                            };
+                            dealwith_file = function (name) { return __awaiter(_this, void 0, void 0, function () {
+                                var articlepath, contentpath, _a, html, meta, text, cmeta, confpath, curl;
+                                return __generator(this, function (_b) {
+                                    switch (_b.label) {
+                                        case 0:
+                                            articlepath = getArticleFile(base, name);
+                                            contentpath = getContentFile(base, name);
+                                            contentpath = changeExt(contentpath);
+                                            console.log(articlepath, contentpath);
+                                            return [4 /*yield*/, transform_1.default(articlepath)];
+                                        case 1:
+                                            _a = _b.sent(), html = _a.html, meta = _a.meta, text = _a.text;
+                                            cmeta = getContentMeta(meta, base, html, text);
+                                            //输出转换进度
+                                            console.log("\u6587\u7AE0:" + meta.title + "\n\u8F6C\u6362" + articlepath + "\u5230" + contentpath);
+                                            return [4 /*yield*/, ensurePath(contentpath)];
+                                        case 2:
+                                            _b.sent();
+                                            fs.writeFile(contentpath, html, function (e) {
+                                                e && console.log(e);
+                                            });
+                                            confpath = changeExt(contentpath, ".json");
+                                            fs.writeFile(confpath, JSON.stringify(cmeta), function (e) {
+                                                e && console.log(e);
+                                            });
+                                            curl = config.base_url + "content";
+                                            dirtable[tbase].self_path = getContentPath(base, curl);
+                                            //不带后缀名的 
+                                            dirtable[tbase].files[name.name] = {
+                                                path: getContentPath(confpath, curl),
+                                                title: meta.title,
+                                                contentpath: getContentPath(contentpath, curl)
+                                            };
+                                            return [2 /*return*/];
+                                    }
+                                });
+                            }); };
+                            _b.label = 1;
+                        case 1:
+                            _b.trys.push([1, 6, 7, 8]);
+                            names_2 = __values(names), names_2_1 = names_2.next();
+                            _b.label = 2;
+                        case 2:
+                            if (!!names_2_1.done) return [3 /*break*/, 5];
+                            v = names_2_1.value;
+                            return [4 /*yield*/, dealwith_file(v)];
+                        case 3:
+                            _b.sent();
+                            _b.label = 4;
+                        case 4:
+                            names_2_1 = names_2.next();
+                            return [3 /*break*/, 2];
+                        case 5: return [3 /*break*/, 8];
+                        case 6:
+                            e_2_1 = _b.sent();
+                            e_2 = { error: e_2_1 };
+                            return [3 /*break*/, 8];
+                        case 7:
+                            try {
+                                if (names_2_1 && !names_2_1.done && (_a = names_2.return)) _a.call(names_2);
+                            }
+                            finally { if (e_2) throw e_2.error; }
+                            return [7 /*endfinally*/];
+                        case 8:
+                            dirtable[tbase].num_files = names.length;
                             next();
                             return [2 /*return*/];
                     }
