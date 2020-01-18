@@ -67,7 +67,6 @@ import { IArticleMeta } from './IArticleMeta';
 import { IContentMeta } from './IContentMeta';
 
 import * as format from "dateformat"
-import { IDirMeta, newDirMeta } from './IDirMeta';
 import { IConfig } from "./IConfig";
 
 /**
@@ -82,18 +81,6 @@ function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,tex
     //去掉最前面的 ./articles
     from_dir=getRel(from_dir);
     let cmeta=JSON.parse(JSON.stringify(articlemeta)) as IContentMeta;
-    cmeta.datetime_str={
-        date:format(articlemeta.date,"yyyy-mm-dd"),
-        datetime:format(articlemeta.date,"yyyy-mm-dd hh:mm:ss"),
-        time:format(articlemeta.date,"hh:mm:ss")
-    }
-    cmeta.time_order={
-        time_ticks:articlemeta.date.getTime(),
-        year:articlemeta.date.getFullYear(),
-        month:articlemeta.date.getMonth(),
-        day:articlemeta.date.getDate(),
-        wday:articlemeta.date.getDay()
-    }
     cmeta.from_dir=from_dir.split("/");
     cmeta.article_length=text.length;
     cmeta.content_length=html.length;
@@ -107,93 +94,43 @@ async function main()
     
     //主函数
     let walker=walk.walk("./articles");
-    //这里同时记录每个目录的元信息 
-    let dirtable:{[index:string]:IDirMeta}={};
-    //得到目录
-    walker.on("directories",(base,names,next)=>{
-        //前置 生成各种路径 以及确保存在表项
-        let tbase=getContentPath(base,"./content");
-        if(!(tbase in dirtable)){
-            //记录
-            dirtable[tbase]=newDirMeta();
-        }
-        //相对baseurl的路径（内容)
-        const curl=`${config.base_url}content`;
-        //添加
-        let obj=dirtable[tbase];
-        obj.dirs={};
-        
-        for(let v of names){
-            //得到目录相对于content的目录
-            let contpath=getContentFile(base,v);
-            //得到相对于baseurl的path
-            obj.dirs[v.name]=getContentPath(contpath,curl);
-        }
-
-        obj.num_dirs=names.length;
-        obj.self_path=getContentPath(base,curl);
-        next();
-    })
+    //文件表 key:元数据路径  value:文章标题  key相对于content目录 后期考虑换为 相对于base_url的路径
+    let files:{[index:string]:string}={};
     //得到文件
-    walker.on("files",async (base,names,next)=>{
+    walker.on("file",async (base,name,next)=>{
+        let articlepath=getArticleFile(base,name);
+        let contentpath=getContentFile(base,name);
+        contentpath=changeExt(contentpath);
+        console.log(articlepath,contentpath);
         
-        let tbase=getContentPath(base,"./content");
-        if(!(tbase in dirtable)){
-            //记录
-            dirtable[tbase]=newDirMeta();
-        }
-        
-        let dealwith_file=async (name)=>{
-            let articlepath=getArticleFile(base,name);
-            let contentpath=getContentFile(base,name);
-            contentpath=changeExt(contentpath);
-            console.log(articlepath,contentpath);
-            
-            //开始转换
-            let {html,meta,text}=await transform(articlepath);
-            //得到contentmeta
-            let cmeta=getContentMeta(meta,base,html,text);
-            //输出转换进度
-            console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`)
-            await ensurePath(contentpath);
-            fs.writeFile(contentpath,html,(e)=>{
-                e&&console.log(e);
-            });
-            //写入配置文件
-            let confpath=changeExt(contentpath,".json");
-            fs.writeFile(confpath,JSON.stringify(cmeta),(e)=>{
-                e&&console.log(e);
-            });
-            //记录 元信息
-            //对于网站来说是相对于根目录
-            //记录dir元信息
-            //写入路径
-            
-            //相对baseurl的路径（内容)
-            const curl=`${config.base_url}content`;
-            dirtable[tbase].self_path=getContentPath(base,curl);
-            //不带后缀名的 
-            dirtable[tbase].files[name.name]={
-                path:getContentPath(confpath,curl),
-                title:meta.title,
-                contentpath:getContentPath(contentpath,curl)
-            };
-        };
-        for(let v of names){
-            await dealwith_file(v);
-        }
-        dirtable[tbase].num_files=names.length;
+        //开始转换
+        let {html,meta,text}=await transform(articlepath);
+        //得到contentmeta
+        let cmeta=getContentMeta(meta,base,html,text);
+        //输出转换进度
+        console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`)
+        await ensurePath(contentpath);
+        fs.writeFile(contentpath,html,(e)=>{
+            e&&console.log(e);
+        });
+        //写入文章元文件
+        let confpath=changeExt(contentpath,".json");
+        fs.writeFile(confpath,JSON.stringify(cmeta),(e)=>{
+            e&&console.log(e);
+        });
+        //记录文章记录到files.json 修bug 替换//
+        let url=confpath.replace("\\","/");
+        let baseu=config.base_url=="/"? "":config.base_url;
+        url=getContentPath(url,baseu+"/content");
+        files[url]=cmeta.title;
         
         next();
     });
     walker.on("end",()=>{
-        //写入dirmetafadsf
-        console.log("fadf")
-        for(let k in dirtable)
-        {
-            
-            fs.writeFile(`${k}/files.json`,JSON.stringify(dirtable[k]),(e)=>console.log(e));
-        }
+        //写入files.json
+        fs.writeFile("./content/files.json",JSON.stringify(files),(e)=>{
+            e&&console.log(e);
+        })
     })
     
 }

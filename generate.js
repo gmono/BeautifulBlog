@@ -35,16 +35,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __values = (this && this.__values) || function (o) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-    if (m) return m.call(o);
-    return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 //遍历articles目录 生成content目录的文章文件
 //每个文章一个html内容文件和一个json信息文件（从frontmatter提取）
@@ -104,8 +94,6 @@ function getArticleFile(root, filestat) {
 var transform_1 = require("./transform");
 var fs = require("fs");
 var ensurePath = require("@wrote/ensure-path");
-var format = require("dateformat");
-var IDirMeta_1 = require("./IDirMeta");
 /**
  *
  * @param articlemeta 元信息
@@ -118,18 +106,6 @@ function getContentMeta(articlemeta, from_dir, html, text) {
     //去掉最前面的 ./articles
     from_dir = getRel(from_dir);
     var cmeta = JSON.parse(JSON.stringify(articlemeta));
-    cmeta.datetime_str = {
-        date: format(articlemeta.date, "yyyy-mm-dd"),
-        datetime: format(articlemeta.date, "yyyy-mm-dd hh:mm:ss"),
-        time: format(articlemeta.date, "hh:mm:ss")
-    };
-    cmeta.time_order = {
-        time_ticks: articlemeta.date.getTime(),
-        year: articlemeta.date.getFullYear(),
-        month: articlemeta.date.getMonth(),
-        day: articlemeta.date.getDate(),
-        wday: articlemeta.date.getDay()
-    };
     cmeta.from_dir = from_dir.split("/");
     cmeta.article_length = text.length;
     cmeta.content_length = html.length;
@@ -141,132 +117,50 @@ var config = require("./config.json");
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         var _this = this;
-        var walker, dirtable;
+        var walker, files;
         return __generator(this, function (_a) {
             walker = walk.walk("./articles");
-            dirtable = {};
-            //得到目录
-            walker.on("directories", function (base, names, next) {
-                //前置 生成各种路径 以及确保存在表项
-                var tbase = getContentPath(base, "./content");
-                if (!(tbase in dirtable)) {
-                    //记录
-                    dirtable[tbase] = IDirMeta_1.newDirMeta();
-                }
-                //相对baseurl的路径（内容)
-                var curl = config.base_url + "content";
-                //添加
-                var obj = dirtable[tbase];
-                obj.dirs = {};
-                try {
-                    for (var names_1 = __values(names), names_1_1 = names_1.next(); !names_1_1.done; names_1_1 = names_1.next()) {
-                        var v = names_1_1.value;
-                        //得到目录相对于content的目录
-                        var contpath = getContentFile(base, v);
-                        //得到相对于baseurl的path
-                        obj.dirs[v.name] = getContentPath(contpath, curl);
-                    }
-                }
-                catch (e_1_1) { e_1 = { error: e_1_1 }; }
-                finally {
-                    try {
-                        if (names_1_1 && !names_1_1.done && (_a = names_1.return)) _a.call(names_1);
-                    }
-                    finally { if (e_1) throw e_1.error; }
-                }
-                obj.num_dirs = names.length;
-                obj.self_path = getContentPath(base, curl);
-                next();
-                var e_1, _a;
-            });
+            files = {};
             //得到文件
-            walker.on("files", function (base, names, next) { return __awaiter(_this, void 0, void 0, function () {
-                var _this = this;
-                var tbase, dealwith_file, names_2, names_2_1, v, e_2_1, e_2, _a;
+            walker.on("file", function (base, name, next) { return __awaiter(_this, void 0, void 0, function () {
+                var articlepath, contentpath, _a, html, meta, text, cmeta, confpath, url, baseu;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
-                            tbase = getContentPath(base, "./content");
-                            if (!(tbase in dirtable)) {
-                                //记录
-                                dirtable[tbase] = IDirMeta_1.newDirMeta();
-                            }
-                            dealwith_file = function (name) { return __awaiter(_this, void 0, void 0, function () {
-                                var articlepath, contentpath, _a, html, meta, text, cmeta, confpath, curl;
-                                return __generator(this, function (_b) {
-                                    switch (_b.label) {
-                                        case 0:
-                                            articlepath = getArticleFile(base, name);
-                                            contentpath = getContentFile(base, name);
-                                            contentpath = changeExt(contentpath);
-                                            console.log(articlepath, contentpath);
-                                            return [4 /*yield*/, transform_1.default(articlepath)];
-                                        case 1:
-                                            _a = _b.sent(), html = _a.html, meta = _a.meta, text = _a.text;
-                                            cmeta = getContentMeta(meta, base, html, text);
-                                            //输出转换进度
-                                            console.log("\u6587\u7AE0:" + meta.title + "\n\u8F6C\u6362" + articlepath + "\u5230" + contentpath);
-                                            return [4 /*yield*/, ensurePath(contentpath)];
-                                        case 2:
-                                            _b.sent();
-                                            fs.writeFile(contentpath, html, function (e) {
-                                                e && console.log(e);
-                                            });
-                                            confpath = changeExt(contentpath, ".json");
-                                            fs.writeFile(confpath, JSON.stringify(cmeta), function (e) {
-                                                e && console.log(e);
-                                            });
-                                            curl = config.base_url + "content";
-                                            dirtable[tbase].self_path = getContentPath(base, curl);
-                                            //不带后缀名的 
-                                            dirtable[tbase].files[name.name] = {
-                                                path: getContentPath(confpath, curl),
-                                                title: meta.title,
-                                                contentpath: getContentPath(contentpath, curl)
-                                            };
-                                            return [2 /*return*/];
-                                    }
-                                });
-                            }); };
-                            _b.label = 1;
+                            articlepath = getArticleFile(base, name);
+                            contentpath = getContentFile(base, name);
+                            contentpath = changeExt(contentpath);
+                            console.log(articlepath, contentpath);
+                            return [4 /*yield*/, transform_1.default(articlepath)];
                         case 1:
-                            _b.trys.push([1, 6, 7, 8]);
-                            names_2 = __values(names), names_2_1 = names_2.next();
-                            _b.label = 2;
+                            _a = _b.sent(), html = _a.html, meta = _a.meta, text = _a.text;
+                            cmeta = getContentMeta(meta, base, html, text);
+                            //输出转换进度
+                            console.log("\u6587\u7AE0:" + meta.title + "\n\u8F6C\u6362" + articlepath + "\u5230" + contentpath);
+                            return [4 /*yield*/, ensurePath(contentpath)];
                         case 2:
-                            if (!!names_2_1.done) return [3 /*break*/, 5];
-                            v = names_2_1.value;
-                            return [4 /*yield*/, dealwith_file(v)];
-                        case 3:
                             _b.sent();
-                            _b.label = 4;
-                        case 4:
-                            names_2_1 = names_2.next();
-                            return [3 /*break*/, 2];
-                        case 5: return [3 /*break*/, 8];
-                        case 6:
-                            e_2_1 = _b.sent();
-                            e_2 = { error: e_2_1 };
-                            return [3 /*break*/, 8];
-                        case 7:
-                            try {
-                                if (names_2_1 && !names_2_1.done && (_a = names_2.return)) _a.call(names_2);
-                            }
-                            finally { if (e_2) throw e_2.error; }
-                            return [7 /*endfinally*/];
-                        case 8:
-                            dirtable[tbase].num_files = names.length;
+                            fs.writeFile(contentpath, html, function (e) {
+                                e && console.log(e);
+                            });
+                            confpath = changeExt(contentpath, ".json");
+                            fs.writeFile(confpath, JSON.stringify(cmeta), function (e) {
+                                e && console.log(e);
+                            });
+                            url = confpath.replace("\\", "/");
+                            baseu = config.base_url == "/" ? "" : config.base_url;
+                            url = getContentPath(url, baseu + "/content");
+                            files[url] = cmeta.title;
                             next();
                             return [2 /*return*/];
                     }
                 });
             }); });
             walker.on("end", function () {
-                //写入dirmetafadsf
-                console.log("fadf");
-                for (var k in dirtable) {
-                    fs.writeFile(k + "/files.json", JSON.stringify(dirtable[k]), function (e) { return console.log(e); });
-                }
+                //写入files.json
+                fs.writeFile("./content/files.json", JSON.stringify(files), function (e) {
+                    e && console.log(e);
+                });
             });
             return [2 /*return*/];
         });
