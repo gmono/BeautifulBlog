@@ -8,7 +8,7 @@ import * as mk from "marked"
 // import * as h from "highlight.js"
 import * as Prism from "prismjs"
 import * as loadLanguages from 'prismjs/components/'
-import { IConfig } from "./IConfig";
+import { IConfig } from "./Interface/IConfig";
 
 // import * as config from "../config.json"
 //如果使用ts加载config会直接被编译到js文件里 这里使用node加载json模块
@@ -30,7 +30,7 @@ let readAsync=async (fpath:string)=>{
 };
 
 import * as cheerio from "cheerio"
-import { IArticleMeta } from "./IArticleMeta";
+import { IArticleMeta } from "./Interface/IArticleMeta";
 
 function htmlProcessing(html:string):string{
   //解析html并在code的pre标签添加class

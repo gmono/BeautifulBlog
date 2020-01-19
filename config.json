@@ -7,5 +7,6 @@
         "python","lua","ruby",
         "shell","powershell",
         "sql","markdown"
-    ]
+    ],
+    "site":"default"
 }

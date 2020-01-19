@@ -12,6 +12,7 @@ import * as path from "path"
  * root dir base ext name
  * }
  * 获取路径中除了最前面的目录的路径: getRel(path)
+ * ./a/b/c->b/c
  */
 
 function getRel(p:string){
@@ -23,7 +24,7 @@ function getRel(p:string){
     //从 ./a/b/c ->b/c
 }
 /**
- * 获取contentdir的对应路径
+ * 获取contentdir的对应路径  ./a/b->{content}/b
  * @param p 原始articles目录的路径
  * @param content content目录的路径
  */
@@ -34,7 +35,11 @@ function getContentPath(p:string,content:string){
 }
 
 
-
+/**
+ * 获取相对于content目录的路径 {content}=./content
+ * @param root 基础路径
+ * @param filestat 文件
+ */
 function getContentFile(root:string,filestat:walk.WalkStats){
     //从文件信息中得到相对于content的文件完整路径
     //合成文件路径
@@ -43,6 +48,11 @@ function getContentFile(root:string,filestat:walk.WalkStats){
     let cpath=getContentPath(apath,"./content");
     return cpath;
 }
+/**
+ * 修改一个路径的扩展名并返回
+ * @param fpath 文件路径
+ * @param ext 扩展名 .xxx
+ */
 function changeExt(fpath:string,ext:string=".html"){
     let obj=path.parse(fpath);
     obj.ext=ext;
@@ -50,6 +60,9 @@ function changeExt(fpath:string,ext:string=".html"){
     let npath=path.format(obj);
     return npath;
 }
+/**
+ * 替换content=./articles
+ */
 function getArticleFile(root:string,filestat:walk.WalkStats){
     //从文件信息中得到相对于content的文件完整路径
     //合成文件路径
@@ -59,15 +72,30 @@ function getArticleFile(root:string,filestat:walk.WalkStats){
     return cpath;
 }
 
+function getUrlFile(root:string,filestat:walk.WalkStats){
+    let url=`${root}/${filestat.name}`;
+    let baseu=config.base_url=="/"? "":config.base_url;
+    let prefix=baseu+"/content";//相对前缀
+    url=getContentPath(url,prefix);
+    return url;
+
+}
+
+/**
+ * 用法 articles_path|content_path|url_path -> 
+ * getContentFile:相对于content目录的路径
+ * getArticleFile:相对于articles目录的路径
+ * getUrlFile:相对于base_url的路径（可直接做为网站链接）
+ */
 
 import transform from "./transform";
 import * as fs from "fs"
 import * as ensurePath from '@wrote/ensure-path'
-import { IArticleMeta } from './IArticleMeta';
-import { IContentMeta } from './IContentMeta';
+import { IArticleMeta } from './Interface/IArticleMeta';
+import { IContentMeta } from './Interface/IContentMeta';
 
 import * as format from "dateformat"
-import { IConfig } from "./IConfig";
+import { IConfig } from "./Interface/IConfig";
 
 /**
  * 
@@ -119,9 +147,7 @@ async function main()
             e&&console.log(e);
         });
         //记录文章记录到files.json 修bug 替换//
-        let url=confpath.replace("\\","/");
-        let baseu=config.base_url=="/"? "":config.base_url;
-        url=getContentPath(url,baseu+"/content");
+        let url=getUrlFile(base,name);
         files[url]=cmeta.title;
         
         next();
