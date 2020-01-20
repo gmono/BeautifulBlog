@@ -1,5 +1,5 @@
 {
-    "base_url":"/",
+    "base_url":"/newBlog",
     "code_languages":[
         "js","html","css",
         "ts","tsx","jsx",
