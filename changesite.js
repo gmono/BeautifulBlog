@@ -35,25 +35,49 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var changesite_1 = require("./changesite");
-//生成内容
-var generator_1 = require("./generator");
-function main() {
+/**
+ * 复制并替换nowSite
+ * 假设nowSite中没有任何改动（与sites中的同目录一致）
+ *
+ */
+//删除nowSite目录复制spath指向的目录并命名为nowSite
+//删除复制目录树
+var _copy = require("copy-dir");
+var copy = _copy;
+var del = require("del");
+var fs_extra_1 = require("fs-extra");
+var path = require("path");
+function copysite(sitename) {
     return __awaiter(this, void 0, void 0, function () {
-        var config;
+        var spath, dpath;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, generator_1.default()];
+                case 0:
+                    spath = path.resolve("./sites", sitename);
+                    dpath = "./nowSite";
+                    return [4 /*yield*/, del(dpath)];
                 case 1:
                     _a.sent();
-                    config = require("./config.json");
-                    return [4 /*yield*/, changesite_1.default(config.site)];
+                    return [4 /*yield*/, fs_extra_1.mkdir(dpath)];
                 case 2:
                     _a.sent();
-                    console.log("网站生成完成");
-                    return [2 /*return*/];
+                    return [2 /*return*/, new Promise(function (r, j) {
+                            copy(spath, dpath, {
+                                utimes: true,
+                                mode: true,
+                                cover: true
+                            }, function (err) {
+                                err && (console.log("切换失败:", err), j(err));
+                                err || (console.log("切换完成"), r());
+                            });
+                        })];
             }
         });
     });
 }
-main();
+//按照配置的来复制
+if (require.main == module) {
+    var config = require("./config.json");
+    copysite(config.base_url);
+}
+exports.default = copysite;

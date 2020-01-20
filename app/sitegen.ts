@@ -1,11 +1,15 @@
-import { IConfig } from './Interface/IConfig';
-/**
- * 网站生成器 生成内容并复制网站
- * 
- */
 
-import * as path from "path"
- let config=require("./config.json") as IConfig;
+import copysite from "./changesite"
 
- let spath=path.resolve("./sites",config.site);
- //删除nowSite目录复制spath指向的目录并命名为nowSite
+//生成内容
+import generate from "./generator";
+import { IConfig } from "./Interface/IConfig";
+
+async function main()
+{
+    await generate()
+    let config=require("./config.json") as IConfig
+    await copysite(config.site);
+    console.log("网站生成完成");
+}
+main();
