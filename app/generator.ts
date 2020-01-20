@@ -58,6 +58,7 @@ function changeExt(fpath:string,ext:string=".html"){
     obj.ext=ext;
     obj.base=obj.name+obj.ext;
     let npath=path.format(obj);
+    npath=npath.replace("\\","/");
     return npath;
 }
 /**
@@ -148,6 +149,7 @@ async function main()
         });
         //记录文章记录到files.json 修bug 替换//
         let url=getUrlFile(base,name);
+        url=changeExt(url,".json");
         files[url]=cmeta.title;
         
         next();

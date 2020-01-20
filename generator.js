@@ -92,6 +92,7 @@ function changeExt(fpath, ext) {
     obj.ext = ext;
     obj.base = obj.name + obj.ext;
     var npath = path.format(obj);
+    npath = npath.replace("\\", "/");
     return npath;
 }
 /**
@@ -175,6 +176,7 @@ function main() {
                                 e && console.log(e);
                             });
                             url = getUrlFile(base, name);
+                            url = changeExt(url, ".json");
                             files[url] = cmeta.title;
                             next();
                             return [2 /*return*/];
