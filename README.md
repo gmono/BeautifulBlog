@@ -36,3 +36,5 @@ site有两个入口文件：
 
 
 
+# Helper说明
+app/Helper目录下的所有内容都会被编译到helpers.js，模块解决方案使用amd,其向HelperManager全局对象注册自己（name-obj)，site可通过其获取各种helper,helper全部在浏览器运行因此不能使用nodejs库
