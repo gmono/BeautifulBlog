@@ -14,10 +14,6 @@ import { IConfig } from "./Interface/IConfig";
 //如果使用ts加载config会直接被编译到js文件里 这里使用node加载json模块
 let config=require("./config.json")  as IConfig;
 let langs=config.code_languages;
-//加载语言高亮支持
-console.log(`设定语言支持：${langs}`)
-console.log("加载语言中.....");
-loadLanguages(langs);
 
 
 import * as template from "art-template"
@@ -31,6 +27,7 @@ let readAsync=async (fpath:string)=>{
 
 import * as cheerio from "cheerio"
 import { IArticleMeta } from "./Interface/IArticleMeta";
+import { outputFile } from "fs-extra";
 
 function htmlProcessing(html:string):string{
   //解析html并在code的pre标签添加class
@@ -43,8 +40,17 @@ function htmlProcessing(html:string):string{
   });
   return $.html();
 }
+
+let first=true;
 async function transform(filepath:string){
-    
+    if(first) {
+      //加载语言高亮支持
+      console.log(`设定语言支持：${langs}`)
+      console.log("加载语言中.....");
+      loadLanguages(langs);
+      first=false;
+
+    }
     let str=(await readAsync(filepath)).toString();
     let res=fm<IArticleMeta>(str);
     // console.log(res);
@@ -82,7 +88,8 @@ async function transform(filepath:string){
     return {html,meta,text:res.body};
   
 }
-fs.writeFileSync("test.html",transform("./articles/about.md"));
+if(require.main==module)
+  fs.writeFileSync("test.html",transform("./articles/about.md"));
 //打开浏览器查看
 
 export default transform;

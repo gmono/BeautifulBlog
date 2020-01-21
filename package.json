@@ -4,7 +4,7 @@
   "description": "博客系统，可自定义整个网站",
   "main": "generate.js",
   "scripts": {
-    "gen": " node generate.js",
+    "gen": " node generator.js",
     "server": "node server.js",
     "trans": "node transform.js",
     "site": "node changesite.js",

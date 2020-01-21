@@ -90,7 +90,7 @@ function getUrlFile(root:string,filestat:walk.WalkStats){
  */
 
 import transform from "./transform";
-import * as fs from "fs"
+import * as fs from "fs-extra"
 import * as ensurePath from '@wrote/ensure-path'
 import { IArticleMeta } from './Interface/IArticleMeta';
 import { IContentMeta } from './Interface/IContentMeta';
@@ -105,7 +105,7 @@ import { IConfig } from "./Interface/IConfig";
  * @param html 内容字符串
  * @param text 文章原文
  */
-function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,text:string){
+function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,text:string,articlefile:walk.WalkStats){
     //从文章信息提取得到内容附加信息
     //去掉最前面的 ./articles
     from_dir=getRel(from_dir);
@@ -113,6 +113,7 @@ function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,tex
     cmeta.from_dir=from_dir.split("/");
     cmeta.article_length=text.length;
     cmeta.content_length=html.length;
+    cmeta.modify_time=articlefile.mtime;
     return cmeta;
 }
 const config=require("./config.json") as IConfig;
@@ -125,32 +126,52 @@ async function main()
     let walker=walk.walk("./articles");
     //文件表 key:元数据路径  value:文章标题  key相对于content目录 后期考虑换为 相对于base_url的路径
     let files:{[index:string]:string}={};
-    //得到文件
+    ///读入已有的files列表，并清除其中不存在的文件
+    /////////////////////////////////////未完成
+
+    //转换每个文件
     walker.on("file",async (base,name,next)=>{
+
+        //转换文件
         let articlepath=getArticleFile(base,name);
         let contentpath=getContentFile(base,name);
-        contentpath=changeExt(contentpath);
-        console.log(articlepath,contentpath);
-        
-        //开始转换
-        let {html,meta,text}=await transform(articlepath);
-        //得到contentmeta
-        let cmeta=getContentMeta(meta,base,html,text);
-        //输出转换进度
-        console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`)
-        await ensurePath(contentpath);
-        fs.writeFile(contentpath,html,(e)=>{
-            e&&console.log(e);
-        });
-        //写入文章元文件
+        //内容路径
+        contentpath=changeExt(contentpath,".html");
+        //内容元数据路径
         let confpath=changeExt(contentpath,".json");
-        fs.writeFile(confpath,JSON.stringify(cmeta),(e)=>{
-            e&&console.log(e);
-        });
-        //记录文章记录到files.json 修bug 替换//
-        let url=getUrlFile(base,name);
-        url=changeExt(url,".json");
-        files[url]=cmeta.title;
+        console.log(articlepath,contentpath);
+        let generate=async ()=>{
+                
+            //开始转换
+            let {html,meta,text}=await transform(articlepath);
+            //得到contentmeta
+            let cmeta=getContentMeta(meta,base,html,text,name);
+            //输出转换进度
+            console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`)
+            await ensurePath(contentpath);
+            fs.writeFile(contentpath,html,(e)=>{
+                e&&console.log(e);
+            });
+            //写入文章元文件
+            
+            fs.writeFile(confpath,JSON.stringify(cmeta),(e)=>{
+                e&&console.log(e);
+            });
+            //记录文章记录到files.json 修bug 替换//
+            let url=getUrlFile(base,name);
+            url=changeExt(url,".json");
+            files[url]=cmeta.title;
+        };
+        //获取articles的时间戳 如果不存在或不同就生成并写入元数据到files.json
+        if(await fs.pathExists(confpath)){
+            let amtime=name.mtime.getTime();
+            //这里直接读入时date是string格式
+            let cmtime=new Date((<IContentMeta>require(confpath)).modify_time).getTime();
+            if(amtime!=cmtime) await generate();//如果修改时间不一样则重新生成
+            else console.log("修改时间一致，跳过生成");
+        }
+        else await generate();//如果元数据不存在则生成
+        
         
         next();
     });

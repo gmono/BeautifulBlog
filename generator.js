@@ -120,7 +120,7 @@ function getUrlFile(root, filestat) {
  * getUrlFile:相对于base_url的路径（可直接做为网站链接）
  */
 var transform_1 = require("./transform");
-var fs = require("fs");
+var fs = require("fs-extra");
 var ensurePath = require("@wrote/ensure-path");
 /**
  *
@@ -129,7 +129,7 @@ var ensurePath = require("@wrote/ensure-path");
  * @param html 内容字符串
  * @param text 文章原文
  */
-function getContentMeta(articlemeta, from_dir, html, text) {
+function getContentMeta(articlemeta, from_dir, html, text, articlefile) {
     //从文章信息提取得到内容附加信息
     //去掉最前面的 ./articles
     from_dir = getRel(from_dir);
@@ -137,6 +137,7 @@ function getContentMeta(articlemeta, from_dir, html, text) {
     cmeta.from_dir = from_dir.split("/");
     cmeta.article_length = text.length;
     cmeta.content_length = html.length;
+    cmeta.modify_time = articlefile.mtime;
     return cmeta;
 }
 var config = require("./config.json");
@@ -149,35 +150,67 @@ function main() {
         return __generator(this, function (_a) {
             walker = walk.walk("./articles");
             files = {};
-            //得到文件
+            ///读入已有的files列表，并清除其中不存在的文件
+            /////////////////////////////////////未完成
+            //转换每个文件
             walker.on("file", function (base, name, next) { return __awaiter(_this, void 0, void 0, function () {
-                var articlepath, contentpath, _a, html, meta, text, cmeta, confpath, url;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
+                var _this = this;
+                var articlepath, contentpath, confpath, generate, amtime, cmtime;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
                         case 0:
                             articlepath = getArticleFile(base, name);
                             contentpath = getContentFile(base, name);
-                            contentpath = changeExt(contentpath);
-                            console.log(articlepath, contentpath);
-                            return [4 /*yield*/, transform_1.default(articlepath)];
-                        case 1:
-                            _a = _b.sent(), html = _a.html, meta = _a.meta, text = _a.text;
-                            cmeta = getContentMeta(meta, base, html, text);
-                            //输出转换进度
-                            console.log("\u6587\u7AE0:" + meta.title + "\n\u8F6C\u6362" + articlepath + "\u5230" + contentpath);
-                            return [4 /*yield*/, ensurePath(contentpath)];
-                        case 2:
-                            _b.sent();
-                            fs.writeFile(contentpath, html, function (e) {
-                                e && console.log(e);
-                            });
+                            //内容路径
+                            contentpath = changeExt(contentpath, ".html");
                             confpath = changeExt(contentpath, ".json");
-                            fs.writeFile(confpath, JSON.stringify(cmeta), function (e) {
-                                e && console.log(e);
-                            });
-                            url = getUrlFile(base, name);
-                            url = changeExt(url, ".json");
-                            files[url] = cmeta.title;
+                            console.log(articlepath, contentpath);
+                            generate = function () { return __awaiter(_this, void 0, void 0, function () {
+                                var _a, html, meta, text, cmeta, url;
+                                return __generator(this, function (_b) {
+                                    switch (_b.label) {
+                                        case 0: return [4 /*yield*/, transform_1.default(articlepath)];
+                                        case 1:
+                                            _a = _b.sent(), html = _a.html, meta = _a.meta, text = _a.text;
+                                            cmeta = getContentMeta(meta, base, html, text, name);
+                                            //输出转换进度
+                                            console.log("\u6587\u7AE0:" + meta.title + "\n\u8F6C\u6362" + articlepath + "\u5230" + contentpath);
+                                            return [4 /*yield*/, ensurePath(contentpath)];
+                                        case 2:
+                                            _b.sent();
+                                            fs.writeFile(contentpath, html, function (e) {
+                                                e && console.log(e);
+                                            });
+                                            //写入文章元文件
+                                            fs.writeFile(confpath, JSON.stringify(cmeta), function (e) {
+                                                e && console.log(e);
+                                            });
+                                            url = getUrlFile(base, name);
+                                            url = changeExt(url, ".json");
+                                            files[url] = cmeta.title;
+                                            return [2 /*return*/];
+                                    }
+                                });
+                            }); };
+                            return [4 /*yield*/, fs.pathExists(confpath)];
+                        case 1:
+                            if (!_a.sent()) return [3 /*break*/, 5];
+                            amtime = name.mtime.getTime();
+                            cmtime = new Date(require(confpath).modify_time).getTime();
+                            if (!(amtime != cmtime)) return [3 /*break*/, 3];
+                            return [4 /*yield*/, generate()];
+                        case 2:
+                            _a.sent(); //如果修改时间不一样则重新生成
+                            return [3 /*break*/, 4];
+                        case 3:
+                            console.log("修改时间一致，跳过生成");
+                            _a.label = 4;
+                        case 4: return [3 /*break*/, 7];
+                        case 5: return [4 /*yield*/, generate()];
+                        case 6:
+                            _a.sent(); //如果元数据不存在则生成
+                            _a.label = 7;
+                        case 7:
                             next();
                             return [2 /*return*/];
                     }

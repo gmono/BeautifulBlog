@@ -10,6 +10,7 @@ export interface IContentMeta extends IArticleMeta{
     content_length:number;
     //文章字数
     article_length:number;
-    
+    //修改时间
+    modify_time:Date;
 
 }

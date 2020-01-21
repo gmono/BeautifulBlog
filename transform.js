@@ -48,10 +48,6 @@ var loadLanguages = require("prismjs/components/");
 //如果使用ts加载config会直接被编译到js文件里 这里使用node加载json模块
 var config = require("./config.json");
 var langs = config.code_languages;
-//加载语言高亮支持
-console.log("\u8BBE\u5B9A\u8BED\u8A00\u652F\u6301\uFF1A" + langs);
-console.log("加载语言中.....");
-loadLanguages(langs);
 var template = require("art-template");
 var readAsync = function (fpath) { return __awaiter(_this, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -74,12 +70,21 @@ function htmlProcessing(html) {
     });
     return $.html();
 }
+var first = true;
 function transform(filepath) {
     return __awaiter(this, void 0, void 0, function () {
         var str, res, content, html, meta;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, readAsync(filepath)];
+                case 0:
+                    if (first) {
+                        //加载语言高亮支持
+                        console.log("\u8BBE\u5B9A\u8BED\u8A00\u652F\u6301\uFF1A" + langs);
+                        console.log("加载语言中.....");
+                        loadLanguages(langs);
+                        first = false;
+                    }
+                    return [4 /*yield*/, readAsync(filepath)];
                 case 1:
                     str = (_a.sent()).toString();
                     res = fm(str);
@@ -116,6 +121,7 @@ function transform(filepath) {
         });
     });
 }
-fs.writeFileSync("test.html", transform("./articles/about.md"));
+if (require.main == module)
+    fs.writeFileSync("test.html", transform("./articles/about.md"));
 //打开浏览器查看
 exports.default = transform;
