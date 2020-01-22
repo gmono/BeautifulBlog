@@ -26,8 +26,9 @@ import * as path from "path"
 async function copysite(sitename:string){
     
     
-    let spath=path.resolve("../sites",sitename);
-    let dpath="../nowSite"
+    let spath=path.resolve("./sites",sitename);
+    let dpath="./nowSite"
+    console.log(spath,dpath)
     await del(dpath)
     await mkdir(dpath)
     return new Promise<void>((r,j)=>{
@@ -46,7 +47,7 @@ async function copysite(sitename:string){
 //按照配置的来复制
 if(require.main==module){
     let config=require("../config.json") as IConfig;
-    copysite(config.base_url);
+    copysite(config.site);
 }
 
 export default copysite;

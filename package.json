@@ -5,10 +5,11 @@
   "main": "generate.js",
   "scripts": {
     "gen": " node ./dist_server/generator.js",
-    "server": "node ./dist_server/server.js",
+    "watch": "node ./dist_server/watch.js",
     "trans": "node ./dist_server/transform.js",
     "site": "node ./dist_server/changesite.js",
-    "use": "node ./dist_server/sitegen.js"
+    "use": "node ./dist_server/sitegen.js",
+    "server":"node ./dist_server/server.js"
   },
   "author": "gmono",
   "license": "MIT",

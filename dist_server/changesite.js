@@ -13,8 +13,9 @@ const del = require("del");
 const fs_extra_1 = require("fs-extra");
 const path = require("path");
 async function copysite(sitename) {
-    let spath = path.resolve("../sites", sitename);
-    let dpath = "../nowSite";
+    let spath = path.resolve("./sites", sitename);
+    let dpath = "./nowSite";
+    console.log(spath, dpath);
     await del(dpath);
     await fs_extra_1.mkdir(dpath);
     return new Promise((r, j) => {
@@ -31,6 +32,6 @@ async function copysite(sitename) {
 //按照配置的来复制
 if (require.main == module) {
     let config = require("../config.json");
-    copysite(config.base_url);
+    copysite(config.site);
 }
 exports.default = copysite;

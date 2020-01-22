@@ -34,7 +34,7 @@ function getContentPath(p, content) {
     return np;
 }
 /**
- * 获取相对于content目录的路径 {content}=../content
+ * 获取相对于content目录的路径 {content}=./content
  * @param root 基础路径
  * @param filestat 文件
  */
@@ -43,7 +43,7 @@ function getContentFile(root, filestat) {
     //合成文件路径
     let apath = `${root}/${filestat.name}`;
     //获取相对于content的路径
-    let cpath = getContentPath(apath, "../content");
+    let cpath = getContentPath(apath, "./content");
     return cpath;
 }
 /**
@@ -122,7 +122,7 @@ async function main() {
         let apath = files[k].article_path;
         if (await fs.pathExists(path.resolve(__dirname, apath)))
             continue;
-        let cpath = getContentPath(apath, "../content");
+        let cpath = getContentPath(apath, "./content");
         let hpath = changeExt(cpath, ".html");
         let jpath = changeExt(cpath, ".json");
         del(hpath);
@@ -178,7 +178,7 @@ async function main() {
     });
     walker.on("end", () => {
         //写入files.json
-        fs.writeFile("../content/files.json", JSON.stringify(files), (e) => {
+        fs.writeFile("./content/files.json", JSON.stringify(files), (e) => {
             e && console.log(e);
         });
         console.log("生成完毕");

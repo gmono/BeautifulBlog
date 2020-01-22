@@ -12,17 +12,17 @@
 
     </div>
     <script>
-        async function main()
-        {
-            let r=await fetch("../content/files.json");
-            let s=await r.json()
-            for(let k in s){
-                let t=await (await fetch(k)).text()
-                document.querySelector("div").innerHTML+=`<a href="${k}">${s[k]}:${t}\n</a>`;
+            async function main()
+            {
+                let r=await fetch("../content/files.json");
+                let s=await r.json()
+                for(let k in s){
+                    let t=await (await fetch(k)).text()
+                    document.querySelector("div").innerHTML+=`<a href="${k}">${s[k]}:${t}\n</a>`;
+                }
+                
             }
-            
-        }
-        main()
+            main()
     </script>
 </body>
 </html>
