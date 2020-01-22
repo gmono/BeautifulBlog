@@ -8,17 +8,25 @@
 </head>
 <body>
     测试
-    <div>
+    <ul>
 
-    </div>
+    </ul>
     <script>
             async function main()
             {
                 let r=await fetch("../content/files.json");
                 let s=await r.json()
+                let ss={}
                 for(let k in s){
-                    let t=await (await fetch(k)).text()
-                    document.querySelector("div").innerHTML+=`<a href="${k}">${s[k]}:${t}\n</a>`;
+                    ss[k]=fetch(k)
+                }
+                for(let k in s){
+                    let t=await (await ss[k]).json()
+                    let str=""
+                    for(let i in t){
+                        str+=`${i}:${t[i]}<br>`
+                    }
+                    document.querySelector("ul").innerHTML+=`<li><a href="${k.replace(/.json$/,".html")}">${s[k].title}:${str}</a></li>`;
                 }
                 
             }
