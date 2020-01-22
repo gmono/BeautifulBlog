@@ -26,6 +26,7 @@
                     for(let i in t){
                         str+=`${i}:${t[i]}<br>`
                     }
+                    str="<br>"+str;
                     document.querySelector("ul").innerHTML+=`<li><a href="${k.replace(/.json$/,".html")}">${s[k].title}:${str}</a></li>`;
                 }
                 
