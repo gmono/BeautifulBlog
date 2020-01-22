@@ -12,7 +12,7 @@ import { IConfig } from "./Interface/IConfig";
 
 // import * as config from "../config.json"
 //如果使用ts加载config会直接被编译到js文件里 这里使用node加载json模块
-let config=require("./config.json")  as IConfig;
+let config=require("../config.json")  as IConfig;
 let langs=config.code_languages;
 
 
@@ -73,7 +73,7 @@ async function transform(filepath:string){
     //实际内容
     let content=mk(res.body);
     //模板化
-    let html=template(__dirname+"/test_transform.html",{
+    let html=template(__dirname+"/../test_transform.html",{
         content:content
     }) as string;
     //添加html处理

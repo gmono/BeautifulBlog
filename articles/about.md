@@ -50,7 +50,18 @@ class Control extends React.Component<{x:string,y:string},{},{}>{
     }
 }
 ```
-```c#
+```csharp
+public class Program
+{
+    static public void main(string[] args){
+        Console.WriteLine("hello world");
+    }
+    static public (string,string) MyFunc(){
+        return ("helo","world");
+    }
+}
 
+```
 
-测试一下    
+# 进展
+目前看来，server工作良好

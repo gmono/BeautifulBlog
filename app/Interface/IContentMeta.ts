@@ -12,5 +12,7 @@ export interface IContentMeta extends IArticleMeta{
     article_length:number;
     //修改时间
     modify_time:Date;
+    //文章原始路径
+    article_path:string;
 
 }

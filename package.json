@@ -4,11 +4,11 @@
   "description": "博客系统，可自定义整个网站",
   "main": "generate.js",
   "scripts": {
-    "gen": " node generator.js",
-    "server": "node server.js",
-    "trans": "node transform.js",
-    "site": "node changesite.js",
-    "use":"node sitegen.js"
+    "gen": " node ./dist_server/generator.js",
+    "server": "node ./dist_server/server.js",
+    "trans": "node ./dist_server/transform.js",
+    "site": "node ./dist_server/changesite.js",
+    "use": "node ./dist_server/sitegen.js"
   },
   "author": "gmono",
   "license": "MIT",
@@ -35,6 +35,7 @@
     "ndir": "^0.1.5",
     "nightmare": "^3.0.2",
     "prismjs": "^1.18.0",
+    "rxjs": "^6.5.4",
     "walk": "^2.3.14",
     "watch": "^1.0.2"
   },

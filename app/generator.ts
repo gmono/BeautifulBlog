@@ -12,7 +12,7 @@ import * as path from "path"
  * root dir base ext name
  * }
  * 获取路径中除了最前面的目录的路径: getRel(path)
- * ./a/b/c->b/c
+ * ../a/b/c->b/c
  */
 
 function getRel(p:string){
@@ -36,7 +36,7 @@ function getContentPath(p:string,content:string){
 
 
 /**
- * 获取相对于content目录的路径 {content}=./content
+ * 获取相对于content目录的路径 {content}=../content
  * @param root 基础路径
  * @param filestat 文件
  */
@@ -45,7 +45,7 @@ function getContentFile(root:string,filestat:walk.WalkStats){
     //合成文件路径
     let apath=`${root}/${filestat.name}`;
     //获取相对于content的路径
-    let cpath=getContentPath(apath,"./content");
+    let cpath=getContentPath(apath,"../content");
     return cpath;
 }
 /**
@@ -97,6 +97,8 @@ import { IContentMeta } from './Interface/IContentMeta';
 
 import * as format from "dateformat"
 import { IConfig } from "./Interface/IConfig";
+import { IFiles } from './Interface/IFiles';
+import del = require("del");
 
 /**
  * 
@@ -116,7 +118,7 @@ function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,tex
     cmeta.modify_time=articlefile.mtime;
     return cmeta;
 }
-const config=require("./config.json") as IConfig;
+const config=require("../config.json") as IConfig;
 // console.log(ensurePath)
 //ensurePath(string)->Promise
 async function main()
@@ -125,13 +127,24 @@ async function main()
     //主函数
     let walker=walk.walk("./articles");
     //文件表 key:元数据路径  value:文章标题  key相对于content目录 后期考虑换为 相对于base_url的路径
-    let files:{[index:string]:string}={};
+    let files:IFiles={};
     ///读入已有的files列表，并清除其中不存在的文件
     /////////////////////////////////////未完成
+    for(let k in files){
+        //从files中清除此项，同时删除对应的json和html文件
+        //k为相对于网站的url
+        //读取元数据
+        let apath=files[k].article_path;
+        if(await fs.pathExists(apath)) continue;
+        let cpath=getContentPath(apath,"../content")
+        let hpath=changeExt(cpath,".html");
+        let jpath=changeExt(cpath,".json");
+        del(hpath);
+        del(jpath);
+    }
 
     //转换每个文件
     walker.on("file",async (base,name,next)=>{
-
         //转换文件
         let articlepath=getArticleFile(base,name);
         let contentpath=getContentFile(base,name);
@@ -139,13 +152,15 @@ async function main()
         contentpath=changeExt(contentpath,".html");
         //内容元数据路径
         let confpath=changeExt(contentpath,".json");
-        console.log(articlepath,contentpath);
+        
+        //生成函数
         let generate=async ()=>{
                 
             //开始转换
             let {html,meta,text}=await transform(articlepath);
             //得到contentmeta
             let cmeta=getContentMeta(meta,base,html,text,name);
+            cmeta.article_path=articlepath;
             //输出转换进度
             console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`)
             await ensurePath(contentpath);
@@ -160,7 +175,10 @@ async function main()
             //记录文章记录到files.json 修bug 替换//
             let url=getUrlFile(base,name);
             url=changeExt(url,".json");
-            files[url]=cmeta.title;
+            files[url]={
+                title:cmeta.title,
+                article_path:articlepath
+            }
         };
         //获取articles的时间戳 如果不存在或不同就生成并写入元数据到files.json
         if(await fs.pathExists(confpath)){
@@ -177,9 +195,10 @@ async function main()
     });
     walker.on("end",()=>{
         //写入files.json
-        fs.writeFile("./content/files.json",JSON.stringify(files),(e)=>{
+        fs.writeFile("../content/files.json",JSON.stringify(files),(e)=>{
             e&&console.log(e);
         })
+        console.log("生成完毕");
     })
     
 }
