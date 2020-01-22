@@ -135,7 +135,7 @@ async function main()
         //k为相对于网站的url
         //读取元数据
         let apath=files[k].article_path;
-        if(await fs.pathExists(apath)) continue;
+        if(await fs.pathExists(path.resolve(__dirname,apath))) continue;
         let cpath=getContentPath(apath,"../content")
         let hpath=changeExt(cpath,".html");
         let jpath=changeExt(cpath,".json");
@@ -181,7 +181,7 @@ async function main()
             }
         };
         //获取articles的时间戳 如果不存在或不同就生成并写入元数据到files.json
-        if(await fs.pathExists(confpath)){
+        if(await fs.pathExists(path.resolve(__dirname,confpath))){
             let amtime=name.mtime.getTime();
             //这里直接读入时date是string格式
             let cmtime=new Date((<IContentMeta>require(confpath)).modify_time).getTime();

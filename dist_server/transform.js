@@ -62,7 +62,7 @@ async function transform(filepath) {
     //实际内容
     let content = mk(res.body);
     //模板化
-    let html = template(__dirname + "/../test_transform.html", {
+    let html = template(fs.realpathSync("./test_transform.html"), {
         content: content
     });
     //添加html处理
@@ -77,6 +77,8 @@ async function transform(filepath) {
     return { html, meta, text: res.body };
 }
 if (require.main == module)
-    fs.writeFileSync("test.html", transform("./articles/about.md"));
+    transform("./articles/about.md").then((obj) => {
+        fs.writeFileSync("test.html", obj.html);
+    });
 //打开浏览器查看
 exports.default = transform;
