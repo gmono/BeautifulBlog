@@ -21,7 +21,7 @@ async function generateFiles(configname:string){
     OnGenerated.next();
 
 }
-async function watchfile(configname:string="default"){
+export default async function watchArticles(configname:string="default"){
     let mon=await createMonitor("./articles");
     mon.on("changed",async (f:string,curr,prev)=>{
         console.clear();
@@ -42,5 +42,5 @@ async function watchfile(configname:string="default"){
     })
 }
 if(require.main==module){
-    watchfile();
+    watchArticles();
 }

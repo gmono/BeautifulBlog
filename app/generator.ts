@@ -121,13 +121,17 @@ function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,tex
 
 // console.log(ensurePath)
 //ensurePath(string)->Promise
-async function generate(configname:string="default")
+async function generate(configname:string="default",verbose=false)
 {
     const config=require(`../config/${configname}.json`) as IConfig;
     //主函数
     let walker=walk.walk("./articles");
     //文件表 key:元数据路径  value:文章标题  key相对于content目录 后期考虑换为 相对于base_url的路径
     let files:IFiles={};
+    if(await fs.pathExists("./content/files.json")){
+        //require基于模块路径
+        files=require("../content/files.json");
+    }
     ///读入已有的files列表，并清除其中不存在的文件
     /////////////////////////////////////未完成
     for(let k in files){
@@ -135,7 +139,7 @@ async function generate(configname:string="default")
         //k为相对于网站的url
         //读取元数据
         let apath=files[k].article_path;
-        if(await fs.pathExists(path.resolve(__dirname,apath))) continue;
+        if(await fs.pathExists(apath)) continue;
         let cpath=getContentPath(apath,"./content")
         let hpath=changeExt(cpath,".html");
         let jpath=changeExt(cpath,".json");
@@ -162,7 +166,8 @@ async function generate(configname:string="default")
             let cmeta=getContentMeta(meta,base,html,text,name);
             cmeta.article_path=articlepath;
             //输出转换进度
-            console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`)
+            if(verbose)
+                console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`)
             await ensurePath(contentpath);
             fs.writeFile(contentpath,html,(e)=>{
                 e&&console.log(e);
@@ -181,12 +186,14 @@ async function generate(configname:string="default")
             }
         };
         //获取articles的时间戳 如果不存在或不同就生成并写入元数据到files.json
-        if(await fs.pathExists(path.resolve(__dirname,confpath))){
+        if(await fs.pathExists(confpath)){
             let amtime=name.mtime.getTime();
             //这里直接读入时date是string格式
-            let cmtime=new Date((<IContentMeta>require(confpath)).modify_time).getTime();
+            let meta=(<IContentMeta>require(getContentPath(confpath,"../content")));
+            let cmtime=new Date(meta.modify_time).getTime();
             if(amtime!=cmtime) await generate();//如果修改时间不一样则重新生成
-            else console.log("修改时间一致，跳过生成");
+            else 
+                if(verbose) console.log(`文章:${meta.title}:修改时间一致，跳过生成`);
         }
         else await generate();//如果元数据不存在则生成
         
@@ -203,6 +210,6 @@ async function generate(configname:string="default")
     
 }
 if(require.main==module){
-    generate()
+    generate("default",true)
 }
 export default generate;

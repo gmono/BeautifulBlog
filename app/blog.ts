@@ -25,10 +25,11 @@ pro.command("transform <filename> [dest]")
     });
 
 
-pro.command("generate [configname]")
-    .description("执行生成器程序")
-    .action(async (config?:string)=>{
-        await generate(config);
+pro.command("generate [configname] [verbose]")
+    .description("执行生成器程序(verbose 可选择v和verbose 不填默认不显示生成详情)")
+    .action(async (config?:string,verbose?:string)=>{
+        let v=verbose=="v"||verbose=="verbose";
+        await generate(config,v);
     });
 
 pro.command("changesite [sitename]")

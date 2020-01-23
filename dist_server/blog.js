@@ -23,10 +23,11 @@ pro.command("transform <filename> [dest]")
         fs.writeFile(mpath, res.meta)]);
     console.log("转换完成");
 });
-pro.command("generate [configname]")
-    .description("执行生成器程序")
-    .action(async (config) => {
-    await generator_1.default(config);
+pro.command("generate [configname] [verbose]")
+    .description("执行生成器程序(verbose 可选择v和verbose 不填默认不显示生成详情)")
+    .action(async (config, verbose) => {
+    let v = verbose == "v" || verbose == "verbose";
+    await generator_1.default(config, v);
 });
 pro.command("changesite [sitename]")
     .description("切换网站")
