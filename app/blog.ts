@@ -10,6 +10,7 @@ import * as fs from "fs-extra"
 import generate from "./generator"
 import changesite from "./changesite";
 import sitegen from "./sitegen"
+import serve from "./server";
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename:string,dest?:string)=>{
@@ -44,7 +45,7 @@ pro.command("server [port]")
 .description("启动开发服务器（未完成）")
 .action(async (port:string="8080")=>{
     let p=parseInt(port);
-    //未完待续
+    await serve(p);
 });
 pro.command("help").description("输出帮助").action(()=>pro.outputHelp());
 

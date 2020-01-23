@@ -10,6 +10,7 @@ const fs = require("fs-extra");
 const generator_1 = require("./generator");
 const changesite_1 = require("./changesite");
 const sitegen_1 = require("./sitegen");
+const server_1 = require("./server");
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename, dest) => {
@@ -41,7 +42,7 @@ pro.command("server [port]")
     .description("启动开发服务器（未完成）")
     .action(async (port = "8080") => {
     let p = parseInt(port);
-    //未完待续
+    await server_1.default(p);
 });
 pro.command("help").description("输出帮助").action(() => pro.outputHelp());
 pro.parseAsync(process.argv);
