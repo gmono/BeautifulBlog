@@ -12,29 +12,29 @@ async function createMonitor(root) {
 const generator_1 = require("./generator");
 const rxjs_1 = require("rxjs");
 exports.OnGenerated = new rxjs_1.Subject();
-async function generateFiles() {
+async function generateFiles(configname) {
     //启动重新生成
-    await generator_1.default();
+    await generator_1.default(configname);
     exports.OnGenerated.next();
 }
-async function watchfile() {
+async function watchfile(configname = "default") {
     let mon = await createMonitor("./articles");
     mon.on("changed", async (f, curr, prev) => {
         console.clear();
         console.log(`更改:${f}`);
-        await generateFiles();
+        await generateFiles(configname);
     });
     mon.on("created", async (f, stat) => {
         //创建了文章
         console.clear();
         console.log(`新文章:${f}`);
-        await generateFiles();
+        await generateFiles(configname);
     });
     mon.on("removed", async (f, stat) => {
         //移除文章 
         console.clear();
         console.log(`删除:${f}`);
-        await generateFiles();
+        await generateFiles(configname);
     });
 }
 if (require.main == module) {

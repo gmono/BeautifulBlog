@@ -12,7 +12,7 @@ const copy = _copy;
 const del = require("del");
 const fs_extra_1 = require("fs-extra");
 const path = require("path");
-async function copysite(sitename) {
+async function changesite(sitename) {
     let spath = path.resolve("./sites", sitename);
     let dpath = "./nowSite";
     console.log(spath, dpath);
@@ -31,7 +31,7 @@ async function copysite(sitename) {
 }
 //按照配置的来复制
 if (require.main == module) {
-    let config = require("../config.json");
-    copysite(config.site);
+    let config = require("../config/default.json");
+    changesite(config.site);
 }
-exports.default = copysite;
+exports.default = changesite;

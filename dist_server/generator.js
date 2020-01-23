@@ -70,9 +70,9 @@ function getArticleFile(root, filestat) {
     let cpath = getContentPath(apath, "./articles");
     return cpath;
 }
-function getUrlFile(root, filestat) {
+function getUrlFile(root, filestat, base_url) {
     let url = `${root}/${filestat.name}`;
-    let baseu = config.base_url == "/" ? "" : config.base_url;
+    let baseu = base_url == "/" ? "" : base_url;
     let prefix = baseu + "/content"; //相对前缀
     url = getContentPath(url, prefix);
     return url;
@@ -105,10 +105,10 @@ function getContentMeta(articlemeta, from_dir, html, text, articlefile) {
     cmeta.modify_time = articlefile.mtime;
     return cmeta;
 }
-const config = require("../config.json");
 // console.log(ensurePath)
 //ensurePath(string)->Promise
-async function main() {
+async function generate(configname = "default") {
+    const config = require(`../config/${configname}.json`);
     //主函数
     let walker = walk.walk("./articles");
     //文件表 key:元数据路径  value:文章标题  key相对于content目录 后期考虑换为 相对于base_url的路径
@@ -155,7 +155,7 @@ async function main() {
                 e && console.log(e);
             });
             //记录文章记录到files.json 修bug 替换//
-            let url = getUrlFile(base, name);
+            let url = getUrlFile(base, name, config.base_url);
             url = changeExt(url, ".json");
             files[url] = {
                 title: cmeta.title,
@@ -185,6 +185,6 @@ async function main() {
     });
 }
 if (require.main == module) {
-    main();
+    generate();
 }
-exports.default = main;
+exports.default = generate;

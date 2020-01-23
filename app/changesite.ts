@@ -23,7 +23,7 @@ const copy=_copy as CopyMod;
  import * as del from "del"
 import  {mkdir}  from "fs-extra";
 import * as path from "path"
-async function copysite(sitename:string){
+async function changesite(sitename:string){
     
     
     let spath=path.resolve("./sites",sitename);
@@ -46,8 +46,8 @@ async function copysite(sitename:string){
 }
 //按照配置的来复制
 if(require.main==module){
-    let config=require("../config.json") as IConfig;
-    copysite(config.site);
+    let config=require("../config/default.json") as IConfig;
+    changesite(config.site);
 }
 
-export default copysite;
+export default changesite;

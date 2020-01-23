@@ -9,7 +9,8 @@
     "trans": "node ./dist_server/transform.js",
     "site": "node ./dist_server/changesite.js",
     "use": "node ./dist_server/sitegen.js",
-    "server":"node ./dist_server/server.js"
+    "server": "node ./dist_server/server.js",
+    "blog":"node ./dist_server/blog.js"
   },
   "author": "gmono",
   "license": "MIT",
@@ -25,6 +26,7 @@
     "@wrote/ensure-path": "^1.1.0",
     "art-template": "^4.13.2",
     "cheerio": "^1.0.0-rc.3",
+    "commander": "^4.1.0",
     "copy-dir": "^1.2.0",
     "dateformat": "^3.0.3",
     "del": "^5.1.0",
@@ -35,6 +37,7 @@
     "marked": "^0.8.0",
     "ndir": "^0.1.5",
     "nightmare": "^3.0.2",
+    "path-extra": "^4.3.0",
     "prismjs": "^1.18.0",
     "rxjs": "^6.5.4",
     "walk": "^2.3.14",

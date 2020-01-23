@@ -12,8 +12,8 @@ import { IConfig } from "./Interface/IConfig";
 
 // import * as config from "../config.json"
 //如果使用ts加载config会直接被编译到js文件里 这里使用node加载json模块
-let config=require("../config.json")  as IConfig;
-let langs=config.code_languages;
+
+
 
 
 import * as template from "art-template"
@@ -48,8 +48,12 @@ export interface TransformResult
   text:string;
 }
 let first=true;
-async function transform(filepath:string):Promise<TransformResult>{
+async function transform(filepath:string,configname:string="default"):Promise<TransformResult>{
+  
     if(first) {
+      //加载配置文件并加载语法高亮
+      let config=require(`../config/${configname}.json`)  as IConfig;
+      let langs=config.code_languages;
       //加载语言高亮支持
       console.log(`设定语言支持：${langs}`)
       console.log("加载语言中.....");

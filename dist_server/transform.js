@@ -10,8 +10,6 @@ const Prism = require("prismjs");
 const loadLanguages = require("prismjs/components/");
 // import * as config from "../config.json"
 //如果使用ts加载config会直接被编译到js文件里 这里使用node加载json模块
-let config = require("../config.json");
-let langs = config.code_languages;
 const template = require("art-template");
 let readAsync = async (fpath) => {
     return new Promise((r) => {
@@ -33,8 +31,11 @@ function htmlProcessing(html) {
     return $.html();
 }
 let first = true;
-async function transform(filepath) {
+async function transform(filepath, configname = "default") {
     if (first) {
+        //加载配置文件并加载语法高亮
+        let config = require(`../config/${configname}.json`);
+        let langs = config.code_languages;
         //加载语言高亮支持
         console.log(`设定语言支持：${langs}`);
         console.log("加载语言中.....");
