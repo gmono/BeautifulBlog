@@ -41,8 +41,14 @@ function htmlProcessing(html:string):string{
   return $.html();
 }
 
+export interface TransformResult
+{
+  html:string;
+  meta:IArticleMeta;
+  text:string;
+}
 let first=true;
-async function transform(filepath:string){
+async function transform(filepath:string):Promise<TransformResult>{
     if(first) {
       //加载语言高亮支持
       console.log(`设定语言支持：${langs}`)
@@ -73,7 +79,7 @@ async function transform(filepath:string){
     //实际内容
     let content=mk(res.body);
     //模板化
-    let html=template(fs.realpathSync("./test_transform.html"),{
+    let html=template(fs.realpathSync("./article_template.html"),{
         content:content
     }) as string;
     //添加html处理

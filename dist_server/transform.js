@@ -62,7 +62,7 @@ async function transform(filepath) {
     //实际内容
     let content = mk(res.body);
     //模板化
-    let html = template(fs.realpathSync("./test_transform.html"), {
+    let html = template(fs.realpathSync("./article_template.html"), {
         content: content
     });
     //添加html处理
