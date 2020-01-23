@@ -16,35 +16,26 @@
     <ul>
     </ul>
     <script>
-            async function main()
-            {
-                let r=await fetch("../content/files.json");
-                let s=await r.json()
-                let ss={}
-                for(let k in s){
-                    ss[k]=fetch(k)
+
+            exports={}
+            require=(v)=>{
+                let tab={
+                    react:React,
+                    "react-dom":ReactDOM
                 }
-                for(let k in s){
-                    let t=await (await ss[k]).json()
-                    let str=""
-                    for(let i in t){
-                        str+=`${i}:${t[i]}<br>`
-                    }
-                    str="<br>"+str;
-                    document.querySelector("ul").innerHTML+=`<li><a href="${k.replace(/.json$/,".html")}">${s[k].title}:${str}</a></li>`;
-                }
-                
+                return tab[v];
             }
-            main()
     </script>
     <style>
-        li{
+        .item{
             list-style: none;
-            background: rgba(255, 187, 0, 0.534);
-            box-shadow: 0 0 2px 2px black;
+            background: rgba(255, 255, 255, 0.781);
+            box-shadow: 0 0 2px 5px black;
             margin:20px;
             padding:20px;
         }
+
+
     </style>
 
     <script src="./scripts/index.js"></script>

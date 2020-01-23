@@ -75,6 +75,7 @@ function getUrlFile(root, filestat, base_url) {
     let baseu = base_url == "/" ? "" : base_url;
     let prefix = baseu + "/content"; //相对前缀
     url = getContentPath(url, prefix);
+    url = url.replace("\\", "/");
     return url;
 }
 /**

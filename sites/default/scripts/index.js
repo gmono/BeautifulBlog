@@ -45,33 +45,64 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// import * as React from "react"
-// import * as ReactDOM from "react-dom"
-var React;
-var ReactDOM;
-var Item = function (props) {
-    return (React.createElement("div", { onClick: props.OnTitleClick, className: "item" },
-        React.createElement("div", null, props.info.title),
-        React.createElement("div", { style: {
-                color: "blue",
-                fontSize: "0.7em"
-            } }, props.info.date),
-        React.createElement("div", null,
-            props.summary,
-            React.createElement("span", { style: {
-                    color: "pink",
-                    fontSize: "0.8em",
-                    fontWeight: "bold"
-                } }, props.isExpanded ? "收起" : "展开"))));
-};
+var React = require("react");
+var ReactDOM = require("react-dom");
+var Item = /** @class */ (function (_super) {
+    __extends(Item, _super);
+    function Item(props) {
+        var _this = _super.call(this, props) || this;
+        _this.state = {
+            contentHeight: 0
+        };
+        return _this;
+    }
+    Item.prototype.componentDidMount = function () {
+        console.log(ReactDOM.findDOMNode(this.refs.content).clientHeight);
+        this.setState({
+            contentHeight: ReactDOM.findDOMNode(this.refs.content).clientHeight
+        });
+    };
+    Item.prototype.componentDidUpdate = function (prevprop, prevstate) {
+        var h = ReactDOM.findDOMNode(this.refs.content).clientHeight;
+        if (prevprop.isExpanded != this.props.isExpanded) {
+            this.setState({
+                contentHeight: h
+            });
+        }
+    };
+    Item.prototype.render = function () {
+        var uexpstyle = {
+            height: "100px",
+            overflow: "hidden",
+            transition: "all ease-out 1s"
+        };
+        var expstyle = {
+            transition: "all ease-in 1s",
+            height: this.state.contentHeight + "px"
+        };
+        return (React.createElement("div", { style: {
+                whiteSpace: "normal"
+            }, className: "item" },
+            React.createElement("div", { onClick: this.props.OnTitleClick }, this.props.info.title),
+            React.createElement("div", { style: {
+                    color: "blue",
+                    fontSize: "0.7em"
+                } }, this.props.info.date.toString()),
+            React.createElement("div", { style: this.props.isExpanded ? expstyle : uexpstyle, onClick: this.props.OnSummaryClick },
+                React.createElement("div", { ref: "content", dangerouslySetInnerHTML: { __html: this.props.summary } }))));
+    };
+    return Item;
+}(React.Component));
 var ArticleItem = /** @class */ (function (_super) {
     __extends(ArticleItem, _super);
     function ArticleItem(props) {
         var _this = _super.call(this, props) || this;
-        _this.setState({
+        _this.state = {
             isExpanded: false,
-            isloaded: false
-        });
+            isloaded: false,
+            info: null,
+            html: null
+        };
         return _this;
     }
     ArticleItem.prototype.loadArticle = function () {
@@ -151,15 +182,83 @@ var ArticleItem = /** @class */ (function (_super) {
                 }, summary: "加载中......", OnTitleClick: function () { }, OnSummaryClick: this.summarySwitch.bind(this), isExpanded: this.state.isExpanded }));
         }
         else {
-            return (React.createElement(Item, { info: this.state.info, summary: this.state.html.slice(0, 300) + "......", OnTitleClick: this.enterArticle.bind(this), OnSummaryClick: this.summarySwitch.bind(this), isExpanded: this.state.isExpanded }));
+            return (React.createElement(Item, { info: this.state.info, summary: this.state.html, OnTitleClick: this.enterArticle.bind(this), OnSummaryClick: this.summarySwitch.bind(this), isExpanded: this.state.isExpanded }));
         }
     };
     return ArticleItem;
 }(React.Component));
-ReactDOM.render(React.createElement(ArticleItem, { metapath: "/content/about.json", OnEnter: function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
+var ArticleList = /** @class */ (function (_super) {
+    __extends(ArticleList, _super);
+    function ArticleList(props) {
+        var _this = _super.call(this, props) || this;
+        _this.state = {
+            metalist: []
+        };
+        return _this;
+    }
+    ArticleList.prototype.reload = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var r, s, ss, k;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.props.filesPath)];
+                    case 1:
+                        r = _a.sent();
+                        return [4 /*yield*/, r.json()];
+                    case 2:
+                        s = _a.sent();
+                        ss = [];
+                        for (k in s) {
+                            ss.push(k);
+                        }
+                        this.setState({
+                            metalist: ss
+                        });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ArticleList.prototype.componentDidMount = function () {
+        this.reload();
+    };
+    ArticleList.prototype.componentDidUpdate = function (prevprop, prevstate) {
+        if (prevprop.filesPath != this.props.filesPath) {
+            this.reload();
         }
-        alert(JSON.stringify(args));
-    } }), document.querySelector("div"));
+    };
+    ArticleList.prototype.render = function () {
+        return (React.createElement(XScrollList, null, this.state.metalist.map(function (v) {
+            return React.createElement("div", { key: v, style: {
+                    display: "inline-block",
+                    width: "80vw",
+                    verticalAlign: "top"
+                } },
+                React.createElement(ArticleItem, { metapath: v, OnEnter: function () {
+                        var args = [];
+                        for (var _i = 0; _i < arguments.length; _i++) {
+                            args[_i] = arguments[_i];
+                        }
+                        alert(JSON.stringify(args));
+                    } }));
+        })));
+    };
+    return ArticleList;
+}(React.Component));
+var XScrollList = /** @class */ (function (_super) {
+    __extends(XScrollList, _super);
+    function XScrollList(props) {
+        return _super.call(this, props) || this;
+    }
+    XScrollList.prototype.whell = function (e) {
+        var ele = ReactDOM.findDOMNode(this.refs.top);
+        window.scroll(window.scrollX + e.deltaY, 0);
+    };
+    XScrollList.prototype.render = function () {
+        return (React.createElement("div", { ref: "top", style: {
+                whiteSpace: "nowrap",
+            }, onWheelCapture: this.whell.bind(this) }, this.props.children));
+    };
+    return XScrollList;
+}(React.Component));
+ReactDOM.render(React.createElement(ArticleList, { filesPath: "../content/files.json" }), document.querySelector("div"));
