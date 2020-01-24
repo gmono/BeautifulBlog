@@ -47,6 +47,7 @@ class Item extends React.Component<ItemInfo,{
             transition:"all ease-out 1s"
         };
         let expstyle={
+            overflow:"hidden",
             transition:"all ease-in 1s",
             height:`${this.state.contentHeight}px`};
         return (<div style={{

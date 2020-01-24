@@ -77,6 +77,7 @@ var Item = /** @class */ (function (_super) {
             transition: "all ease-out 1s"
         };
         var expstyle = {
+            overflow: "hidden",
             transition: "all ease-in 1s",
             height: this.state.contentHeight + "px"
         };
