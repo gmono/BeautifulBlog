@@ -32,6 +32,7 @@ pro.command("generate [configname] [verbose]")
         await generate(config,v);
     });
 
+
 pro.command("changesite [sitename]")
     .description("切换网站")
     .action(async (sitename:string="default")=>{
@@ -43,11 +44,12 @@ pro.command("watch [configname]")
         await sitegen(configname);
     });
 pro.command("server [port]")
-.description("启动开发服务器（未完成）")
+.description("启动开发服务器（未完成,服务器目前只能使用default.json配置文件）")
 .action(async (port:string="8080")=>{
     let p=parseInt(port);
     await serve(p);
 });
+
 pro.command("help").description("输出帮助").action(()=>pro.outputHelp());
 
 pro.parseAsync(process.argv);

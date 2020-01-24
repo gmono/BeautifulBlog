@@ -40,7 +40,7 @@ pro.command("watch [configname]")
     await sitegen_1.default(configname);
 });
 pro.command("server [port]")
-    .description("启动开发服务器（未完成）")
+    .description("启动开发服务器（未完成,服务器目前只能使用default.json配置文件）")
     .action(async (port = "8080") => {
     let p = parseInt(port);
     await server_1.default(p);

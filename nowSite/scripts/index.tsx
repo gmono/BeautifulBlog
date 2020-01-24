@@ -213,8 +213,13 @@ class XScrollList extends React.Component<{children:any[]}>{
         super(props)
     }
     whell(e:React.WheelEvent<HTMLDivElement>){
-        let ele=ReactDOM.findDOMNode(this.refs.top) as HTMLDivElement;
-        window.scroll(window.scrollX+e.deltaY,0);
+        if(e.target instanceof HTMLElement){
+            if(e.target == ReactDOM.findDOMNode(this.refs.top)){
+                e.preventDefault();
+                let ele=ReactDOM.findDOMNode(this.refs.top) as HTMLDivElement;
+                window.scroll(window.scrollX+e.deltaY,0);
+            }
+        }
     }
     render(){
         return (
