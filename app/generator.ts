@@ -188,7 +188,7 @@ async function generate(configname:string="default",verbose=false)
             //记录文章记录到files.json 修bug 替换//
             let url=getUrlFile(base,name,config.base_url);
             url=changeExt(url,".json");
-            files[url]={
+            files.fileList[url]={
                 title:cmeta.title,
                 article_path:articlepath
             }
