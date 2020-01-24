@@ -16,7 +16,7 @@ async function serve(port = 80, configname = "default") {
     if (clu.isMaster) {
         console.log(`服务器启动，端口:${port},地址:http://localhost:${port}`);
         //删除原有content 全部重新生成
-        del("./content");
+        await del("./content");
         console.log("已启动全部重新生成");
         generator_1.default(configname);
         //开启监视进程

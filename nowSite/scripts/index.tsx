@@ -208,17 +208,29 @@ class ArticleList extends React.Component<ArticleListProp,{
     }
 }
 
+
 class XScrollList extends React.Component<{children:any[]}>{
     constructor(props){
         super(props)
     }
-    whell(e:React.WheelEvent<HTMLDivElement>){
+
+    whell(e:WheelEvent){
+        console.log(e.target);
         if(e.target instanceof HTMLElement){
-            if(e.target == ReactDOM.findDOMNode(this.refs.top)){
+            if(e.target == ReactDOM.findDOMNode(this.refs.mouse)){
                 e.preventDefault();
                 let ele=ReactDOM.findDOMNode(this.refs.top) as HTMLDivElement;
                 window.scroll(window.scrollX+e.deltaY,0);
             }
+        }
+    }
+    componentDidMount(){
+        let ele=ReactDOM.findDOMNode(this.refs.mouse);
+        if(ele instanceof HTMLElement){
+            ele.addEventListener("wheel",this.whell.bind(this),{
+                capture:true,
+                passive:false
+            });
         }
     }
     render(){
@@ -226,7 +238,15 @@ class XScrollList extends React.Component<{children:any[]}>{
             <div ref="top" style={{
                 whiteSpace:"nowrap",
                 
-            }} onWheelCapture={this.whell.bind(this)}>
+            }}>
+                <div ref="mouse" style={{
+                    position:"fixed",
+                    right:"0",
+                    bottom:"0",
+                    height:"200px",
+                    width:"200px",
+                    backgroundColor:"gray"
+                }}></div>
                 {this.props.children}
             </div>
         )

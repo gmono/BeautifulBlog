@@ -39,11 +39,11 @@ pro.command("watch [configname]")
     .action(async (configname) => {
     await sitegen_1.default(configname);
 });
-pro.command("server [port]")
-    .description("启动开发服务器（未完成,服务器目前只能使用default.json配置文件）")
-    .action(async (port = "8080") => {
+pro.command("server [port] [configname]")
+    .description("启动开发服务器(指定端口与配置文件）")
+    .action(async (port = "8080", configname = "default") => {
     let p = parseInt(port);
-    await server_1.default(p);
+    await server_1.default(p, configname);
 });
 pro.command("help").description("输出帮助").action(() => pro.outputHelp());
 pro.parseAsync(process.argv);

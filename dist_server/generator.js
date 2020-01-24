@@ -120,6 +120,7 @@ async function generate(configname = "default", verbose = false) {
     }
     ///读入已有的files列表，并清除其中不存在的文件
     /////////////////////////////////////未完成
+    let dtasks = [];
     for (let k in files) {
         //从files中清除此项，同时删除对应的json和html文件
         //k为相对于网站的url
@@ -130,9 +131,11 @@ async function generate(configname = "default", verbose = false) {
         let cpath = getContentPath(apath, "./content");
         let hpath = changeExt(cpath, ".html");
         let jpath = changeExt(cpath, ".json");
-        del(hpath);
-        del(jpath);
+        console.log("删除：", hpath);
+        dtasks.push(del(hpath));
+        dtasks.push(del(jpath));
     }
+    await Promise.all(dtasks);
     //转换每个文件
     walker.on("file", async (base, name, next) => {
         //转换文件

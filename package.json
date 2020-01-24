@@ -32,6 +32,7 @@
     "cheerio": "^1.0.0-rc.3",
     "commander": "^4.1.0",
     "copy-dir": "^1.2.0",
+    "core-decorators": "^0.20.0",
     "dateformat": "^3.0.3",
     "del": "^5.1.0",
     "front-matter": "^3.0.2",

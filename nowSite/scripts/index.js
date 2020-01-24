@@ -251,13 +251,37 @@ var XScrollList = /** @class */ (function (_super) {
         return _super.call(this, props) || this;
     }
     XScrollList.prototype.whell = function (e) {
-        var ele = ReactDOM.findDOMNode(this.refs.top);
-        window.scroll(window.scrollX + e.deltaY, 0);
+        console.log(e.target);
+        if (e.target instanceof HTMLElement) {
+            if (e.target == ReactDOM.findDOMNode(this.refs.mouse)) {
+                e.preventDefault();
+                var ele = ReactDOM.findDOMNode(this.refs.top);
+                window.scroll(window.scrollX + e.deltaY, 0);
+            }
+        }
+    };
+    XScrollList.prototype.componentDidMount = function () {
+        var ele = ReactDOM.findDOMNode(this.refs.mouse);
+        if (ele instanceof HTMLElement) {
+            ele.addEventListener("wheel", this.whell.bind(this), {
+                capture: true,
+                passive: false
+            });
+        }
     };
     XScrollList.prototype.render = function () {
         return (React.createElement("div", { ref: "top", style: {
                 whiteSpace: "nowrap",
-            }, onWheelCapture: this.whell.bind(this) }, this.props.children));
+            } },
+            React.createElement("div", { ref: "mouse", style: {
+                    position: "fixed",
+                    right: "0",
+                    bottom: "0",
+                    height: "200px",
+                    width: "200px",
+                    backgroundColor: "gray"
+                } }),
+            this.props.children));
     };
     return XScrollList;
 }(React.Component));
