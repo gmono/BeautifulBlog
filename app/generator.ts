@@ -128,19 +128,23 @@ async function generate(configname:string="default",verbose=false)
     //主函数
     let walker=walk.walk("./articles");
     //文件表 key:元数据路径  value:文章标题  key相对于content目录 后期考虑换为 相对于base_url的路径
-    let files:IFiles={};
+    let files:IFiles={useConfig:configname,fileList:{}};
     if(await fs.pathExists("./content/files.json")){
         //require基于模块路径
-        files=require("../content/files.json");
+        let t=require("../content/files.json");
+        //如果不相等就维持初始化，等于全部重新生成
+        if(files.useConfig==configname){
+            files=t;
+        }
     }
     ///读入已有的files列表，并清除其中不存在的文件
     /////////////////////////////////////未完成
     let dtasks=[]
-    for(let k in files){
+    for(let k in files.fileList){
         //从files中清除此项，同时删除对应的json和html文件
         //k为相对于网站的url
         //读取元数据
-        let apath=files[k].article_path;
+        let apath=files.fileList[k].article_path;
         if(await fs.pathExists(apath)) continue;
         let cpath=getContentPath(apath,"./content")
         let hpath=changeExt(cpath,".html");
