@@ -198,7 +198,7 @@ var ArticleList = /** @class */ (function (_super) {
     }
     ArticleList.prototype.reload = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var r, s, ss, k;
+            var r, f, s, ss, k;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, fetch(this.props.filesPath)];
@@ -206,7 +206,8 @@ var ArticleList = /** @class */ (function (_super) {
                         r = _a.sent();
                         return [4 /*yield*/, r.json()];
                     case 2:
-                        s = _a.sent();
+                        f = _a.sent();
+                        s = f.fileList;
                         ss = [];
                         for (k in s) {
                             ss.push(k);

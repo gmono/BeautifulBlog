@@ -3,6 +3,7 @@ import { IContentMeta } from '../../../app/Interface/IContentMeta';
 
 import * as React from "react"
 import * as ReactDOM from "react-dom"
+import { IFiles } from '../../../app/Interface/IFiles';
 
 // var React:any;
 // var ReactDOM:any;
@@ -171,7 +172,8 @@ class ArticleList extends React.Component<ArticleListProp,{
     async reload()
     {
         let r=await fetch(this.props.filesPath);
-        let s=await r.json()
+        let f=await r.json() as IFiles;
+        let s=f.fileList;
         let ss=[]
         for(let k in s){
             ss.push(k)
