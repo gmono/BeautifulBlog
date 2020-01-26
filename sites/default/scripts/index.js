@@ -261,6 +261,8 @@ var XScrollList = /** @class */ (function (_super) {
             if (e.target == ReactDOM.findDOMNode(this.refs.mouse)) {
                 e.preventDefault();
                 var ele = ReactDOM.findDOMNode(this.refs.top);
+                //默认150
+                var delta = e.deltaMode == 1 ? e.deltaY * 50 : e.deltaMode == 0 ? e.deltaY : 150;
                 window.scroll(window.scrollX + e.deltaY, 0);
             }
         }

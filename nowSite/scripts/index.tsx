@@ -229,6 +229,8 @@ class XScrollList extends React.Component<{children:any[]}>{
             if(e.target == ReactDOM.findDOMNode(this.refs.mouse)){
                 e.preventDefault();
                 let ele=ReactDOM.findDOMNode(this.refs.top) as HTMLDivElement;
+                //默认150
+                let delta=e.deltaMode==1? e.deltaY*50:e.deltaMode==0? e.deltaY:150;
                 window.scroll(window.scrollX+e.deltaY,0);
             }
         }
