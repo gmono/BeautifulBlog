@@ -20,14 +20,23 @@ async function serve(port = 80, configname = "default") {
         console.log("已启动全部重新生成");
         generator_1.default(configname);
         //开启监视进程
-        let worker = clu.fork();
-        worker.send("start");
+        let worker1 = clu.fork();
+        let worker2 = clu.fork();
+        //同时监控文章和网站
+        worker1.send("start");
+        worker2.send("site");
         app.listen(port);
     }
     else {
         process.on("message", (msg) => {
-            if (msg == "start") {
+            if (msg == "article") {
                 watch_1.default(configname);
+            }
+            else if (msg == "site") {
+                //监控网站 读取指定配置文件中的网站设置
+                let config = require(`../config/${configname}.json`);
+                let sname = config.site;
+                watch_1.watchSite(sname);
             }
         });
     }

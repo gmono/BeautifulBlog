@@ -15,7 +15,7 @@ const path = require("path");
 async function changesite(sitename) {
     let spath = path.resolve("./sites", sitename);
     let dpath = "./nowSite";
-    console.log(spath, dpath);
+    // console.log(spath,dpath)
     await del(dpath);
     await fs_extra_1.mkdir(dpath);
     return new Promise((r, j) => {

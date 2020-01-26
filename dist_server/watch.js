@@ -18,6 +18,7 @@ async function generateFiles(configname) {
     exports.OnGenerated.next();
 }
 async function watchArticles(configname = "default") {
+    //等待更改 自动进行全部重新生成 如同服务器里一样
     let mon = await createMonitor("./articles");
     mon.on("changed", async (f, curr, prev) => {
         console.clear();
@@ -38,6 +39,36 @@ async function watchArticles(configname = "default") {
     });
 }
 exports.default = watchArticles;
+const path = require("path");
+const fse = require("fs-extra");
+const changesite_1 = require("./changesite");
+/**
+ * 监控指定site，如果有改动就自动复制到nowSite（实际上一开始是先删除再建立再复制为保证完整性）
+ * @param sitename 网站名字
+ */
+async function watchSite(sitename) {
+    let spath = path.resolve("./sites", sitename);
+    if (!(await fse.pathExists(spath)))
+        return;
+    let mon = await createMonitor(spath);
+    let update = async (f) => {
+        //更新网站
+        //这里直接使用changesite 后期考虑优化
+        await changesite_1.default(sitename);
+        console.log("网站同步完成!");
+    };
+    mon.on("changed", async (f, c, p) => {
+        await update(f);
+    });
+    mon.on("created", async (f, s) => {
+        await update(f);
+    });
+    mon.on("removed", async (f, s) => {
+        await update(f);
+    });
+}
+exports.watchSite = watchSite;
 if (require.main == module) {
     watchArticles();
+    // watchSite("default");
 }

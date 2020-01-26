@@ -84,7 +84,11 @@ var Item = /** @class */ (function (_super) {
         return (React.createElement("div", { style: {
                 whiteSpace: "normal"
             }, className: "item" },
-            React.createElement("div", { onClick: this.props.OnTitleClick }, this.props.info.title),
+            React.createElement("div", { style: {
+                    fontFamily: "微软雅黑",
+                    fontSize: "xx-large"
+                }, onClick: this.props.OnTitleClick }, this.props.info.title),
+            React.createElement("hr", null),
             React.createElement("div", { style: {
                     color: "blue",
                     fontSize: "0.7em"
@@ -253,7 +257,6 @@ var XScrollList = /** @class */ (function (_super) {
         return _super.call(this, props) || this;
     }
     XScrollList.prototype.whell = function (e) {
-        console.log(e.target);
         if (e.target instanceof HTMLElement) {
             if (e.target == ReactDOM.findDOMNode(this.refs.mouse)) {
                 e.preventDefault();
@@ -293,4 +296,36 @@ var XScrollList = /** @class */ (function (_super) {
     };
     return XScrollList;
 }(React.Component));
-ReactDOM.render(React.createElement(ArticleList, { filesPath: "../content/files.json" }), document.querySelector("div"));
+/**
+ * 等宽容器，其会将自己的height设置为与scrollWidth相同 进而使其内容物都可以有同样的宽度
+ */
+var ScrollWidthContainer = /** @class */ (function (_super) {
+    __extends(ScrollWidthContainer, _super);
+    function ScrollWidthContainer(props) {
+        return _super.call(this, props) || this;
+    }
+    ScrollWidthContainer.prototype.reset = function () {
+        var ele = ReactDOM.findDOMNode(this.refs.top);
+        if (ele instanceof HTMLElement) {
+            ele.style.width = ele.scrollWidth + "px";
+        }
+        //暂时轮询解决
+        setTimeout(this.reset.bind(this), 500);
+    };
+    ScrollWidthContainer.prototype.componentDidMount = function () {
+        this.reset();
+    };
+    ScrollWidthContainer.prototype.componentDidUpdate = function (prevprop, prevstate) {
+        // this.reset();
+    };
+    ScrollWidthContainer.prototype.render = function () {
+        return (React.createElement("div", { ref: "top", id: "hello" }, this.props.children));
+    };
+    return ScrollWidthContainer;
+}(React.Component));
+//暂时不适用上面的容器 性能问题 直接设置fixed
+var Page = (React.createElement(ScrollWidthContainer, null,
+    React.createElement("h1", null, "\u6211\u7684\u535A\u5BA2"),
+    React.createElement("hr", { style: { marginBottom: "30px" } }),
+    React.createElement(ArticleList, { filesPath: "../content/files.json" })));
+ReactDOM.render(Page, document.querySelector("#page"));

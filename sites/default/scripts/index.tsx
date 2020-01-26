@@ -53,7 +53,12 @@ class Item extends React.Component<ItemInfo,{
         return (<div style={{
             whiteSpace:"normal"
         }}  className="item">
-            <div onClick={this.props.OnTitleClick}>{this.props.info.title}</div>
+            {/*这是标题*/}
+            <div style={{
+                fontFamily:"微软雅黑",
+                fontSize:"xx-large"
+            }} onClick={this.props.OnTitleClick}>{this.props.info.title}</div>
+            <hr></hr>
             <div style={{
                 color:"blue",
                 fontSize:"0.7em"
@@ -182,6 +187,8 @@ class ArticleList extends React.Component<ArticleListProp,{
         this.setState({
             metalist:ss
         });
+        //这里考虑加上加载完毕事件
+        //整体考虑使用mobx管理
     }
     componentDidMount(){
         this.reload();
@@ -218,7 +225,6 @@ class XScrollList extends React.Component<{children:any[]}>{
     }
 
     whell(e:WheelEvent){
-        console.log(e.target);
         if(e.target instanceof HTMLElement){
             if(e.target == ReactDOM.findDOMNode(this.refs.mouse)){
                 e.preventDefault();
@@ -261,4 +267,42 @@ class XScrollList extends React.Component<{children:any[]}>{
         )
     }
 }
-ReactDOM.render(<ArticleList filesPath="../content/files.json" /> ,document.querySelector("div"));
+
+/**
+ * 等宽容器，其会将自己的height设置为与scrollWidth相同 进而使其内容物都可以有同样的宽度
+ */
+class ScrollWidthContainer extends React.Component<{children:any[]}>{
+    constructor(props){
+        super(props);
+    }
+    reset()
+    {
+        let ele=ReactDOM.findDOMNode(this.refs.top);
+        if(ele instanceof HTMLElement){
+            ele.style.width=`${ele.scrollWidth}px`;
+        }
+        //暂时轮询解决
+        setTimeout(this.reset.bind(this),500);
+    }
+    componentDidMount(){
+        this.reset();
+        
+    }
+    componentDidUpdate(prevprop,prevstate){
+        // this.reset();
+    }
+    render(){
+        return (<div ref="top" id="hello">
+            {this.props.children}
+        </div>)
+    }
+}
+
+//暂时不适用上面的容器 性能问题 直接设置fixed
+let Page=(<ScrollWidthContainer>
+    <h1>我的博客</h1>
+    <hr style={{marginBottom:"30px"}}></hr>
+    <ArticleList filesPath="../content/files.json" />
+</ScrollWidthContainer>);
+
+ReactDOM.render(Page,document.querySelector("#page"));

@@ -28,7 +28,7 @@ async function changesite(sitename:string){
     
     let spath=path.resolve("./sites",sitename);
     let dpath="./nowSite"
-    console.log(spath,dpath)
+    // console.log(spath,dpath)
     await del(dpath)
     await mkdir(dpath)
     return new Promise<void>((r,j)=>{
