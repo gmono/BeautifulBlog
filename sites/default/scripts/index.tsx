@@ -248,8 +248,14 @@ class XScrollList extends React.Component<{children:any[]}>{
                     bottom:"0",
                     height:"200px",
                     width:"200px",
-                    backgroundColor:"gray"
-                }}></div>
+                    backgroundColor:"gray",
+                    display:"flex",
+                    justifyContent:"center",
+                    alignItems:"center"
+                    
+                }}><h2 style={{
+                    pointerEvents:"none"
+                }}>横向滚动区</h2></div>
                 {this.props.children}
             </div>
         )

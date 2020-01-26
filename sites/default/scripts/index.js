@@ -281,8 +281,14 @@ var XScrollList = /** @class */ (function (_super) {
                     bottom: "0",
                     height: "200px",
                     width: "200px",
-                    backgroundColor: "gray"
-                } }),
+                    backgroundColor: "gray",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center"
+                } },
+                React.createElement("h2", { style: {
+                        pointerEvents: "none"
+                    } }, "\u6A2A\u5411\u6EDA\u52A8\u533A")),
             this.props.children));
     };
     return XScrollList;
