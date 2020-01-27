@@ -294,7 +294,11 @@ class ScrollWidthContainer extends React.Component<{children:any[]}>{
         // this.reset();
     }
     render(){
-        return (<div ref="top" id="hello">
+        return (<div ref="top" style={{
+            backgroundImage:"url(./back.jpg)",
+            backgroundPosition:"center",
+            backgroundSize:"cover"
+        }}>
             {this.props.children}
         </div>)
     }

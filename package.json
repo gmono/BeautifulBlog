@@ -48,7 +48,8 @@
     "prismjs": "^1.18.0",
     "rxjs": "^6.5.4",
     "walk": "^2.3.14",
-    "watch": "^1.0.2"
+    "watch": "^1.0.2",
+    "webpack": "^4.41.5"
   },
   "devDependencies": {
     "@types/node": "^13.1.6"
