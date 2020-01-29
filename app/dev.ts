@@ -9,11 +9,17 @@
 
 
  import * as cluster from "cluster"
-import { spawn } from "child_process";
+import { spawn, exec, execSync } from "child_process";
  /**
   * 启动tsc -w 来监视一个目录的ts文件实时编译
   * @param dirpath 要监控的目录
   */
- async function tscWatch(dirpath:string)
+ function tscWatch(dirpath:string)
  {
+     let child=spawn("tsc -w",{
+         stdio:"pipe"
+     });
+     child.on("message",(msg,send)=>{
+         //接收到输出
+     })
  }
