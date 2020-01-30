@@ -14,16 +14,19 @@ import { spawn, exec, execSync, fork } from "child_process";
   * 启动tsc -w 来监视一个目录的ts文件实时编译
   * @param dirpath 要监控的目录
   */
- function tscWatch(dirpath:string)
+ function tscWatch(name:string,dirpath:string)
  {
-     fork("",[],{
-
-     })
-     let child=spawn("tsc -w",{
-         stdio:"pipe"
+     //需要调查detached在false时，有监听事件时，会不会被自动结束的问题
+     let child=spawn("tsc",["-w"],{
+         stdio:"pipe",
+         cwd:dirpath,
+         detached:false
      });
-     child.stdin.wr
-     child.on("message",(msg,send)=>{
-         //接收到输出
+     child.stdout.on("data",(chunk)=>{
+         console.log(`${name}输出:`,chunk);
+     })
+     child.stderr.on("data",(c)=>{
+         console.log(`${name}错误:`,c);
      })
  }
+
