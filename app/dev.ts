@@ -10,6 +10,7 @@
 
  import * as cluster from "cluster"
 import { spawn, exec, execSync, fork } from "child_process";
+
  /**
   * 启动tsc -w 来监视一个目录的ts文件实时编译
   * @param dirpath 要监控的目录
@@ -17,16 +18,37 @@ import { spawn, exec, execSync, fork } from "child_process";
  function tscWatch(name:string,dirpath:string)
  {
      //需要调查detached在false时，有监听事件时，会不会被自动结束的问题
-     let child=spawn("tsc",["-w"],{
-         stdio:"pipe",
-         cwd:dirpath,
-         detached:false
+     let child=exec("tsc -w",{
+         cwd:dirpath
+     },(error,stdout,stderr)=>{
+         if(error!=null){
+             console.log(`${name}输出:`,stdout);
+             console.log(`${name}ERROR:`,stderr)
+         }
      });
-     child.stdout.on("data",(chunk)=>{
-         console.log(`${name}输出:`,chunk);
-     })
+     console.log(name,"已启动");
+    //  child.stdout.on("data",(chunk)=>{
+    //      console.log(`${name}输出:\n`,chunk);
+
+    //  })
      child.stderr.on("data",(c)=>{
          console.log(`${name}错误:`,c);
      })
+     child.on("close",(code,signal)=>{
+         console.log(name,"已退出",`退出代码${code}`);
+     })
+     return child;
  }
 
+export default async function main()
+{
+    let childs=[
+        tscWatch("App ts监视器","."),
+        tscWatch("Helper ts监视器","./app/Helper")
+    ];
+    //等待所有任务结束 或输入q 结束所有进程
+    console.log("输入ctrl+c结束所有监视任务");
+}
+
+
+main()

@@ -12,13 +12,35 @@ const child_process_1 = require("child_process");
  * 启动tsc -w 来监视一个目录的ts文件实时编译
  * @param dirpath 要监控的目录
  */
-function tscWatch(dirpath) {
-    child_process_1.fork("", [], {});
-    let child = child_process_1.spawn("tsc -w", {
-        stdio: "pipe"
+function tscWatch(name, dirpath) {
+    //需要调查detached在false时，有监听事件时，会不会被自动结束的问题
+    let child = child_process_1.exec("tsc -w", {
+        cwd: dirpath
+    }, (error, stdout, stderr) => {
+        if (error != null) {
+            console.log(`${name}输出:`, stdout);
+            console.log(`${name}ERROR:`, stderr);
+        }
     });
-    child.stdin.wr;
-    child.on("message", (msg, send) => {
-        //接收到输出
+    console.log(name, "已启动");
+    //  child.stdout.on("data",(chunk)=>{
+    //      console.log(`${name}输出:\n`,chunk);
+    //  })
+    child.stderr.on("data", (c) => {
+        console.log(`${name}错误:`, c);
     });
+    child.on("close", (code, signal) => {
+        console.log(name, "已退出", `退出代码${code}`);
+    });
+    return child;
 }
+async function main() {
+    let childs = [
+        tscWatch("App ts监视器", "."),
+        tscWatch("Helper ts监视器", "./app/Helper")
+    ];
+    //等待所有任务结束 或输入q 结束所有进程
+    console.log("输入ctrl+c结束所有监视任务");
+}
+exports.default = main;
+main();
