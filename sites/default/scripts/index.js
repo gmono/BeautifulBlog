@@ -321,13 +321,26 @@ var ScrollWidthContainer = /** @class */ (function (_super) {
         // this.reset();
     };
     ScrollWidthContainer.prototype.render = function () {
-        return (React.createElement("div", { ref: "top", id: "hello" }, this.props.children));
+        return (React.createElement("div", { ref: "top", style: {
+                backgroundImage: "url(./back.jpg)",
+                backgroundPosition: "center",
+                backgroundSize: "cover",
+                backgroundAttachment: "fixed",
+                backgroundBlendMode: "color-burn",
+                backgroundOrigin: "border-box",
+                backgroundRepeat: "no-repeat",
+                minHeight: "100vh"
+            } }, this.props.children));
     };
     return ScrollWidthContainer;
 }(React.Component));
 //暂时不适用上面的容器 性能问题 直接设置fixed
 var Page = (React.createElement(ScrollWidthContainer, null,
-    React.createElement("h1", null, "\u6211\u7684\u535A\u5BA2"),
+    React.createElement("h1", { style: {
+            margin: "0",
+            marginBottom: "1rem",
+            padding: "2rem"
+        } }, "\u6211\u7684\u535A\u5BA2"),
     React.createElement("hr", { style: { marginBottom: "30px" } }),
     React.createElement(ArticleList, { filesPath: "../content/files.json" })));
 ReactDOM.render(Page, document.querySelector("#page"));

@@ -11,6 +11,7 @@ import generate from "./generator"
 import changesite from "./changesite";
 import sitegen from "./sitegen"
 import serve from "./server";
+import dev from "./dev";
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename:string,dest?:string)=>{
@@ -50,6 +51,16 @@ pro.command("server [port] [configname]")
     await serve(p,configname);
 });
 
+pro.command("refresh [configname]")
+    .description("刷新，切换网站并重新生成内容，相当于changesite与generate的组合")
+    .action(async (configname="default")=>{
+        await sitegen(configname);
+    });
+pro.command("dev")
+    .description("启动开发监视器（主要用于开发者 开发blog程序和helpers),监视app与helpers目录并实时生成js")
+    .action(async ()=>{
+        await dev();
+    })
 pro.command("help").description("输出帮助").action(()=>pro.outputHelp());
 
 pro.parseAsync(process.argv);

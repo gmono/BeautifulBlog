@@ -26,11 +26,16 @@ async function tscWatch(name, dirpath) {
     return new Promise((resolve) => {
         //等待输出编译完成后返回
         child.stdout.on("data", (chunk) => {
+            //每次重新编译都会触发此检测
             if (chunk.indexOf("Compilation complete. Watching for file changes") != -1) {
                 //表示已经启动监视
-                console.log(`[${name}] `, "初次编译完成");
+                console.log(`[${name}] `, "编译完成");
                 //实际返回
                 resolve(child);
+            }
+            else {
+                //考虑在此处检测错误
+                //检测方法不明
             }
         });
         child.stderr.on("data", (c) => {
@@ -41,14 +46,25 @@ async function tscWatch(name, dirpath) {
         });
     });
 }
-async function main() {
+/**
+ * 启动开发监视器，进行自动项目编译部署
+ * @param configname 主要用于确定“当前网站”  并对网站目录启动监视（目前为单一的tsc监视)
+ */
+async function dev(configname = "default") {
     console.log("正在启动处理进程......");
+    let config = require(`../config/${configname}.json`);
+    let sitename = config.site;
+    //考虑抽离此函数作为公共工具函数
+    let getsitepath = (sitename) => `./sites/${sitename}`;
     let childs = await Promise.all([
         tscWatch("App ts监视器", "."),
-        tscWatch("Helper ts监视器", "./app/Helper")
+        tscWatch("Helper ts监视器", "./app/Helper"),
+        tscWatch(`当前网站[${sitename}]`, getsitepath(sitename))
     ]);
     //等待所有任务结束 或输入q 结束所有进程
     console.log("输入ctrl+c结束所有监视任务");
 }
-exports.default = main;
-main();
+exports.default = dev;
+if (require.main == module) {
+    dev();
+}

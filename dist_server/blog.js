@@ -11,6 +11,7 @@ const generator_1 = require("./generator");
 const changesite_1 = require("./changesite");
 const sitegen_1 = require("./sitegen");
 const server_1 = require("./server");
+const dev_1 = require("./dev");
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename, dest) => {
@@ -44,6 +45,16 @@ pro.command("server [port] [configname]")
     .action(async (port = "8080", configname = "default") => {
     let p = parseInt(port);
     await server_1.default(p, configname);
+});
+pro.command("refresh [configname]")
+    .description("刷新，切换网站并重新生成内容，相当于changesite与generate的组合")
+    .action(async (configname = "default") => {
+    await sitegen_1.default(configname);
+});
+pro.command("dev")
+    .description("启动开发监视器（主要用于开发者 开发blog程序和helpers),监视app与helpers目录并实时生成js")
+    .action(async () => {
+    await dev_1.default();
 });
 pro.command("help").description("输出帮助").action(() => pro.outputHelp());
 pro.parseAsync(process.argv);

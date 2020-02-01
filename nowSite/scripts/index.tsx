@@ -294,7 +294,16 @@ class ScrollWidthContainer extends React.Component<{children:any[]}>{
         // this.reset();
     }
     render(){
-        return (<div ref="top" id="hello">
+        return (<div ref="top" style={{
+            backgroundImage:"url(./back.jpg)",
+            backgroundPosition:"center",
+            backgroundSize:"cover",
+            backgroundAttachment:"fixed",
+            backgroundBlendMode:"color-burn",
+            backgroundOrigin:"border-box",
+            backgroundRepeat:"no-repeat",
+            minHeight:"100vh"
+        }}>
             {this.props.children}
         </div>)
     }
@@ -302,7 +311,11 @@ class ScrollWidthContainer extends React.Component<{children:any[]}>{
 
 //暂时不适用上面的容器 性能问题 直接设置fixed
 let Page=(<ScrollWidthContainer>
-    <h1>我的博客</h1>
+    <h1 style={{
+        margin:"0",
+        marginBottom:"1rem",
+        padding:"2rem"
+    }}>我的博客</h1>
     <hr style={{marginBottom:"30px"}}></hr>
     <ArticleList filesPath="../content/files.json" />
 </ScrollWidthContainer>);
