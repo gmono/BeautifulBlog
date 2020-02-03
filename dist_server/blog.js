@@ -10,7 +10,7 @@ const fs = require("fs-extra");
 const generator_1 = require("./generator");
 const changesite_1 = require("./changesite");
 const sitegen_1 = require("./sitegen");
-const server_1 = require("./server");
+const sync_1 = require("./sync");
 const dev_1 = require("./dev");
 const create_1 = require("./create");
 pro.command("transform <filename> [dest]")
@@ -45,7 +45,7 @@ pro.command("sync [port] [configname]")
     .description("启动开发服务器(指定端口与配置文件）")
     .action(async (port = "8080", configname = "default") => {
     let p = parseInt(port);
-    await server_1.default(p, configname);
+    await sync_1.default(p, configname);
 });
 pro.command("refresh [configname]")
     .description("刷新，切换网站并重新生成内容，相当于changesite与generate的组合")
@@ -59,7 +59,7 @@ pro.command("dev [configname] [usesync] [serverport]")
     //考虑在此处启动开发服务器实现自动同步site和自动生成content 以提供完整的开发体验
     if (useserver == "y") {
         let p = parseInt(serverport);
-        await server_1.default(p, configname);
+        await sync_1.default(p, configname);
     }
 });
 //new命令与create程序对应

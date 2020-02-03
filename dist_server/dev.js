@@ -8,6 +8,31 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
+const tscCompileOK = (outcontent) => outcontent.indexOf("Compilation complete. Watching for file changes") != -1;
+const tscCompileError = (outcontent) => {
+    //tsc编译器编译出错的情况
+    //扫描并检测每行，记录所有错误和错误位置 错误号与 错误表述
+    let errorlines = outcontent.split("\n").filter((line) => (line.indexOf("error TS") != -1));
+    //提取每个错误行的信息
+    let errors = errorlines.map((line, i) => {
+        //把每行转换为一个对象 
+        let regex = /(.*)\((\d+),(\d+)\):\s*error\sTS(\d+):(.+)/;
+        //1:文件 2:行 3 列 4 错误号 5 错误描述
+        let result = line.match(regex);
+        let info = {
+            errorCode: parseInt(result[4]),
+            errorDesc: result[5],
+            errorFile: result[1],
+            errorPoints: [
+                [parseInt(result[2]), parseInt(result[3])]
+            ]
+        };
+        return info;
+    });
+    //合并操作 合并errorFile相同的info对象
+    //此处需要groupBy函数 
+    let conErrors;
+};
 /**
  * 启动tsc -w 来监视一个目录的ts文件实时编译
  * @param dirpath 要监控的目录
@@ -28,7 +53,7 @@ async function tscWatch(name, dirpath) {
         //等待输出编译完成后返回
         child.stdout.on("data", (chunk) => {
             //每次重新编译都会触发此检测
-            if (chunk.indexOf("Compilation complete. Watching for file changes") != -1) {
+            if (tscCompileOK(chunk)) {
                 //表示已经启动监视
                 console.log(`[${name}] `, "编译完成");
                 //实际返回

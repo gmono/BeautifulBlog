@@ -10,7 +10,7 @@ import * as fs from "fs-extra"
 import generate from "./generator"
 import changesite from "./changesite";
 import sitegen from "./sitegen"
-import sync from "./server";
+import sync from "./sync";
 import dev from "./dev";
 import { createArticle, createClass } from "./create";
 pro.command("transform <filename> [dest]")
