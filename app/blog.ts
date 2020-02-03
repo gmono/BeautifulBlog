@@ -57,10 +57,15 @@ pro.command("refresh [configname]")
     .action(async (configname="default")=>{
         await sitegen(configname);
     });
-pro.command("dev [configname]")
-    .description("启动开发监视器（主要用于开发者 开发blog程序和helpers),监视app与helpers目录并实时生成js,配置文件主要用于指定要监视的网站（sites目录中）")
-    .action(async (configname="default")=>{
+pro.command("dev [configname] [useserver] [serverport]")
+    .description("启动开发用自动编译器（主要用于开发者),监视app与helpers目录并实时生成js,配置文件主要用于指定要监视的网站（sites目录中）,useserver=y|n 指定是否同时启动开发服务器（等同于server命令）以自动同步site和生成content")
+    .action(async (configname="default",useserver:"y"|"n"="y",serverport="8080")=>{
         await dev(configname);
+        //考虑在此处启动开发服务器实现自动同步site和自动生成content 以提供完整的开发体验
+        if(useserver=="y"){
+            let p=parseInt(serverport);
+            await serve(p,configname);
+        }
     })
 
 //new命令与create程序对应
