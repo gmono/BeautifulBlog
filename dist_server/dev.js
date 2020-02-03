@@ -23,6 +23,7 @@ async function tscWatch(name, dirpath) {
         }
     });
     console.log(`[${name}] `, "已启动,正在等待完成......");
+    ///此处等待Subject实现（rxjs）
     return new Promise((resolve) => {
         //等待输出编译完成后返回
         child.stdout.on("data", (chunk) => {

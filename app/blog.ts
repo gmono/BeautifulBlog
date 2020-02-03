@@ -12,6 +12,7 @@ import changesite from "./changesite";
 import sitegen from "./sitegen"
 import serve from "./server";
 import dev from "./dev";
+import { createArticle, createClass } from "./create";
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename:string,dest?:string)=>{
@@ -56,10 +57,29 @@ pro.command("refresh [configname]")
     .action(async (configname="default")=>{
         await sitegen(configname);
     });
-pro.command("dev")
-    .description("启动开发监视器（主要用于开发者 开发blog程序和helpers),监视app与helpers目录并实时生成js")
-    .action(async ()=>{
-        await dev();
+pro.command("dev [configname]")
+    .description("启动开发监视器（主要用于开发者 开发blog程序和helpers),监视app与helpers目录并实时生成js,配置文件主要用于指定要监视的网站（sites目录中）")
+    .action(async (configname="default")=>{
+        await dev(configname);
+    })
+
+//new命令与create程序对应
+pro.command("new <type> <path> <name> ")
+    .description("创建文章或子类 type: a 文章 c 子类 ")
+    .action(async (type:"a"|"c",p:string,name:string)=>{
+        //合成相对于articles的地址
+        let basepath=`./articles/${p}`;
+        switch(type){
+            case "a":
+                await createArticle(basepath,name);
+                break;
+            case "c":
+                await createClass(basepath,name);
+                break;
+            default:
+                console.warn("不存在此创建类型");
+                break;
+        }
     })
 pro.command("help").description("输出帮助").action(()=>pro.outputHelp());
 

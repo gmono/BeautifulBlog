@@ -28,6 +28,7 @@ import { IConfig } from "./Interface/IConfig";
          }
      });
      console.log(`[${name}] `,"已启动,正在等待完成......");
+     ///此处等待Subject实现（rxjs）
      return new Promise<ChildProcess>((resolve)=>{
          //等待输出编译完成后返回
         child.stdout.on("data",(chunk:string)=>{

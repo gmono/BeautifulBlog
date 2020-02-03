@@ -12,6 +12,7 @@ const changesite_1 = require("./changesite");
 const sitegen_1 = require("./sitegen");
 const server_1 = require("./server");
 const dev_1 = require("./dev");
+const create_1 = require("./create");
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename, dest) => {
@@ -51,10 +52,28 @@ pro.command("refresh [configname]")
     .action(async (configname = "default") => {
     await sitegen_1.default(configname);
 });
-pro.command("dev")
-    .description("启动开发监视器（主要用于开发者 开发blog程序和helpers),监视app与helpers目录并实时生成js")
-    .action(async () => {
-    await dev_1.default();
+pro.command("dev [configname]")
+    .description("启动开发监视器（主要用于开发者 开发blog程序和helpers),监视app与helpers目录并实时生成js,配置文件主要用于指定要监视的网站（sites目录中）")
+    .action(async (configname = "default") => {
+    await dev_1.default(configname);
+});
+//new命令与create程序对应
+pro.command("new <type> <path> <name> ")
+    .description("创建文章或子类 type: a 文章 c 子类 ")
+    .action(async (type, p, name) => {
+    //合成相对于articles的地址
+    let basepath = `./articles/${p}`;
+    switch (type) {
+        case "a":
+            await create_1.createArticle(basepath, name);
+            break;
+        case "c":
+            await create_1.createClass(basepath, name);
+            break;
+        default:
+            console.warn("不存在此创建类型");
+            break;
+    }
 });
 pro.command("help").description("输出帮助").action(() => pro.outputHelp());
 pro.parseAsync(process.argv);

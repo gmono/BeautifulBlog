@@ -23,34 +23,56 @@ let makeToClassBase=<T>(func:(tp:string,...args)=>T)=>{
   * @param basepath 要创建的文章的目录
   * @param title 文章标题 同名则报错
   */
-async function createArticle(basepath:string,title:string){
+export async function createArticle(basepath:string,title:string){
     //生成文件名
     let filename=`${title}.md`;
     let p=path.resolve(basepath,filename);
     if(await fse.pathExists(p)){
         throw new Error(`错误，目录${basepath}存在同名文章`);
     }
-    //读取标准模板
-    let templateContent=`
----
+    //标准模板
+    let templateContent=`---
 title: "${title}"
-date: ${new Date()}
+date: ${JSON.stringify(new Date())}
 draft: true
 ---
     `
     //创建文件
     await fse.writeFile(p,templateContent);
+    console.log(`创建文章完成，文章路径:${p}`)
 }
 
 
-
-async function createClass(basepath:string,name:string){
-
+/**
+ * 在一个文件夹中创建一个子类（一个子文件夹）
+ * @param basepath 要在其中创建Class（子文件夹）的目录
+ * @param name class名称
+ */
+export async function createClass(basepath:string,name:string){
+    let p=path.resolve(basepath,name);
+    if(await fse.pathExists(p)){
+        throw new Error("错误，子类已存在");
+    }
+    await fse.mkdir(p);
+    console.log(`创建子类完成，子类文件夹路径:${p}`)
 }
-async function createVersion(basepath:string,name:string){
 
-}
-async function createTag(basepath:string,name:string){
 
+export async function createVersion(basepath:string,name:string){
+    throw new Error("尚未实现此功能");
 }
-let createArticleByClass=makeToClassBase(createArticle);
+export async function createTag(basepath:string,name:string){
+    throw new Error("尚未实现此功能");
+}
+
+//使用类序列而非地址来工作的函数
+//所有函数除第一个参数为一个string[] 表示classes（逐级下降）外，其余参数与原始函数相同
+export let createArticleByClasses=makeToClassBase(createArticle);
+export let createClassByClasses=makeToClassBase(createClass);
+export let createVersionByClasses=makeToClassBase(createVersion);
+export let createTagByClass=makeToClassBase(createTag);
+
+if(require.main==module){
+    console.log("本程序不支持直接运行,请在程序中引用");
+}
+
