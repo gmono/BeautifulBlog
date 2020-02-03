@@ -10,7 +10,7 @@ import * as fs from "fs-extra"
 import generate from "./generator"
 import changesite from "./changesite";
 import sitegen from "./sitegen"
-import serve from "./server";
+import sync from "./server";
 import dev from "./dev";
 import { createArticle, createClass } from "./create";
 pro.command("transform <filename> [dest]")
@@ -45,11 +45,11 @@ pro.command("watch [configname]")
     .action(async (configname?:string)=>{
         await sitegen(configname);
     });
-pro.command("server [port] [configname]")
+pro.command("sync [port] [configname]")
 .description("启动开发服务器(指定端口与配置文件）")
 .action(async (port:string="8080",configname="default")=>{
     let p=parseInt(port);
-    await serve(p,configname);
+    await sync(p,configname);
 });
 
 pro.command("refresh [configname]")
@@ -57,14 +57,14 @@ pro.command("refresh [configname]")
     .action(async (configname="default")=>{
         await sitegen(configname);
     });
-pro.command("dev [configname] [useserver] [serverport]")
-    .description("启动开发用自动编译器（主要用于开发者),监视app与helpers目录并实时生成js,配置文件主要用于指定要监视的网站（sites目录中）,useserver=y|n 指定是否同时启动开发服务器（等同于server命令）以自动同步site和生成content")
+pro.command("dev [configname] [usesync] [serverport]")
+    .description("启动开发用自动编译器（主要用于开发者),监视app与helpers目录并实时生成js,配置文件主要用于指定要监视的网站（sites目录中）,usesync=y|n 指定是否同时启动同步服务器（等同于sync命令）以自动同步site和生成content")
     .action(async (configname="default",useserver:"y"|"n"="y",serverport="8080")=>{
         await dev(configname);
         //考虑在此处启动开发服务器实现自动同步site和自动生成content 以提供完整的开发体验
         if(useserver=="y"){
             let p=parseInt(serverport);
-            await serve(p,configname);
+            await sync(p,configname);
         }
     })
 

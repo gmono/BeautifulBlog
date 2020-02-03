@@ -41,7 +41,7 @@ pro.command("watch [configname]")
     .action(async (configname) => {
     await sitegen_1.default(configname);
 });
-pro.command("server [port] [configname]")
+pro.command("sync [port] [configname]")
     .description("启动开发服务器(指定端口与配置文件）")
     .action(async (port = "8080", configname = "default") => {
     let p = parseInt(port);
@@ -52,8 +52,8 @@ pro.command("refresh [configname]")
     .action(async (configname = "default") => {
     await sitegen_1.default(configname);
 });
-pro.command("dev [configname] [useserver] [serverport]")
-    .description("启动开发用自动编译器（主要用于开发者),监视app与helpers目录并实时生成js,配置文件主要用于指定要监视的网站（sites目录中）,useserver=y|n 指定是否同时启动开发服务器（等同于server命令）以自动同步site和生成content")
+pro.command("dev [configname] [usesync] [serverport]")
+    .description("启动开发用自动编译器（主要用于开发者),监视app与helpers目录并实时生成js,配置文件主要用于指定要监视的网站（sites目录中）,usesync=y|n 指定是否同时启动同步服务器（等同于sync命令）以自动同步site和生成content")
     .action(async (configname = "default", useserver = "y", serverport = "8080") => {
     await dev_1.default(configname);
     //考虑在此处启动开发服务器实现自动同步site和自动生成content 以提供完整的开发体验
