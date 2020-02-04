@@ -22,26 +22,45 @@ const tscCompileError = (outcontent) => {
         let regex = /(.*)\((\d+),(\d+)\):\s*error\sTS(\d+):(.+)/;
         //1:文件 2:行 3 列 4 错误号 5 错误描述
         let result = line.match(regex);
+        //初始只记录一个文件的一个point
         let info = {
             errorCode: parseInt(result[4]),
             errorDesc: result[5],
-            errorFile: result[1],
-            errorPoints: [
-                [parseInt(result[2]), parseInt(result[3])]
-            ]
+            //未来合并 此处记录一条 一个文件的一个位置
+            errors: [{
+                    filepath: result[1],
+                    errorPoints: [[parseInt(result[2]), parseInt(result[3])]]
+                }]
         };
         return info;
     });
     //合并操作 合并errorFile相同的info对象
-    //此处需要groupBy函数 
-    let conErrors = ld.groupBy(errors, (e) => e.errorFile);
-    //进行融合
+    //此处需要groupBy函数 这里可以改变进而改变
+    let conErrors = ld.groupBy(errors, (e) => e.errorCode);
+    //进行融合 根据errorcode
     let result = ld.reduce(conErrors, (result, value, key) => {
-        //此处融合errorinfo列表为一个
-        let allpoints = value.map((v) => v.errorPoints).flat();
+        //展开一组的需要合并的信息 此处为errors数组 每个数组记录一个文件的一个位置
+        //把每组中的每个元素映射到其保存的唯一一个错误信息得到一个error列表 然后根据filepath分组
+        //得到一个error列表的dict key=filepath value=  filepath==key的error的数组
+        let allpoints = ld.groupBy(value.map(v => v.errors[0]), v => v.filepath);
+        //合并同filepath的points 把 error组的列表变为error的列表（合并组） value表示一组 key表示这组的filepath
+        let ninfos = ld.reduce(allpoints, (result, value, key) => {
+            //合并组 合并完成后得到一个包含有同filepath和其所有point的errorfileinfo[]
+            //此处value为同filepath的info
+            //本质上为把所有info中的points数组合并为一个数组
+            //这里考虑把把所有info map为各自的point数组并执行flat 合并数组
+            let points = value.map(v => v.errorPoints).flat();
+            //创建新的info
+            let ninfo = {
+                filepath: key,
+                errorPoints: points
+            };
+            result.push(ninfo);
+            return result;
+        }, []);
         //生成唯一的info
         let info = ld.cloneDeep(value[0]);
-        info.errorPoints = allpoints;
+        info.errors = ninfos;
         //把融合的info加入结果数组
         result.push(info);
         return result;
@@ -74,7 +93,7 @@ async function tscWatch(name, dirpath) {
                 //输出错误
                 errors.forEach((v) => {
                     //此处考虑追加输出行列
-                    console.error(`[${name}] `, `错误 ${v.errorCode}:${v.errorDesc}`);
+                    console.error(`[${name}] `, `错误 ${v.errorCode}:${v.errorDesc} 文件数:${v.errors.length} 总位置数:${ld.sumBy(v.errors, v => v.errorPoints.length)}`);
                 });
             }
             if (tscCompileOK(chunk)) {
