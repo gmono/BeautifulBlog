@@ -15,6 +15,11 @@ import { IConfig } from "./Interface/IConfig";
 const app=new koa();
 app.use(kstatic("."));
 
+/**
+ * 此函数一定要作为单独程序启动
+ * @param port 接口
+ * @param configname 配置文件
+ */
 export default async function serve(port:number=80,configname="default"){
     
     //启动监视

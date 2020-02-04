@@ -13,6 +13,7 @@ import sitegen from "./sitegen"
 import sync from "./sync";
 import dev from "./dev";
 import { createArticle, createClass } from "./create";
+import { exec, fork } from "child_process";
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename:string,dest?:string)=>{
@@ -63,8 +64,12 @@ pro.command("dev [configname] [usesync] [serverport]")
         await dev(configname);
         //考虑在此处启动开发服务器实现自动同步site和自动生成content 以提供完整的开发体验
         if(useserver=="y"){
+            console.log("正在启动同步程序...");
             let p=parseInt(serverport);
-            await sync(p,configname);
+            let c= exec(`yarn blog sync ${p} ${configname}`);
+            c.stdout.on("data",(str:string)=>{
+                console.log("[同步程序] ",str);
+            })
         }
     })
 

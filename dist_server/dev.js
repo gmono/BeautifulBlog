@@ -9,10 +9,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
 const tscCompileOK = (outcontent) => outcontent.indexOf("Compilation complete. Watching for file changes") != -1;
+const ld = require("lodash");
 const tscCompileError = (outcontent) => {
     //tsc编译器编译出错的情况
     //扫描并检测每行，记录所有错误和错误位置 错误号与 错误表述
     let errorlines = outcontent.split("\n").filter((line) => (line.indexOf("error TS") != -1));
+    if (errorlines.length == 0)
+        return null;
     //提取每个错误行的信息
     let errors = errorlines.map((line, i) => {
         //把每行转换为一个对象 
@@ -31,7 +34,19 @@ const tscCompileError = (outcontent) => {
     });
     //合并操作 合并errorFile相同的info对象
     //此处需要groupBy函数 
-    let conErrors;
+    let conErrors = ld.groupBy(errors, (e) => e.errorFile);
+    //进行融合
+    let result = ld.reduce(conErrors, (result, value, key) => {
+        //此处融合errorinfo列表为一个
+        let allpoints = value.map((v) => v.errorPoints).flat();
+        //生成唯一的info
+        let info = ld.cloneDeep(value[0]);
+        info.errorPoints = allpoints;
+        //把融合的info加入结果数组
+        result.push(info);
+        return result;
+    }, []);
+    return result;
 };
 /**
  * 启动tsc -w 来监视一个目录的ts文件实时编译
@@ -53,15 +68,20 @@ async function tscWatch(name, dirpath) {
         //等待输出编译完成后返回
         child.stdout.on("data", (chunk) => {
             //每次重新编译都会触发此检测
+            //检测错误
+            let errors = tscCompileError(chunk);
+            if (errors != null) {
+                //输出错误
+                errors.forEach((v) => {
+                    //此处考虑追加输出行列
+                    console.error(`[${name}] `, `错误 ${v.errorCode}:${v.errorDesc}`);
+                });
+            }
             if (tscCompileOK(chunk)) {
                 //表示已经启动监视
                 console.log(`[${name}] `, "编译完成");
                 //实际返回
                 resolve(child);
-            }
-            else {
-                //考虑在此处检测错误
-                //检测方法不明
             }
         });
         child.stderr.on("data", (c) => {

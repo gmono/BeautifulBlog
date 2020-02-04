@@ -13,6 +13,7 @@ const sitegen_1 = require("./sitegen");
 const sync_1 = require("./sync");
 const dev_1 = require("./dev");
 const create_1 = require("./create");
+const child_process_1 = require("child_process");
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename, dest) => {
@@ -58,8 +59,12 @@ pro.command("dev [configname] [usesync] [serverport]")
     await dev_1.default(configname);
     //考虑在此处启动开发服务器实现自动同步site和自动生成content 以提供完整的开发体验
     if (useserver == "y") {
+        console.log("正在启动同步程序...");
         let p = parseInt(serverport);
-        await sync_1.default(p, configname);
+        let c = child_process_1.exec(`yarn blog sync ${p} ${configname}`);
+        c.stdout.on("data", (str) => {
+            console.log("[同步程序] ", str);
+        });
     }
 });
 //new命令与create程序对应
