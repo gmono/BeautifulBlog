@@ -14,6 +14,7 @@ import sync from "./sync";
 import dev from "./dev";
 import { createArticle, createClass } from "./create";
 import { exec, fork } from "child_process";
+import watchArticles from "./watch";
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename:string,dest?:string)=>{
@@ -41,10 +42,13 @@ pro.command("changesite [sitename]")
     .action(async (sitename:string="default")=>{
         await changesite(sitename);
     });
+
+//并不等同于watch程序（watch程序中有监视articles目录和sites目录的函数）
 pro.command("watch [configname]")
     .description("监视文件改动并实时生成")
     .action(async (configname?:string)=>{
-        await sitegen(configname);
+        console.log("正在监视文章改动......");
+        await watchArticles();
     });
 pro.command("sync [port] [configname]")
 .description("启动开发服务器(指定端口与配置文件）")

@@ -13,13 +13,18 @@ const ld = require("lodash");
 function hasError(outcontent) {
     return outcontent.indexOf("error TS") != -1;
 }
+/**
+ * 测试一行错误是否发生在nodemodules目录中
+ */
 function isInNodeModules(errorline) {
     //此处有问题 似乎没有起到过滤nodemodules的作用
     let reg = /^.*\/?node_modules\/.*/;
     let result = errorline.match(reg);
+    //匹配不上说明不是在nodemodules目录中发生
     if (result == null)
-        return true;
-    return false;
+        return false;
+    console.log(result[0]);
+    return true;
 }
 const tscCompileError = (outcontent) => {
     //tsc编译器编译出错的情况
@@ -102,9 +107,14 @@ async function tscWatch(name, dirpath) {
             //检测错误
             if (hasError(chunk)) {
                 //存储chunk 到outcontent中
-                if (!isInNodeModules(chunk))
+                let lines = chunk.split("\n");
+                lines.forEach(v => {
+                    //每一行如果是在node modules目录中发生的则过滤掉
+                    if (isInNodeModules(v))
+                        return;
+                    //不是则加到总的错误输出上 等待编译完成后统一处理输出
                     outcontent += chunk + "\n";
-                //过滤node_modules中的错误
+                });
             }
             if (tscCompileOK(chunk)) {
                 //编译完成 统计并输出所有错误
@@ -115,7 +125,7 @@ async function tscWatch(name, dirpath) {
                     //输出错误
                     errors.forEach((v) => {
                         //此处考虑追加输出行列
-                        console.error(`\t[${name}] `, `错误 ${v.errorCode}:${v.errorDesc} 文件数:${v.errors.length} 总位置数:${ld.sumBy(v.errors, v => v.errorPoints.length)}`);
+                        console.error(`\t[${name}] `, `错误 ${v.errorCode}:${v.errorDesc} 文件数:${v.errors[0].filepath} 总位置数:${ld.sumBy(v.errors, v => v.errorPoints.length)}`);
                     });
                 }
                 console.log(`[${name}] `, "监视中");

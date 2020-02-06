@@ -14,6 +14,7 @@ const sync_1 = require("./sync");
 const dev_1 = require("./dev");
 const create_1 = require("./create");
 const child_process_1 = require("child_process");
+const watch_1 = require("./watch");
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename, dest) => {
@@ -37,10 +38,12 @@ pro.command("changesite [sitename]")
     .action(async (sitename = "default") => {
     await changesite_1.default(sitename);
 });
+//并不等同于watch程序（watch程序中有监视articles目录和sites目录的函数）
 pro.command("watch [configname]")
     .description("监视文件改动并实时生成")
     .action(async (configname) => {
-    await sitegen_1.default(configname);
+    console.log("正在监视文章改动......");
+    await watch_1.default();
 });
 pro.command("sync [port] [configname]")
     .description("启动开发服务器(指定端口与配置文件）")
