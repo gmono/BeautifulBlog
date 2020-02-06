@@ -29,6 +29,16 @@ interface ErrorInfo
 }
 import * as ld from "lodash"
 
+function hasError(outcontent:string){
+    return outcontent.indexOf("error TS")!=-1;
+}
+function isInNodeModules(errorline:string):boolean{
+    //此处有问题 似乎没有起到过滤nodemodules的作用
+    let reg=/^.*\/?node_modules\/.*/;
+    let result=errorline.match(reg);
+    if(result==null) return true;
+    return false;
+}
 const tscCompileError=(outcontent:string)=>{
     //tsc编译器编译出错的情况
     //扫描并检测每行，记录所有错误和错误位置 错误号与 错误表述
@@ -104,20 +114,31 @@ const tscCompileError=(outcontent:string)=>{
      ///此处等待Subject实现（rxjs）
      return new Promise<ChildProcess>((resolve)=>{
          //等待输出编译完成后返回
+         let outcontent="";
         child.stdout.on("data",(chunk:string)=>{
             //每次重新编译都会触发此检测
             //检测错误
-            let errors=tscCompileError(chunk);
-            if(errors!=null){
-                //输出错误
-                errors.forEach((v)=>{
-                    //此处考虑追加输出行列
-                    console.error(`[${name}] `,`错误 ${v.errorCode}:${v.errorDesc} 文件数:${v.errors.length} 总位置数:${ld.sumBy(v.errors,v=>v.errorPoints.length)}`);
-                })
+            if(hasError(chunk)){
+                //存储chunk 到outcontent中
+                if(!isInNodeModules(chunk))
+                    outcontent+=chunk+"\n";
+                //过滤node_modules中的错误
             }
+            
             if(tscCompileOK(chunk)){
+                //编译完成 统计并输出所有错误
                 //表示已经启动监视
                 console.log(`[${name}] `,"编译完成");
+                let errors=tscCompileError(outcontent);
+                if(errors!=null){
+                    //输出错误
+                    errors.forEach((v)=>{
+                        //此处考虑追加输出行列
+                        console.error(`\t[${name}] `,`错误 ${v.errorCode}:${v.errorDesc} 文件数:${v.errors.length} 总位置数:${ld.sumBy(v.errors,v=>v.errorPoints.length)}`);
+                    })
+                }
+                console.log(`[${name}] `,"监视中");
+                outcontent="";
                 //实际返回
                 resolve(child);
             }
