@@ -36,8 +36,9 @@ function hasError(outcontent:string){
  * 测试一行错误是否发生在nodemodules目录中
  */
 function isInNodeModules(errorline:string):boolean{
+    // console.log(JSON.stringify(errorline));
     //此处有问题 似乎没有起到过滤nodemodules的作用
-    let reg=/^.*\/?node_modules\/.*/;
+    let reg=/.*\/?node_modules\/.*/;
     let result=errorline.match(reg);
     //匹配不上说明不是在nodemodules目录中发生
     if(result==null) return false;
@@ -125,12 +126,14 @@ const tscCompileError=(outcontent:string)=>{
             if(hasError(chunk)){
                 //存储chunk 到outcontent中
                 let lines=chunk.split("\n");
+                //分割中可能会有空行 空行会一并被记录到outcontent中
                 lines.forEach(v=>{
                     //每一行如果是在node modules目录中发生的则过滤掉
-                    if(isInNodeModules(v)) return;
-                    //不是则加到总的错误输出上 等待编译完成后统一处理输出
-                    console.log(chunk); //此处可能有问题
-                    outcontent+=chunk+"\n";
+                    if(!isInNodeModules(v)){
+                        //不是则加到总的错误输出上 等待编译完成后统一处理输出
+                        outcontent+=v+"\n";
+                    }
+                    
                 });
             }
             
