@@ -108,7 +108,13 @@ function getContentMeta(articlemeta, from_dir, html, text, articlefile) {
 }
 // console.log(ensurePath)
 //ensurePath(string)->Promise
-async function generate(configname = "default", verbose = false) {
+/**
+ * 从articles生成content
+ * @param configname 配置文件名
+ * @param verbose 是否输出详细文件转换列表
+ * @param refresh 是否执行全部重新生成（当前未完成）
+ */
+async function generate(configname = "default", verbose = false, refresh = false) {
     const config = require(`../config/${configname}.json`);
     //主函数
     let walker = walk.walk("./articles");
@@ -117,13 +123,16 @@ async function generate(configname = "default", verbose = false) {
     if (await fs.pathExists("./content/files.json")) {
         //require基于模块路径
         let t = require("../content/files.json");
-        //如果不相等就维持初始化，等于全部重新生成
+        //如果上次生成使用的配置文件与这次不相等就维持初始化，等于全部重新生成 相等则把files初始化为上次内容
         if (files.useConfig == configname) {
+            //输出提示
+            console.log("增量生成模式");
             files = t;
         }
     }
     ///读入已有的files列表，并清除其中不存在的文件
-    /////////////////////////////////////未完成
+    //如果已经读入了上次的files则需要首先清除不存在的文件 然后生成缺失的和更改的文件
+    //如果重新初始化则此处无用 fileList为空
     let dtasks = [];
     for (let k in files.fileList) {
         //从files中清除此项，同时删除对应的json和html文件
@@ -135,11 +144,11 @@ async function generate(configname = "default", verbose = false) {
         let cpath = getContentPath(apath, "./content");
         let hpath = changeExt(cpath, ".html");
         let jpath = changeExt(cpath, ".json");
-        console.log("删除：", hpath);
+        console.log("文章已删除：", hpath);
         dtasks.push(del(hpath));
         dtasks.push(del(jpath));
     }
-    await Promise.all(dtasks);
+    await Promise.all(dtasks); //等待所有任务完成
     //转换每个文件
     walker.on("file", async (base, name, next) => {
         //转换文件
