@@ -211,7 +211,7 @@ async function generate(configname:string="default",verbose=false,refresh=false)
             let meta=(<IContentMeta>require(getContentPath(confpath,"../content")));
             let cmtime=new Date(meta.modify_time).getTime();
             if(amtime!=cmtime) await generate();//如果修改时间不一样则重新生成
-            else 
+            else ////此处导致了不调用generate函数而无法在files中保存记录的问题(如果config修改或之前的files.json文件或信息丢失则发生此问题)
                 if(verbose) console.log(`文章:${meta.title}:修改时间一致，跳过生成`);
         }
         else await generate();//如果元数据不存在则生成
