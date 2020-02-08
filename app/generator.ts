@@ -120,6 +120,8 @@ function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,tex
     return cmeta;
 }
 
+
+const filesjsonpath="./content/files.json";
 // console.log(ensurePath)
 //ensurePath(string)->Promise
 /**
@@ -217,11 +219,15 @@ async function generate(configname:string="default",verbose=false,refresh=false)
         
         next();
     });
-    walker.on("end",()=>{
+    walker.on("end",async ()=>{
         //写入files.json
-        fs.writeFile("./content/files.json",JSON.stringify(files),(e)=>{
-            e&&console.log(e);
-        })
+        //如果已经存在就先删除
+
+        if(await fs.pathExists(filesjsonpath)){
+            await del(filesjsonpath);
+        }
+        //确定是这里导致的已存在的files.json消失
+        await fs.writeFile(filesjsonpath,JSON.stringify(files));
         console.log("生成完毕");
     })
     
