@@ -31,7 +31,7 @@ function getRel(p) {
 function getContentPath(p, content) {
     let np = getRel(p);
     np = np != "" ? `${content}/${np}` : content;
-    return np;
+    return np.replace("\\", "/");
 }
 /**
  * 获取相对于content目录的路径 {content}=./content
@@ -125,10 +125,15 @@ async function generate(configname = "default", verbose = false, refresh = false
         //require基于模块路径
         let t = require("../content/files.json");
         //如果上次生成使用的配置文件与这次不相等就维持初始化，等于全部重新生成 相等则把files初始化为上次内容
-        if (files.useConfig == configname) {
+        if (t.useConfig == configname) {
             //输出提示
-            console.log("增量生成模式");
+            console.log("配置文件一致，清洗并刷新记录数据中......");
             files = t;
+        }
+        else {
+            //这里由于配置文件更改，files中没有记录，无法清理不存在文章
+            //可以考虑全部重新生成以不出现文件碎片
+            console.log("配置文件更改，刷新记录数据中...");
         }
     }
     ///读入已有的files列表，并清除其中不存在的文件
@@ -174,15 +179,23 @@ async function generate(configname = "default", verbose = false, refresh = false
                 e && console.log(e);
             });
             //写入文章元文件
-            fs.writeFile(confpath, JSON.stringify(cmeta), (e) => {
+            fs.writeFile(confpath, JSON.stringify(cmeta, null, "\t"), (e) => {
                 e && console.log(e);
             });
+            //生成后记录
+            CurrFileRecordToFiles(cmeta.title);
+        };
+        /**
+         * 把当前文件记录到记录到files.json
+         * @param title 文章标题（一般从元数据中获取或从文章中提取）
+         */
+        let CurrFileRecordToFiles = (title) => {
             //记录文章记录到files.json 修bug 替换//
             let url = getUrlFile(base, name, config.base_url);
             url = changeExt(url, ".json");
             files.fileList[url] = {
-                title: cmeta.title,
-                article_path: articlepath
+                title: title,
+                article_path: articlepath.replace("\\", "/")
             };
         };
         //获取articles的时间戳 如果不存在或不同就生成并写入元数据到files.json
@@ -193,11 +206,16 @@ async function generate(configname = "default", verbose = false, refresh = false
             let cmtime = new Date(meta.modify_time).getTime();
             if (amtime != cmtime)
                 await generate(); //如果修改时间不一样则重新生成
-            else if (verbose)
-                console.log(`文章:${meta.title}:修改时间一致，跳过生成`);
+            else {
+                ////此处导致了不调用generate函数而无法在files中保存记录的问题(如果config修改或之前的files.json文件或信息丢失则发生此问题)
+                if (verbose)
+                    console.log(`文章:${meta.title}:修改时间一致，跳过生成`);
+                //此处从已经存在的元数据中读取title并重新记录当前文件到files.json以保证数据最新
+                CurrFileRecordToFiles(meta.title);
+            }
         }
         else
-            await generate(); //如果元数据不存在则生成
+            await generate(); //如果元数据不存在则生成并自动记录到files.json
         next();
     });
     walker.on("end", async () => {
@@ -207,7 +225,7 @@ async function generate(configname = "default", verbose = false, refresh = false
             await del(filesjsonpath);
         }
         //确定是这里导致的已存在的files.json消失
-        await fs.writeFile(filesjsonpath, JSON.stringify(files));
+        await fs.writeFile(filesjsonpath, JSON.stringify(files, null, "\t"));
         console.log("生成完毕");
     });
 }
