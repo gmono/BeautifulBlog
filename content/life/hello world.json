@@ -1,1 +1,9 @@
-{"from_dir":["life"],"article_length":98,"content_length":680,"modify_time":"2020-02-03T09:23:15.511Z","article_path":"./articles/life/hello world.md"}
+{
+	"from_dir": [
+		"life"
+	],
+	"article_length": 98,
+	"content_length": 680,
+	"modify_time": "2020-02-03T09:23:15.511Z",
+	"article_path": "./articles/life/hello world.md"
+}

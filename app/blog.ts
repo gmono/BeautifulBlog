@@ -29,11 +29,12 @@ pro.command("transform <filename> [dest]")
     });
 
 
-pro.command("generate [configname] [verbose]")
+pro.command("generate [configname] [refresh] [verbose]")
     .description("执行生成器程序(verbose 可选择v和verbose 不填默认不显示生成详情)")
-    .action(async (config?:string,verbose?:string)=>{
+    .action(async (config?:string,refresh:"y"|"n"="n",verbose?:string)=>{
         let v=verbose=="v"||verbose=="verbose";
-        await generate(config,v);
+        let r=refresh=="y";
+        await generate(config,v,r);
     });
 
 

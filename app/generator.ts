@@ -132,11 +132,21 @@ const filesjsonpath="./content/files.json";
  */
 async function generate(configname:string="default",verbose=false,refresh=false)
 {
+    //refresh的含义是
+    //1 即使存在content元数据依然执行generate 2. 即使配置文件一致依然初始化files
+    if(refresh) {
+        console.log("已启动全部重新生成");
+    }
+    /////
     const config=require(`../config/${configname}.json`) as IConfig;
     //主函数
     let walker=walk.walk("./articles");
     //文件表 key:元数据路径  value:文章标题  key相对于content目录 后期考虑换为 相对于base_url的路径
     let files:IFiles={useConfig:configname,fileList:{}};
+
+    //此处不缩进表示双重条件
+    //不刷新才考虑加载此前的配置文件
+    if(!refresh) //前缀检查写法
     if(await fs.pathExists("./content/files.json")){
         //require基于模块路径
         let t=require("../content/files.json");
@@ -218,6 +228,10 @@ async function generate(configname:string="default",verbose=false,refresh=false)
                 article_path:articlepath.replace("\\","/")
             }
         }
+
+        //前缀选择写法 加功能专用
+        if(refresh) await generate();
+        else
         //获取articles的时间戳 如果不存在或不同就生成并写入元数据到files.json
         if(await fs.pathExists(confpath)){
             let amtime=name.mtime.getTime();

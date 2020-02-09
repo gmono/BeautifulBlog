@@ -116,26 +116,35 @@ const filesjsonpath = "./content/files.json";
  * @param refresh 是否执行全部重新生成（当前未完成）
  */
 async function generate(configname = "default", verbose = false, refresh = false) {
+    //refresh的含义是
+    //1 即使存在content元数据依然执行generate 2. 即使配置文件一致依然初始化files
+    if (refresh) {
+        console.log("已启动全部重新生成");
+    }
+    /////
     const config = require(`../config/${configname}.json`);
     //主函数
     let walker = walk.walk("./articles");
     //文件表 key:元数据路径  value:文章标题  key相对于content目录 后期考虑换为 相对于base_url的路径
     let files = { useConfig: configname, fileList: {} };
-    if (await fs.pathExists("./content/files.json")) {
-        //require基于模块路径
-        let t = require("../content/files.json");
-        //如果上次生成使用的配置文件与这次不相等就维持初始化，等于全部重新生成 相等则把files初始化为上次内容
-        if (t.useConfig == configname) {
-            //输出提示
-            console.log("配置文件一致，清洗并刷新记录数据中......");
-            files = t;
+    //此处不缩进表示双重条件
+    //不刷新才考虑加载此前的配置文件
+    if (!refresh)
+        if (await fs.pathExists("./content/files.json")) {
+            //require基于模块路径
+            let t = require("../content/files.json");
+            //如果上次生成使用的配置文件与这次不相等就维持初始化，等于全部重新生成 相等则把files初始化为上次内容
+            if (t.useConfig == configname) {
+                //输出提示
+                console.log("配置文件一致，清洗并刷新记录数据中......");
+                files = t;
+            }
+            else {
+                //这里由于配置文件更改，files中没有记录，无法清理不存在文章
+                //可以考虑全部重新生成以不出现文件碎片
+                console.log("配置文件更改，刷新记录数据中...");
+            }
         }
-        else {
-            //这里由于配置文件更改，files中没有记录，无法清理不存在文章
-            //可以考虑全部重新生成以不出现文件碎片
-            console.log("配置文件更改，刷新记录数据中...");
-        }
-    }
     ///读入已有的files列表，并清除其中不存在的文件
     //如果已经读入了上次的files则需要首先清除不存在的文件 然后生成缺失的和更改的文件
     //如果重新初始化则此处无用 fileList为空
@@ -198,6 +207,10 @@ async function generate(configname = "default", verbose = false, refresh = false
                 article_path: articlepath.replace("\\", "/")
             };
         };
+        //前缀选择写法 加功能专用
+        if (refresh)
+            await generate();
+        else 
         //获取articles的时间戳 如果不存在或不同就生成并写入元数据到files.json
         if (await fs.pathExists(confpath)) {
             let amtime = name.mtime.getTime();

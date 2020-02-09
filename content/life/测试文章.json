@@ -1,1 +1,12 @@
-{"from_dir":["life"],"article_length":91,"content_length":701,"modify_time":"2020-02-03T09:20:34.378Z","article_path":"./articles/life/测试文章.md"}
+{
+	"title": "测试文章",
+	"date": "Mon Feb 03 2020 17:20:34 GMT+0800 (GMT+08:00)",
+	"draft": true,
+	"from_dir": [
+		"life"
+	],
+	"article_length": 0,
+	"content_length": 568,
+	"modify_time": "2020-02-09T05:06:43.859Z",
+	"article_path": "./articles/life/测试文章.md"
+}

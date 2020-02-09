@@ -1,1 +1,12 @@
-{"title":"设计一个新的静态博客系统","date":"2020-01-04T14:38:54.000Z","draft":false,"from_dir":["tech"],"article_length":1566,"content_length":11153,"modify_time":"2020-01-04T15:42:27.903Z","article_path":"./articles/tech/设计一个新的静态博客系统.md"}
+{
+	"title": "设计一个新的静态博客系统",
+	"date": "2020-01-04T14:38:54.000Z",
+	"draft": false,
+	"from_dir": [
+		"tech"
+	],
+	"article_length": 1566,
+	"content_length": 11153,
+	"modify_time": "2020-01-04T15:42:27.903Z",
+	"article_path": "./articles/tech/设计一个新的静态博客系统.md"
+}
