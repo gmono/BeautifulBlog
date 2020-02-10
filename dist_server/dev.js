@@ -86,8 +86,11 @@ const tscCompileError = (outcontent) => {
 /**
  * 启动tsc -w 来监视一个目录的ts文件实时编译
  * @param dirpath 要监控的目录
+ * @param spinner 用于输出的spinner（一个状态显示行）
  */
-async function tscWatch(name, dirpath) {
+async function tscWatch(name, dirpath, spinner) {
+    //设置显示前缀（名字）
+    spinner.prefixText = `[${name}] `;
     //需要调查detached在false时，有监听事件时，会不会被自动结束的问题
     let child = child_process_1.exec("tsc -w", {
         cwd: dirpath
@@ -97,7 +100,7 @@ async function tscWatch(name, dirpath) {
             console.log(`${name}ERROR:`, stderr);
         }
     });
-    console.log(`[${name}] `, "已启动,正在等待完成......");
+    spinner.text = "已启动,正在等待完成......";
     ///此处等待Subject实现（rxjs）
     return new Promise((resolve) => {
         //等待输出编译完成后返回
@@ -120,26 +123,27 @@ async function tscWatch(name, dirpath) {
             if (tscCompileOK(chunk)) {
                 //编译完成 统计并输出所有错误
                 //表示已经启动监视
-                console.log(`[${name}] `, "编译完成");
+                spinner.text = "编译完成";
                 let errors = tscCompileError(outcontent);
                 if (errors != null) {
                     //输出错误
                     errors.forEach((v) => {
                         //此处考虑追加输出行列
+                        //这里有个如何输出一个"面板“的问题
                         console.error(`\t[${name}] `, `错误 ${v.errorCode}:${v.errorDesc} 文件数:${v.errors[0].filepath} 总位置数:${ld.sumBy(v.errors, v => v.errorPoints.length)}`);
                     });
                 }
-                console.log(`[${name}] `, "监视中");
+                spinner.text = "监视中";
                 outcontent = "";
                 //实际返回
                 resolve(child);
             }
         });
         child.stderr.on("data", (c) => {
-            console.log(`[${name}] `, `错误:`, c);
+            spinner.warn(`错误:${c}`);
         });
         child.on("close", (code, signal) => {
-            console.log(`[${name}] `, "已退出", `退出代码${code}`);
+            spinner.text = "已退出", `退出代码${code}`;
         });
     });
 }
@@ -154,9 +158,9 @@ async function dev(configname = "default") {
     //考虑抽离此函数作为公共工具函数
     let getsitepath = (sitename) => `./sites/${sitename}`;
     let childs = await Promise.all([
-        tscWatch("App ts监视器", "."),
-        tscWatch("Helper ts监视器", "./app/Helper"),
-        tscWatch(`当前网站[${sitename}]`, getsitepath(sitename))
+        tscWatch("App ts监视器", ".", ora({}).start()),
+        tscWatch("Helper ts监视器", "./app/Helper", ora("......").start()),
+        tscWatch(`当前网站[${sitename}]`, getsitepath(sitename), ora("......").start())
     ]);
     //等待所有任务结束 或输入q 结束所有进程
     console.log("输入ctrl+c结束所有监视任务");

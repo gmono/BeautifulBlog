@@ -11,7 +11,8 @@
     "refresh": "node ./dist_server/sitegen.js",
     "server": "node ./dist_server/server.js",
     "dev": "node ./dist_server/dev.js",
-    "blog": "node ./dist_server/blog.js"
+    "blog": "node ./dist_server/blog.js",
+    "test": "node ./dist_server/testLib.js"
   },
   "author": "gmono",
   "license": "MIT",
@@ -38,6 +39,7 @@
     "core-decorators": "^0.20.0",
     "dateformat": "^3.0.3",
     "del": "^5.1.0",
+    "delay": "^4.3.0",
     "front-matter": "^3.0.2",
     "fs-extra": "^8.1.0",
     "highlight": "^0.2.4",

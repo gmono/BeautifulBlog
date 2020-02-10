@@ -1124,6 +1124,10 @@ del@^5.1.0:
     rimraf "^3.0.0"
     slash "^3.0.0"
 
+delay@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.npmjs.org/delay/-/delay-4.3.0.tgz#efeebfb8f545579cb396b3a722443ec96d14c50e"
+
 delayed-stream@~1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/delayed-stream/-/delayed-stream-1.0.0.tgz#df3ae199acadfb7d440aaae0b29e2272b24ec619"
