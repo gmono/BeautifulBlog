@@ -113,6 +113,12 @@
   dependencies:
     "@types/koa" "*"
 
+"@types/koa-router@^7.4.0":
+  version "7.4.0"
+  resolved "https://registry.npmjs.org/@types/koa-router/-/koa-router-7.4.0.tgz#4a5f48ca4432281f7429faedd9510c20945939dc"
+  dependencies:
+    "@types/koa" "*"
+
 "@types/koa-send@*":
   version "4.1.2"
   resolved "https://registry.npmjs.org/@types/koa-send/-/koa-send-4.1.2.tgz#978f8267ad116d12ac6a18fecd8f34c5657e09ad"
@@ -1054,6 +1060,12 @@ debug@^3.1.0:
   dependencies:
     ms "^2.1.1"
 
+debug@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.npmjs.org/debug/-/debug-4.1.1.tgz#3b72260255109c6b589cee050f1d516139664791"
+  dependencies:
+    ms "^2.1.1"
+
 debug@~3.1.0:
   version "3.1.0"
   resolved "https://registry.npmjs.org/debug/-/debug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
@@ -1820,7 +1832,7 @@ http-assert@^1.3.0:
     deep-equal "~1.0.1"
     http-errors "~1.7.2"
 
-http-errors@^1.6.3, http-errors@~1.7.2:
+http-errors@^1.6.3, http-errors@^1.7.3, http-errors@~1.7.2:
   version "1.7.3"
   resolved "https://registry.npmjs.org/http-errors/-/http-errors-1.7.3.tgz#6c619e4f9c60308c38519498c14fbb10aacebb06"
   dependencies:
@@ -2181,6 +2193,17 @@ koa-convert@^1.2.0:
     co "^4.6.0"
     koa-compose "^3.0.0"
 
+koa-router@^8.0.7:
+  version "8.0.7"
+  resolved "https://registry.npmjs.org/koa-router/-/koa-router-8.0.7.tgz#40a6a7ca95f17e3809181d93f5d6d8f2ec39f206"
+  dependencies:
+    debug "^4.1.1"
+    http-errors "^1.7.3"
+    koa-compose "^4.1.0"
+    methods "^1.1.2"
+    path-to-regexp "1.x"
+    urijs "^1.19.2"
+
 koa-send@^5.0.0:
   version "5.0.0"
   resolved "https://registry.npmjs.org/koa-send/-/koa-send-5.0.0.tgz#5e8441e07ef55737734d7ced25b842e50646e7eb"
@@ -2189,6 +2212,12 @@ koa-send@^5.0.0:
     http-errors "^1.6.3"
     mz "^2.7.0"
     resolve-path "^1.4.0"
+
+koa-static-router@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.npmjs.org/koa-static-router/-/koa-static-router-1.3.0.tgz#b15aa7bca0849d20e1343474429b21c26aa895fe"
+  dependencies:
+    koa-send "^5.0.0"
 
 koa-static@^5.0.0:
   version "5.0.0"
@@ -2372,6 +2401,10 @@ merge2@^1.2.3, merge2@^1.3.0:
 merge@^1.2.0:
   version "1.2.1"
   resolved "https://registry.npmjs.org/merge/-/merge-1.2.1.tgz#38bebf80c3220a8a487b6fcfb3941bb11720c145"
+
+methods@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/methods/-/methods-1.1.2.tgz#5529a4d67654134edcc5266656835b0f851afcee"
 
 micromatch@^3.1.10, micromatch@^3.1.4:
   version "3.1.10"
@@ -2817,6 +2850,12 @@ path-is-absolute@1.0.1, path-is-absolute@^1.0.0:
 path-parse@^1.0.6:
   version "1.0.6"
   resolved "https://registry.npmjs.org/path-parse/-/path-parse-1.0.6.tgz#d62dbb5679405d72c4737ec58600e9ddcf06d24c"
+
+path-to-regexp@1.x:
+  version "1.8.0"
+  resolved "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-1.8.0.tgz#887b3ba9d84393e87a0a0b9f4cb756198b53548a"
+  dependencies:
+    isarray "0.0.1"
 
 path-type@^1.0.0:
   version "1.1.0"
@@ -3720,6 +3759,10 @@ uri-js@^4.2.2:
   resolved "https://registry.npmjs.org/uri-js/-/uri-js-4.2.2.tgz#94c540e1ff772956e2299507c010aea6c8838eb0"
   dependencies:
     punycode "^2.1.0"
+
+urijs@^1.19.2:
+  version "1.19.2"
+  resolved "https://registry.npmjs.org/urijs/-/urijs-1.19.2.tgz#f9be09f00c4c5134b7cb3cf475c1dd394526265a"
 
 urix@^0.1.0:
   version "0.1.0"

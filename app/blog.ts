@@ -51,9 +51,9 @@ pro.command("watch [configname]")
         console.log("正在监视文章改动......");
         await watchArticles();
     });
-pro.command("sync [port] [configname]")
+pro.command("sync  [configname] [port]")
 .description("启动开发服务器(指定端口与配置文件）")
-.action(async (port:string="8080",configname="default")=>{
+.action(async (configname="default",port:string="8080")=>{
     let p=parseInt(port);
     await sync(p,configname);
 });
@@ -63,6 +63,11 @@ pro.command("refresh [configname]")
     .action(async (configname="default")=>{
         await sitegen(configname);
     });
+
+/**
+ * 其中usesync 为n时 configname只用于选取要监视的网站(编译并自动复制到nowSite) usesync为y时，configname还用于给
+ * sync程序指定配置文件（用于生成内容）
+ */
 pro.command("dev [configname] [usesync] [serverport]")
     .description("启动开发用自动编译器（主要用于开发者),监视app与helpers目录并实时生成js,配置文件主要用于指定要监视的网站（sites目录中）,usesync=y|n 指定是否同时启动同步服务器（等同于sync命令）以自动同步site和生成content")
     .action(async (configname="default",useserver:"y"|"n"="y",serverport="8080")=>{

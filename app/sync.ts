@@ -5,15 +5,21 @@
 
 import * as koa from "koa"
 import * as kstatic from "koa-static"
+import * as krouter from "koa-router"
+
+
 import { watchFile } from "fs";
 import watchArticles, { watchSite } from "./watch";
 import { fork } from "child_process";
 import del = require("del");
 import generate from "./generator";
 import   * as clu from "cluster"
+
 import { IConfig } from "./Interface/IConfig";
-const app=new koa();
-app.use(kstatic("."));
+
+
+
+
 
 /**
  * 此函数一定要作为单独程序启动
@@ -21,10 +27,31 @@ app.use(kstatic("."));
  * @param configname 配置文件
  */
 export default async function serve(port:number=80,configname="default"){
+    let config=require(`../config/${configname}.json`) as IConfig;
+    //启动服务器
+    const app=new koa();
+    //prefixify中间件
+    app.use(async (ctx,next)=>{
+        let p=ctx.path;
+        if(p.startsWith(config.base_url)){
+
+            // if(p==config.base_url&&!p.endsWith("/")) (p+="/",ctx.redirect(p));
+            //去除
+            let ap=p.slice(config.base_url.length);
+            if(ap=="") ap="/";
+            
+            //使用去头后的调用next
+            ctx.path=ap;
+            return next();
+        }
+        //错误
+        ctx.redirect(config.base_url+"/");
+    })
+    app.use(kstatic("."))
     
     //启动监视
     if(clu.isMaster){
-        console.log(`服务器启动，端口:${port},地址:http://localhost:${port}`);
+        console.log(`服务器启动，端口:${port},地址:http://localhost:${port}${config.base_url}`);
         //删除原有content 全部重新生成
         await del("./content");
         console.log("已启动全部重新生成");
@@ -44,7 +71,7 @@ export default async function serve(port:number=80,configname="default"){
             }
             else if(msg=="site"){
                 //监控网站 读取指定配置文件中的网站设置
-                let config=require(`../config/${configname}.json`) as IConfig;
+                
                 let sname=config.site;
                 watchSite(sname);
             }
