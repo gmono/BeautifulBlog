@@ -28,6 +28,7 @@ interface ErrorInfo
     errors:ErrorFileInfo[];
 }
 import * as ld from "lodash"
+import * as fse from 'fs-extra';
 
 function hasError(outcontent:string){
     return outcontent.indexOf("error TS")!=-1;
@@ -174,7 +175,7 @@ const tscCompileError=(outcontent:string)=>{
 export default async function dev(configname="default")
 {
     console.log("正在启动处理进程......");
-    let config=require(`../config/${configname}.json`) as IConfig;
+    let config=(await fse.readJSON(`./config/${configname}.json`)) as IConfig;
     let sitename=config.site;
     //考虑抽离此函数作为公共工具函数
     let getsitepath=(sitename:string)=>`./sites/${sitename}`;

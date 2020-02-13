@@ -28,6 +28,7 @@ let readAsync=async (fpath:string)=>{
 import * as cheerio from "cheerio"
 import { IArticleMeta } from "./Interface/IArticleMeta";
 import { outputFile } from "fs-extra";
+import * as fse from 'fs-extra';
 
 function htmlProcessing(html:string):string{
   //解析html并在code的pre标签添加class
@@ -52,7 +53,7 @@ async function transform(filepath:string,configname:string="default"):Promise<Tr
   
     if(first) {
       //加载配置文件并加载语法高亮
-      let config=require(`../config/${configname}.json`)  as IConfig;
+      let config=(await fse.readJSON(`./config/${configname}.json`))  as IConfig;
       let langs=config.code_languages;
       //加载语言高亮支持
       console.log(`设定语言支持：${langs}`)

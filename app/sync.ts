@@ -16,6 +16,7 @@ import generate from "./generator";
 import   * as clu from "cluster"
 
 import { IConfig } from "./Interface/IConfig";
+import * as fse from 'fs-extra';
 
 
 
@@ -27,7 +28,7 @@ import { IConfig } from "./Interface/IConfig";
  * @param configname 配置文件
  */
 export default async function serve(port:number=80,configname="default"){
-    let config=require(`../config/${configname}.json`) as IConfig;
+    let config=(await fse.readJSON(`./config/${configname}.json`)) as IConfig;
     //启动服务器
     const app=new koa();
     //prefixify中间件

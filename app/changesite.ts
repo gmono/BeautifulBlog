@@ -44,9 +44,11 @@ async function changesite(sitename:string){
     })
     
 }
+import * as fs from "fs-extra"
 //按照配置的来复制
 if(require.main==module){
-    let config=require("../config/default.json") as IConfig;
+    
+    let config=fs.readJsonSync("./config/default.json") as IConfig;
     changesite(config.site);
 }
 

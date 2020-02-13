@@ -9,13 +9,14 @@ const watch_1 = require("./watch");
 const del = require("del");
 const generator_1 = require("./generator");
 const clu = require("cluster");
+const fse = require("fs-extra");
 /**
  * 此函数一定要作为单独程序启动
  * @param port 接口
  * @param configname 配置文件
  */
 async function serve(port = 80, configname = "default") {
-    let config = require(`../config/${configname}.json`);
+    let config = (await fse.readJSON(`./config/${configname}.json`));
     //启动服务器
     const app = new koa();
     //prefixify中间件

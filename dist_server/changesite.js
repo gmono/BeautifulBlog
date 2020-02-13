@@ -29,9 +29,10 @@ async function changesite(sitename) {
         });
     });
 }
+const fs = require("fs-extra");
 //按照配置的来复制
 if (require.main == module) {
-    let config = require("../config/default.json");
+    let config = fs.readJsonSync("./config/default.json");
     changesite(config.site);
 }
 exports.default = changesite;

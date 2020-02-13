@@ -122,7 +122,7 @@ async function generate(configname = "default", verbose = false, refresh = false
         console.log("已启动全部重新生成");
     }
     /////
-    const config = require(`../config/${configname}.json`);
+    const config = (await fs.readJSON(`./config/${configname}.json`));
     //主函数
     let walker = walk.walk("./articles");
     //文件表 key:元数据路径  value:文章标题  key相对于content目录 后期考虑换为 相对于base_url的路径
@@ -132,7 +132,7 @@ async function generate(configname = "default", verbose = false, refresh = false
     if (!refresh)
         if (await fs.pathExists("./content/files.json")) {
             //require基于模块路径
-            let t = require("../content/files.json");
+            let t = (await fs.readJSON("./content/files.json"));
             //如果上次生成使用的配置文件与这次不相等就维持初始化，等于全部重新生成 相等则把files初始化为上次内容
             if (t.useConfig == configname) {
                 //输出提示
@@ -215,7 +215,7 @@ async function generate(configname = "default", verbose = false, refresh = false
         if (await fs.pathExists(confpath)) {
             let amtime = name.mtime.getTime();
             //这里直接读入时date是string格式
-            let meta = require(getContentPath(confpath, "../content"));
+            let meta = await fs.readJSON(getContentPath(confpath, "./content"));
             let cmtime = new Date(meta.modify_time).getTime();
             if (amtime != cmtime)
                 await generate(); //如果修改时间不一样则重新生成

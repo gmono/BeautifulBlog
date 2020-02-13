@@ -19,6 +19,7 @@ let readAsync = async (fpath) => {
     });
 };
 const cheerio = require("cheerio");
+const fse = require("fs-extra");
 function htmlProcessing(html) {
     //解析html并在code的pre标签添加class
     let $ = cheerio.load(html);
@@ -34,7 +35,7 @@ let first = true;
 async function transform(filepath, configname = "default") {
     if (first) {
         //加载配置文件并加载语法高亮
-        let config = require(`../config/${configname}.json`);
+        let config = (await fse.readJSON(`./config/${configname}.json`));
         let langs = config.code_languages;
         //加载语言高亮支持
         console.log(`设定语言支持：${langs}`);

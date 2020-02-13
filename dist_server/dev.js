@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
 const tscCompileOK = (outcontent) => outcontent.indexOf("Compilation complete. Watching for file changes") != -1;
 const ld = require("lodash");
+const fse = require("fs-extra");
 function hasError(outcontent) {
     return outcontent.indexOf("error TS") != -1;
 }
@@ -149,7 +150,7 @@ async function tscWatch(name, dirpath) {
  */
 async function dev(configname = "default") {
     console.log("正在启动处理进程......");
-    let config = require(`../config/${configname}.json`);
+    let config = (await fse.readJSON(`./config/${configname}.json`));
     let sitename = config.site;
     //考虑抽离此函数作为公共工具函数
     let getsitepath = (sitename) => `./sites/${sitename}`;
