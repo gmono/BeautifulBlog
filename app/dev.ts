@@ -101,12 +101,14 @@ const tscCompileError=(outcontent:string)=>{
     },[] as ErrorInfo[])
     return result;
 }
+
  /**
   * 启动tsc -w 来监视一个目录的ts文件实时编译
   * @param dirpath 要监控的目录
   */
  async function tscWatch(name:string,dirpath:string)
  {
+     
      //需要调查detached在false时，有监听事件时，会不会被自动结束的问题
      let child=exec("tsc -w",{
          cwd:dirpath
