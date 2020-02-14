@@ -7,6 +7,7 @@ import * as fs from "fs"
 import * as mk from "marked"
 // import * as h from "highlight.js"
 import * as Prism from "prismjs"
+//这行问题导致pkg打包时运行失败
 import * as loadLanguages from 'prismjs/components/'
 import { IConfig } from "./Interface/IConfig";
 
@@ -29,6 +30,7 @@ import * as cheerio from "cheerio"
 import { IArticleMeta } from "./Interface/IArticleMeta";
 import { outputFile } from "fs-extra";
 import * as fse from 'fs-extra';
+import * as path from 'path';
 
 function htmlProcessing(html:string):string{
   //解析html并在code的pre标签添加class
@@ -83,8 +85,8 @@ async function transform(filepath:string,configname:string="default"):Promise<Tr
     })
     //实际内容
     let content=mk(res.body);
-    //模板化
-    let html=template(fs.realpathSync("./static/article_template.html"),{
+    //模板化 改为相对于程序文件的目录（加载静态资源）
+    let html=template(fs.realpathSync(path.resolve(__dirname,"..","./static/article_template.html")),{
         content:content
     }) as string;
     //添加html处理
