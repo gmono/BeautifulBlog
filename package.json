@@ -3,13 +3,15 @@
   "version": "0.0.1",
   "description": "博客系统，可自定义整个网站",
   "main": "generate.js",
-  "bin": "./dist_server/blog.js",
+  "bin": "./dist_server/transform.js",
   "pkg":{
     "scripts": [
-      "./dist_server/**/*.js"
+      
+      "./node_modules/prismjs/components/*.js"
       ],
       "assets": [
           "./static/**/*"
+          
       ]
   },
   "scripts": {
@@ -62,16 +64,18 @@
     "lodash": "^4.17.15",
     "marked": "^0.8.0",
     "ndir": "^0.1.5",
-    "nightmare": "^3.0.2",
+    
     "path-extra": "^4.3.0",
     "prismjs": "^1.18.0",
     "rxjs": "^6.5.4",
     "spinnies": "^0.5.1",
     "walk": "^2.3.14",
-    "watch": "^1.0.2",
-    "webpack": "^4.41.5"
+    "watch": "^1.0.2"
+    
   },
   "devDependencies": {
-    "@types/node": "^13.1.6"
+    "@types/node": "^13.1.6",
+    "nightmare": "^3.0.2",
+    "webpack": "^4.41.5"
   }
 }

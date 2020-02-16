@@ -7,6 +7,7 @@ const fs = require("fs");
 const mk = require("marked");
 // import * as h from "highlight.js"
 const Prism = require("prismjs");
+//这行问题导致pkg打包时运行失败
 const loadLanguages = require("prismjs/components/");
 // import * as config from "../config.json"
 //如果使用ts加载config会直接被编译到js文件里 这里使用node加载json模块
@@ -20,6 +21,7 @@ let readAsync = async (fpath) => {
 };
 const cheerio = require("cheerio");
 const fse = require("fs-extra");
+const path = require("path");
 function htmlProcessing(html) {
     //解析html并在code的pre标签添加class
     let $ = cheerio.load(html);
@@ -63,8 +65,8 @@ async function transform(filepath, configname = "default") {
     });
     //实际内容
     let content = mk(res.body);
-    //模板化
-    let html = template(fs.realpathSync("./article_template.html"), {
+    //模板化 改为相对于程序文件的目录（加载静态资源）
+    let html = template(fs.realpathSync(path.resolve(__dirname, "..", "./static/article_template.html")), {
         content: content
     });
     //添加html处理
