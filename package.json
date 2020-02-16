@@ -10,7 +10,9 @@
       "./node_modules/prismjs/components/*.js"
       ],
       "assets": [
-          "./static/**/*"
+          "./static/**/*",
+          "./sites/default/**/*",
+          "./config/default.json"
           
       ]
   },
