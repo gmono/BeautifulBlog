@@ -10,7 +10,6 @@ import * as krouter from "koa-router"
 
 import { watchFile } from "fs";
 import watchArticles, { watchSite } from "./watch";
-import { fork } from "child_process";
 import del = require("del");
 import generate from "./generator";
 import   * as clu from "cluster"

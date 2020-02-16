@@ -70,13 +70,15 @@ pro.command("refresh [configname]")
  */
 pro.command("dev [configname] [usesync] [serverport]")
     .description("启动开发用自动编译器（主要用于开发者),监视app与helpers目录并实时生成js,配置文件主要用于指定要监视的网站（sites目录中）,usesync=y|n 指定是否同时启动同步服务器（等同于sync命令）以自动同步site和生成content")
-    .action(async (configname="default",useserver:"y"|"n"="y",serverport="8080")=>{
+    .action(async (configname:string="default",useserver:"y"|"n"="y",serverport="8080")=>{
         await dev(configname);
         //考虑在此处启动开发服务器实现自动同步site和自动生成content 以提供完整的开发体验
         if(useserver=="y"){
             console.log("正在启动同步程序...");
             let p=parseInt(serverport);
-            let c= exec(`node ${__dirname}/blog.js sync ${p} ${configname}`);
+            let c= fork(`${__dirname}/blog.js`, ["sync",configname,serverport],{
+                stdio:"pipe"
+            });
             c.stdout.on("data",(str:string)=>{
                 console.log("[同步程序] ",str);
             })

@@ -108,7 +108,7 @@ const tscCompileError=(outcontent:string)=>{
   */
  async function tscWatch(name:string,dirpath:string)
  {
-     
+     //pkg打包后此处仍然会使用本地的tsc   
      //需要调查detached在false时，有监听事件时，会不会被自动结束的问题
      let child=exec("tsc -w",{
          cwd:dirpath
