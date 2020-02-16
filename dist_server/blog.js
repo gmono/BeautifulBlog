@@ -69,7 +69,7 @@ pro.command("dev [configname] [usesync] [serverport]")
     if (useserver == "y") {
         console.log("正在启动同步程序...");
         let p = parseInt(serverport);
-        let c = child_process_1.exec(`yarn blog sync ${p} ${configname}`);
+        let c = child_process_1.exec(`node ${__dirname}/blog.js sync ${p} ${configname}`);
         c.stdout.on("data", (str) => {
             console.log("[同步程序] ", str);
         });
