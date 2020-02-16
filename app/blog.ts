@@ -79,8 +79,8 @@ pro.command("dev [configname] [usesync] [serverport]")
             let c= fork(`${__dirname}/blog.js`, ["sync",configname,serverport],{
                 stdio:"pipe"
             });
-            c.stdout.on("data",(str:string)=>{
-                console.log("[同步程序] ",str);
+            c.stdout.on("data",(str:Buffer)=>{
+                console.log("[同步程序] ",str.toString());
             })
         }
     })

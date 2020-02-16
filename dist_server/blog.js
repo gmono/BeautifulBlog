@@ -73,7 +73,7 @@ pro.command("dev [configname] [usesync] [serverport]")
             stdio: "pipe"
         });
         c.stdout.on("data", (str) => {
-            console.log("[同步程序] ", str);
+            console.log("[同步程序] ", str.toString());
         });
     }
 });
