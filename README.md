@@ -14,8 +14,9 @@
 4. 使用yarn blog -h 查看说明并使用
 开发服务器使用说明：
 * 开发服务器启动为 yarn blog sync
-* 开发服务器默认使用default.json配置，请勿修改default.json 中的baseurl否则server目前不能工作
+* 开发服务器默认使用default.json配置
 * 开发服务器启动会使用指定配置文件重新生成所有内容
+* 如果提交到github且网站的地址中带有path，请将path加入base_url中，github.json 配置文件有此示例
 
 # 使用说明（独立程序）（正在实现中......)
 1. 单文件版：下载release下对应系统版本的程序文件（单文件）放到一个目录，把这个目录加入PATH环境变量中，运行blog -h
