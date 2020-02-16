@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "博客系统，可自定义整个网站",
   "main": "generate.js",
-  "bin": "./dist_server/transform.js",
+  "bin": "./dist_server/generator.js",
   "pkg":{
     "scripts": [
       
@@ -23,7 +23,8 @@
     "server": "node ./dist_server/server.js",
     "dev": "node ./dist_server/dev.js",
     "blog": "node ./dist_server/blog.js",
-    "test": "node ./dist_server/testLib.js"
+    "test": "node ./dist_server/testLib.js",
+    "pkg":"pkg -t win package.json"
   },
   "author": "gmono",
   "license": "MIT",
