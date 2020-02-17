@@ -15,6 +15,8 @@ const dev_1 = require("./dev");
 const create_1 = require("./create");
 const child_process_1 = require("child_process");
 const watch_1 = require("./watch");
+const init_1 = require("./init");
+const manager_1 = require("./manager");
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename, dest) => {
@@ -62,7 +64,7 @@ pro.command("refresh [configname]")
  * sync程序指定配置文件（用于生成内容）
  */
 pro.command("dev [configname] [usesync] [serverport]")
-    .description("启动开发用自动编译器（主要用于开发者),监视app与helpers目录并实时生成js,配置文件主要用于指定要监视的网站（sites目录中）,usesync=y|n 指定是否同时启动同步服务器（等同于sync命令）以自动同步site和生成content")
+    .description("启动开发用自动编译器（开发时专用),usesync=y|n （y等同于自动执行sync命令）")
     .action(async (configname = "default", useserver = "y", serverport = "8080") => {
     await dev_1.default(configname);
     //考虑在此处启动开发服务器实现自动同步site和自动生成content 以提供完整的开发体验
@@ -94,6 +96,33 @@ pro.command("new <type> <path> <name> ")
             console.warn("不存在此创建类型");
             break;
     }
+});
+pro.command("init <dir> [autoCreateDir]")
+    .description("初始化一个目录作为Blog,autoCreateDir指定是否自动创建目录(如果不存在)")
+    .action(async (dirpath, autocreate = "y") => {
+    let auto = autocreate == "y";
+    init_1.createBlog(dirpath, auto);
+});
+pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|remove|push,p1为name,p2为url")
+    .action(async (cmd, p1, p2) => {
+    let cmds = {
+        list() {
+            manager_1.listRemote();
+        },
+        add() {
+            manager_1.addRemote(p1, p2);
+        },
+        remove() {
+            manager_1.removeRemote(p1);
+        },
+        push() {
+            if (p1 != null)
+                manager_1.pushToRemote(p1);
+            else
+                manager_1.pushToRemote();
+        }
+    };
+    cmds[cmd]();
 });
 pro.command("help").description("输出帮助").action(() => pro.outputHelp());
 pro.parseAsync(process.argv);

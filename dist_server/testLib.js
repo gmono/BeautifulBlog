@@ -1,5 +1,7 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const generator_1 = require("./generator");
 /**
- * 此程序用于各种库和方法的测试，不算
+ * 此程序用作调试入口
  */
-console.log("hello ")
+generator_1.default("default", true);

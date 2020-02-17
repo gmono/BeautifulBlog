@@ -13,9 +13,12 @@ const fse = require("fs-extra");
  * 在目录中创建博客
  * @param dirpath 要创建博客的目录
  */
-async function createBlog(dirpath) {
+async function createBlog(dirpath, autocreate = true) {
     if (!(await fse.pathExists(dirpath)))
-        await fse.ensureDir(dirpath);
+        if (autocreate)
+            await fse.ensureDir(dirpath);
+        else
+            console.warn("目录不存在！");
     //当前直接程序创建
     //未来考虑使用模板解压
     await Promise.all([
@@ -36,6 +39,8 @@ async function createBlog(dirpath) {
     await execa("git init", {
         stdio: "inherit"
     });
+    await execa("git add .", { stdio: "inherit" });
+    console.log("创建完毕");
 }
 exports.createBlog = createBlog;
 if (require.main == module) {

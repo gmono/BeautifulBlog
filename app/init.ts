@@ -12,8 +12,11 @@ import * as fse from "fs-extra"
  * 在目录中创建博客
  * @param dirpath 要创建博客的目录
  */
-export async function createBlog(dirpath:string){
-    if(!(await fse.pathExists(dirpath))) await fse.ensureDir(dirpath);
+export async function createBlog(dirpath:string,autocreate:boolean=true){
+    if(!(await fse.pathExists(dirpath))) 
+    if(autocreate) await fse.ensureDir(dirpath);
+    else console.warn("目录不存在！");
+    
     //当前直接程序创建
     //未来考虑使用模板解压
     await Promise.all([
@@ -34,6 +37,8 @@ export async function createBlog(dirpath:string){
     await execa("git init",{
         stdio:"inherit"
     });
+    await execa("git add .",{stdio:"inherit"});
+    console.log("创建完毕")
 
 }
 

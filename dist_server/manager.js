@@ -1,12 +1,53 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+async function getRemoteList() {
+    return Promise.all((await getNames()).map(v => getRemote(v)));
+}
+exports.getRemoteList = getRemoteList;
+let lst = {
+    "测试": "http://helloworld",
+    "hello": "http://baidu.com"
+};
+const ld = require("lodash");
+async function getNames() {
+    return ld.keys(lst);
+}
+exports.getNames = getNames;
+//临时如此 实际使用时类型为
+async function getRemote(name) {
+    return { name: name, url: lst[name] };
+}
+exports.getRemote = getRemote;
 /**
- * 用于管理博客
- * 包括但不限于：
- * 1. 配置远程git仓库地址（增删改查）
- * 2. 提交博客到git仓库（确保自动生成最新 只提交content到远端 ）
- * 3. 控制版本，允许方便的提交更改 退回和版本选择
- *
- * git本地仓库包括全部文件防止信息丢失
- * git远端仓库原则上只包括 index.html nowSite content 三个目录
- *
- * 未来考虑添加articles目录独立配置远端仓库功能（以防止articles丢失）
- */ 
+ * 显示所有可用的RemoteItem
+ */
+async function listRemote() {
+    console.log("发布地址列表:");
+    (await getRemoteList()).forEach(v => {
+        console.log(`Name:${v.name} URL:${v.url}`);
+    });
+}
+exports.listRemote = listRemote;
+async function addRemote(name, url) {
+}
+exports.addRemote = addRemote;
+async function removeRemote(name) {
+}
+exports.removeRemote = removeRemote;
+async function pushToRemote(name) {
+    let push = async (url) => {
+        //提交到url
+    };
+    if (name != null) {
+        await push((await getRemote(name)).url);
+        console.log(`成功提交到:${name}`);
+    }
+    else {
+        //提交到所有
+        (await getRemoteList()).map(v => ({ name: v.name, res: push(v.url) })).forEach(async (v) => {
+            await v.res;
+            console.log(`成功提交到:${v.name}`);
+        });
+    }
+}
+exports.pushToRemote = pushToRemote;
