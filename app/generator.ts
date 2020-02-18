@@ -108,13 +108,13 @@ import del = require("del");
  * @param html 内容字符串
  * @param text 文章原文
  */
-function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,text:string,articlefile:walk.WalkStats){
+function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,raw:Buffer,articlefile:walk.WalkStats){
     //从文章信息提取得到内容附加信息
     //去掉最前面的 ./articles
     from_dir=getRel(from_dir);
     let cmeta=JSON.parse(JSON.stringify(articlemeta)) as IContentMeta;
     cmeta.from_dir=from_dir.split("/");
-    cmeta.article_length=text.length;
+    cmeta.article_length=raw.length;
     cmeta.content_length=html.length;
     cmeta.modify_time=articlefile.mtime;
     return cmeta;
@@ -195,9 +195,9 @@ async function generate(configname:string="default",verbose=false,refresh=false)
         let generate=async ()=>{
                 
             //开始转换
-            let {html,meta,text}=await transform(articlepath);
-            //得到contentmeta
-            let cmeta=getContentMeta(meta,base,html,text,name);
+            let {html,meta,raw}=await transform(articlepath);
+            //得到contentmeta.
+            let cmeta=getContentMeta(meta,base,html,raw,name);
             cmeta.article_path=articlepath;
             //输出转换进度
             if(verbose)

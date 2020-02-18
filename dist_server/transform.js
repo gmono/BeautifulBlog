@@ -78,7 +78,7 @@ async function transform(filepath, configname = "default") {
      * 文章元数据
      * 文章markdown原文
      */
-    return { html, meta, text: res.body };
+    return { html, meta, raw: Buffer.from(res.body) };
 }
 if (require.main == module)
     transform("./articles/about.md").then((obj) => {

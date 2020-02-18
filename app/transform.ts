@@ -48,7 +48,7 @@ export interface TransformResult
 {
   html:string;
   meta:IArticleMeta;
-  text:string;
+  raw:Buffer;
 }
 let first=true;
 async function transform(filepath:string,configname:string="default"):Promise<TransformResult>{
@@ -98,7 +98,7 @@ async function transform(filepath:string,configname:string="default"):Promise<Tr
      * 文章元数据
      * 文章markdown原文
      */
-    return {html,meta,text:res.body};
+    return {html,meta,raw:Buffer.from(res.body)};
   
 }
 if(require.main==module)
