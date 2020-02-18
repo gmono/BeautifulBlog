@@ -24,12 +24,14 @@ export async function createBlog(dirpath:string,autocreate:boolean=true){
         mkdir(`${dirpath}/content`),
         mkdir(`${dirpath}/nowSite`),
         mkdir(`${dirpath}/config`),
-        mkdir(`${dirpath}/sites`)
+        mkdir(`${dirpath}/sites`),
+        mkdir(`${dirpath}/assets`)
     ]);
     console.log("目录创建完毕")
     await Promise.all([
         fse.copy(`${__dirname}/../sites/default`,`${dirpath}/sites/default`),
-        fse.copy(`${__dirname}/../config/default.json`,`${dirpath}/config/default.json`)
+        fse.copy(`${__dirname}/../config/default.json`,`${dirpath}/config/default.json`),
+        fse.copy(`${__dirname}/../assets`,`${dirpath}/assets`)
     ]);
     console.log("文件复制完毕");
     console.log("开始创建git仓库");

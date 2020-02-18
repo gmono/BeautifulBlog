@@ -4,17 +4,16 @@
   "description": "博客系统，可自定义整个网站",
   "main": "generate.js",
   "bin": "./dist_server/blog.js",
-  "pkg":{
+  "pkg": {
     "scripts": [
-      
       "./node_modules/prismjs/components/*.js"
-      ],
-      "assets": [
-          "./static/**/*",
-          "./sites/default/**/*",
-          "./config/default.json"
-          
-      ]
+    ],
+    "assets": [
+      "./static/**/*",
+      "./sites/default/**/*",
+      "./config/*.json",
+      "./assets/**/*"
+    ]
   },
   "scripts": {
     "gen": " node ./dist_server/generator.js",
@@ -26,7 +25,7 @@
     "dev": "node ./dist_server/dev.js",
     "blog": "node ./dist_server/blog.js",
     "test": "node ./dist_server/testLib.js",
-    "pkg":"pkg  package.json -o ./bin/blog"
+    "pkg": "pkg  package.json -o ./bin/blog"
   },
   "author": "gmono",
   "license": "MIT",
@@ -67,18 +66,17 @@
     "lodash": "^4.17.15",
     "marked": "^0.8.0",
     "ndir": "^0.1.5",
-    
     "path-extra": "^4.3.0",
     "prismjs": "^1.18.0",
     "rxjs": "^6.5.4",
     "spinnies": "^0.5.1",
     "walk": "^2.3.14",
     "watch": "^1.0.2"
-    
   },
   "devDependencies": {
     "@types/node": "^13.1.6",
     "nightmare": "^3.0.2",
+    "simple-git": "^1.131.0",
     "webpack": "^4.41.5"
   }
 }

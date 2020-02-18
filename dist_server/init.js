@@ -26,12 +26,14 @@ async function createBlog(dirpath, autocreate = true) {
         fs_extra_1.mkdir(`${dirpath}/content`),
         fs_extra_1.mkdir(`${dirpath}/nowSite`),
         fs_extra_1.mkdir(`${dirpath}/config`),
-        fs_extra_1.mkdir(`${dirpath}/sites`)
+        fs_extra_1.mkdir(`${dirpath}/sites`),
+        fs_extra_1.mkdir(`${dirpath}/assets`)
     ]);
     console.log("目录创建完毕");
     await Promise.all([
         fse.copy(`${__dirname}/../sites/default`, `${dirpath}/sites/default`),
-        fse.copy(`${__dirname}/../config/default.json`, `${dirpath}/config/default.json`)
+        fse.copy(`${__dirname}/../config/default.json`, `${dirpath}/config/default.json`),
+        fse.copy(`${__dirname}/../assets`, `${dirpath}/assets`)
     ]);
     console.log("文件复制完毕");
     console.log("开始创建git仓库");

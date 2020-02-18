@@ -51,12 +51,16 @@ export interface TransformResult
   raw:Buffer;
 }
 let first=true;
+let baseurl="/";
 async function transform(filepath:string,configname:string="default"):Promise<TransformResult>{
   
+
     if(first) {
       //加载配置文件并加载语法高亮
       let config=(await fse.readJSON(`./config/${configname}.json`))  as IConfig;
       let langs=config.code_languages;
+      //处理当作root作为baseurl时的问题
+      baseurl=config.base_url=="/"?"":config.base_url;
       //加载语言高亮支持
       console.log(`设定语言支持：${langs}`)
       console.log("加载语言中.....");
@@ -87,7 +91,8 @@ async function transform(filepath:string,configname:string="default"):Promise<Tr
     let content=mk(res.body);
     //模板化 改为相对于程序文件的目录（加载静态资源）
     let html=template(fs.realpathSync(path.resolve(__dirname,"../static/article_template.html")),{
-        content:content
+        content:content,
+        cssurl:`${baseurl}/assets/prism.css`
     }) as string;
     //添加html处理
     html=htmlProcessing(html);
