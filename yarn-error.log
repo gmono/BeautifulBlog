@@ -1,8 +1,8 @@
 Arguments: 
-  D:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add @types/koa-static-router
+  D:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js init
 
 PATH: 
-  C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\gaozijian\bin;C:\Perl64\site\bin;C:\Perl64\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\dotnet;C:\Program Files\Git\cmd;C:\ProgramData\chocolatey\bin;C:\Program Files (x86)\Yarn\bin;D:\Program Files\IBM\SPSS\Statistics\25\JRE\bin;C:\Program Files\Microsoft SQL Server\130\Tools\Binn;D:\PostgreSQL\pg10\bin;C:\Program Files\Microsoft VS Code\bin;D:\Program Files\Calibre2;C:\Program Files\Common Files\Autodesk Shared;C:\Users\gaozijian\AppData\Roaming\nvm;D:\Program Files\nodejs;C:\Users\gaozijian\scoop\shims;C:\Users\gaozijian\.cargo\bin;D:\MiniConda3;D:\MiniConda3\Library\mingw-w64\bin;D:\MiniConda3\Library\usr\bin;D:\MiniConda3\Library\bin;D:\MiniConda3\Scripts;C:\Users\gaozijian\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Microsoft VS Code\bin;C:\Users\gaozijian\AppData\Roaming\npm;C:\Users\gaozijian\AppData\Local\Yarn\bin;D:\Program Files\Java\jdk-10.0.1\bin;C:\Users\gaozijian\.dotnet\tools;C:\Users\gaozijian\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\gaozijian\AppData\Local\atom\bin;C:\Users\gaozijian\AppData\Roaming\nvm;D:\Program Files\nodejs
+  C:\Perl64\site\bin;C:\Perl64\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;C:\ProgramData\chocolatey\bin;C:\Program Files (x86)\Yarn\bin\;D:\Program Files\IBM\SPSS\Statistics\25\JRE\bin;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;D:\PostgreSQL\pg10\bin;C:\Program Files\Microsoft VS Code\bin;D:\Program Files\Calibre2\;C:\Program Files\Common Files\Autodesk Shared\;C:\Users\gaozijian\AppData\Roaming\nvm;D:\Program Files\nodejs;C:\Users\gaozijian\scoop\shims;C:\Users\gaozijian\.cargo\bin;D:\MiniConda3;D:\MiniConda3\Library\mingw-w64\bin;D:\MiniConda3\Library\usr\bin;D:\MiniConda3\Library\bin;D:\MiniConda3\Scripts;C:\Users\gaozijian\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Microsoft VS Code\bin;C:\Users\gaozijian\AppData\Roaming\npm;C:\Users\gaozijian\AppData\Local\Yarn\bin;D:\Program Files\Java\jdk-10.0.1\bin;C:\Users\gaozijian\.dotnet\tools;C:\Users\gaozijian\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\gaozijian\AppData\Local\atom\bin;C:\Users\gaozijian\AppData\Roaming\nvm;D:\Program Files\nodejs
 
 Yarn version: 
   1.6.0
@@ -14,17 +14,13 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: https://registry.npmjs.org/@types%2fkoa-static-router: Not found
-      at Request.params.callback [as _callback] (C:\Program Files (x86)\Yarn\lib\cli.js:65327:18)
-      at Request.self.callback (C:\Program Files (x86)\Yarn\lib\cli.js:133155:22)
-      at Request.emit (events.js:210:5)
-      at Request.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:134138:10)
-      at Request.emit (events.js:210:5)
-      at IncomingMessage.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:134058:12)
-      at Object.onceWrapper (events.js:299:28)
-      at IncomingMessage.emit (events.js:215:7)
-      at endReadableNT (_stream_readable.js:1184:12)
-      at processTicksAndRejections (internal/process/task_queues.js:80:21)
+  Error: Can't answer a question unless a user TTY
+      at ConsoleReporter.question (C:\Program Files (x86)\Yarn\lib\cli.js:93239:59)
+      at Object.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:86193:38)
+      at Generator.next (<anonymous>)
+      at step (C:\Program Files (x86)\Yarn\lib\cli.js:98:30)
+      at C:\Program Files (x86)\Yarn\lib\cli.js:109:13
+      at processTicksAndRejections (internal/process/task_queues.js:93:5)
 
 npm manifest: 
   {
@@ -32,6 +28,18 @@ npm manifest:
     "version": "0.0.1",
     "description": "博客系统，可自定义整个网站",
     "main": "generate.js",
+    "bin": "./dist_server/init.js",
+    "pkg": {
+      "scripts": [
+        "./node_modules/prismjs/components/*.js"
+      ],
+      "assets": [
+        "./static/**/*",
+        "./sites/default/**/*",
+        "./config/*.json",
+        "./assets/**/*"
+      ]
+    },
     "scripts": {
       "gen": " node ./dist_server/generator.js",
       "watch": "node ./dist_server/watch.js",
@@ -41,7 +49,9 @@ npm manifest:
       "server": "node ./dist_server/server.js",
       "dev": "node ./dist_server/dev.js",
       "blog": "node ./dist_server/blog.js",
-      "test": "node ./dist_server/testLib.js"
+      "test": "node ./dist_server/testLib.js",
+      "init":"node ./dist_server/init.js",
+      "pkg": "pkg  package.json -o ./bin/blog"
     },
     "author": "gmono",
     "license": "MIT",
@@ -70,6 +80,7 @@ npm manifest:
       "dateformat": "^3.0.3",
       "del": "^5.1.0",
       "delay": "^4.3.0",
+      "execa": "^4.0.0",
       "front-matter": "^3.0.2",
       "fs-extra": "^8.1.0",
       "highlight": "^0.2.4",
@@ -81,17 +92,18 @@ npm manifest:
       "lodash": "^4.17.15",
       "marked": "^0.8.0",
       "ndir": "^0.1.5",
-      "nightmare": "^3.0.2",
       "path-extra": "^4.3.0",
       "prismjs": "^1.18.0",
       "rxjs": "^6.5.4",
       "spinnies": "^0.5.1",
       "walk": "^2.3.14",
-      "watch": "^1.0.2",
-      "webpack": "^4.41.5"
+      "watch": "^1.0.2"
     },
     "devDependencies": {
-      "@types/node": "^13.1.6"
+      "@types/node": "^13.1.6",
+      "nightmare": "^3.0.2",
+      "simple-git": "^1.131.0",
+      "webpack": "^4.41.5"
     }
   }
 
@@ -1096,6 +1108,14 @@ Lockfile:
       safe-buffer "^5.0.1"
       sha.js "^2.4.8"
   
+  cross-spawn@^7.0.0:
+    version "7.0.1"
+    resolved "https://registry.npmjs.org/cross-spawn/-/cross-spawn-7.0.1.tgz#0ab56286e0f7c24e153d04cc2aa027e43a9a5d14"
+    dependencies:
+      path-key "^3.1.0"
+      shebang-command "^2.0.0"
+      which "^2.0.1"
+  
   crypto-browserify@^3.11.0:
     version "3.12.0"
     resolved "https://registry.npmjs.org/crypto-browserify/-/crypto-browserify-3.12.0.tgz#396cf9f3137f03e4b8e532c58f698254e00f80ec"
@@ -1161,7 +1181,7 @@ Lockfile:
     dependencies:
       ms "^2.1.1"
   
-  debug@^4.1.1:
+  debug@^4.0.1, debug@^4.1.1:
     version "4.1.1"
     resolved "https://registry.npmjs.org/debug/-/debug-4.1.1.tgz#3b72260255109c6b589cee050f1d516139664791"
     dependencies:
@@ -1513,6 +1533,20 @@ Lockfile:
     dependencies:
       merge "^1.2.0"
   
+  execa@^4.0.0:
+    version "4.0.0"
+    resolved "https://registry.npmjs.org/execa/-/execa-4.0.0.tgz#7f37d6ec17f09e6b8fc53288611695b6d12b9daf"
+    dependencies:
+      cross-spawn "^7.0.0"
+      get-stream "^5.0.0"
+      human-signals "^1.1.1"
+      is-stream "^2.0.0"
+      merge-stream "^2.0.0"
+      npm-run-path "^4.0.0"
+      onetime "^5.1.0"
+      signal-exit "^3.0.2"
+      strip-final-newline "^2.0.0"
+  
   expand-brackets@^2.1.4:
     version "2.1.4"
     resolved "https://registry.npmjs.org/expand-brackets/-/expand-brackets-2.1.4.tgz#b77735e315ce30f6b6eff0f83b04151a22449622"
@@ -1750,6 +1784,12 @@ Lockfile:
     version "4.0.1"
     resolved "https://registry.npmjs.org/get-stdin/-/get-stdin-4.0.1.tgz#b968c6b0a04384324902e8bf1a5df32579a450fe"
   
+  get-stream@^5.0.0:
+    version "5.1.0"
+    resolved "https://registry.npmjs.org/get-stream/-/get-stream-5.1.0.tgz#01203cdc92597f9b909067c3e656cc1f4d3c4dc9"
+    dependencies:
+      pump "^3.0.0"
+  
   get-value@^2.0.3, get-value@^2.0.6:
     version "2.0.6"
     resolved "https://registry.npmjs.org/get-value/-/get-value-2.0.6.tgz#dc15ca1c672387ca76bd37ac0a395ba2042a2c28"
@@ -1964,6 +2004,10 @@ Lockfile:
     version "1.0.0"
     resolved "https://registry.npmjs.org/https-browserify/-/https-browserify-1.0.0.tgz#ec06c10e0a34c0f2faf199f7fd7fc78fffd03c73"
   
+  human-signals@^1.1.1:
+    version "1.1.1"
+    resolved "https://registry.npmjs.org/human-signals/-/human-signals-1.1.1.tgz#c5b1cd14f50aeae09ab6c59fe63ba3395fe4dfa3"
+  
   ieee754@^1.1.4:
     version "1.1.13"
     resolved "https://registry.npmjs.org/ieee754/-/ieee754-1.1.13.tgz#ec168558e95aa181fd87d37f55c32bbcb6708b84"
@@ -2141,6 +2185,10 @@ Lockfile:
     dependencies:
       isobject "^3.0.1"
   
+  is-stream@^2.0.0:
+    version "2.0.0"
+    resolved "https://registry.npmjs.org/is-stream/-/is-stream-2.0.0.tgz#bde9c32680d6fae04129d6ac9d921ce7815f78e3"
+  
   is-typedarray@~1.0.0:
     version "1.0.0"
     resolved "https://registry.npmjs.org/is-typedarray/-/is-typedarray-1.0.0.tgz#e479c80858df0c1b11ddda6940f96011fcda4a9a"
@@ -2164,6 +2212,10 @@ Lockfile:
   isarray@1.0.0, isarray@^1.0.0, isarray@~1.0.0:
     version "1.0.0"
     resolved "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz#bb935d48582cba168c06834957a54a3e07124f11"
+  
+  isexe@^2.0.0:
+    version "2.0.0"
+    resolved "https://registry.npmjs.org/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
   
   isobject@^2.0.0:
     version "2.1.0"
@@ -2495,6 +2547,10 @@ Lockfile:
     dependencies:
       source-map "^0.6.1"
   
+  merge-stream@^2.0.0:
+    version "2.0.0"
+    resolved "https://registry.npmjs.org/merge-stream/-/merge-stream-2.0.0.tgz#52823629a14dd00c9770fb6ad47dc6310f2c1f60"
+  
   merge2@^1.2.3, merge2@^1.3.0:
     version "1.3.0"
     resolved "https://registry.npmjs.org/merge2/-/merge2-1.3.0.tgz#5b366ee83b2f1582c48f87e47cf1a9352103ca81"
@@ -2750,6 +2806,12 @@ Lockfile:
     version "3.0.0"
     resolved "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
   
+  npm-run-path@^4.0.0:
+    version "4.0.1"
+    resolved "https://registry.npmjs.org/npm-run-path/-/npm-run-path-4.0.1.tgz#b7ecd1e5ed53da8e37a55e1c2269e0b97ed748ea"
+    dependencies:
+      path-key "^3.0.0"
+  
   nth-check@~1.0.1:
     version "1.0.2"
     resolved "https://registry.npmjs.org/nth-check/-/nth-check-1.0.2.tgz#b2bd295c37e3dd58a3bf0700376663ba4d9cf05c"
@@ -2947,6 +3009,10 @@ Lockfile:
   path-is-absolute@1.0.1, path-is-absolute@^1.0.0:
     version "1.0.1"
     resolved "https://registry.npmjs.org/path-is-absolute/-/path-is-absolute-1.0.1.tgz#174b9268735534ffbc7ace6bf53a5a9e1b5c5f5f"
+  
+  path-key@^3.0.0, path-key@^3.1.0:
+    version "3.1.1"
+    resolved "https://registry.npmjs.org/path-key/-/path-key-3.1.1.tgz#581f6ade658cbba65a0d3380de7753295054f375"
   
   path-parse@^1.0.6:
     version "1.0.6"
@@ -3393,9 +3459,25 @@ Lockfile:
       inherits "^2.0.1"
       safe-buffer "^5.0.1"
   
+  shebang-command@^2.0.0:
+    version "2.0.0"
+    resolved "https://registry.npmjs.org/shebang-command/-/shebang-command-2.0.0.tgz#ccd0af4f8835fbdc265b82461aaf0c36663f34ea"
+    dependencies:
+      shebang-regex "^3.0.0"
+  
+  shebang-regex@^3.0.0:
+    version "3.0.0"
+    resolved "https://registry.npmjs.org/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
+  
   signal-exit@^3.0.0, signal-exit@^3.0.2:
     version "3.0.2"
     resolved "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
+  
+  simple-git@^1.131.0:
+    version "1.131.0"
+    resolved "https://registry.npmjs.org/simple-git/-/simple-git-1.131.0.tgz#68d85bf6a706e418b8a92cae765d2ad358781e21"
+    dependencies:
+      debug "^4.0.1"
   
   single-line-log@^1.1.2:
     version "1.1.2"
@@ -3625,6 +3707,10 @@ Lockfile:
     resolved "https://registry.npmjs.org/strip-bom/-/strip-bom-2.0.0.tgz#6219a85616520491f35788bdbf1447a99c7e6b0e"
     dependencies:
       is-utf8 "^0.2.0"
+  
+  strip-final-newline@^2.0.0:
+    version "2.0.0"
+    resolved "https://registry.npmjs.org/strip-final-newline/-/strip-final-newline-2.0.0.tgz#89b852fb2fcbe936f6f4b3187afb0a12c1ab58ad"
   
   strip-indent@^1.0.0, strip-indent@^1.0.1:
     version "1.0.1"
@@ -3978,6 +4064,12 @@ Lockfile:
       terser-webpack-plugin "^1.4.3"
       watchpack "^1.6.0"
       webpack-sources "^1.4.1"
+  
+  which@^2.0.1:
+    version "2.0.2"
+    resolved "https://registry.npmjs.org/which/-/which-2.0.2.tgz#7c6a8dd0a636a0327e10b59c9286eee93f3f51b1"
+    dependencies:
+      isexe "^2.0.0"
   
   word-wrap@~1.2.3:
     version "1.2.3"

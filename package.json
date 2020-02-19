@@ -25,6 +25,7 @@
     "dev": "node ./dist_server/dev.js",
     "blog": "node ./dist_server/blog.js",
     "test": "node ./dist_server/testLib.js",
+    "init":"node ./dist_server/init.js",
     "pkg": "pkg  package.json -o ./bin/blog"
   },
   "author": "gmono",

@@ -51,3 +51,4 @@ async function pushToRemote(name) {
     }
 }
 exports.pushToRemote = pushToRemote;
+//# sourceMappingURL=manager.js.map

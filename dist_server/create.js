@@ -73,3 +73,4 @@ exports.createTagByClass = makeToClassBase(createTag);
 if (require.main == module) {
     console.log("本程序不支持直接运行,请在程序中引用");
 }
+//# sourceMappingURL=create.js.map

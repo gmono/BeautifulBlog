@@ -11,6 +11,7 @@ const execa = require("execa");
 const fse = require("fs-extra");
 const path = require("path");
 const walk = require("walk");
+const del = require("del");
 //工具函数区域
 /**
  * 复制，通过write(read(file)) 功能继承自fse.copy
@@ -23,7 +24,10 @@ async function innerCopy(src, dest) {
         let rd = fse.createReadStream(s);
         let wd = fse.createWriteStream(d);
         return new Promise((r) => {
-            wd.addListener("finish", () => r());
+            wd.addListener("finish", () => {
+                console.log(`复制文件 ${s} 到 ${d}`);
+                r();
+            });
             rd.pipe(wd);
         });
     };
@@ -37,11 +41,12 @@ async function innerCopy(src, dest) {
         let mon = walk.walk(src);
         mon.on("file", async (dirpath, filename, next) => {
             //把文件复制到对应位置 把dirpath和filename合成完整src路径 从中生成dest路径 复制文件
-            let allpath = path.resolve(dirpath, filename.name);
+            //不带src路径前缀的目录路径
+            let endDirpath = dirpath.slice(src.length);
+            let allpath = path.resolve(dirpath, filename.name); //源地址
             //在allpath中去除src的部分
-            let endpath = allpath.slice(src.length);
-            let destpath = path.resolve(dest, endpath);
-            let destdir = path.parse(destpath).dir;
+            let destdir = path.resolve(dest, endDirpath); //目的目录地址
+            let destpath = path.resolve(destdir, filename.name); //目的文件地址
             await fse.ensureDir(destdir);
             //复制文件
             await copyFile(allpath, destpath);
@@ -56,7 +61,7 @@ async function innerCopy(src, dest) {
  * 在目录中创建博客
  * @param dirpath 要创建博客的目录
  */
-async function createBlog(dirpath, autocreate = true) {
+async function createBlog(dirpath, autocreate = true, autoreplace = false) {
     if (!(await fse.pathExists(dirpath)))
         if (autocreate)
             await fse.ensureDir(dirpath);
@@ -64,14 +69,26 @@ async function createBlog(dirpath, autocreate = true) {
             console.warn("目录不存在！");
     //当前直接程序创建
     //未来考虑使用模板解压
-    await Promise.all([
-        fs_extra_1.mkdir(`${dirpath}/articles`),
-        fs_extra_1.mkdir(`${dirpath}/content`),
-        fs_extra_1.mkdir(`${dirpath}/nowSite`),
-        fs_extra_1.mkdir(`${dirpath}/config`),
-        fs_extra_1.mkdir(`${dirpath}/sites`),
-        fs_extra_1.mkdir(`${dirpath}/assets`)
-    ]);
+    try {
+        await Promise.all([
+            fs_extra_1.mkdir(`${dirpath}/articles`),
+            fs_extra_1.mkdir(`${dirpath}/content`),
+            fs_extra_1.mkdir(`${dirpath}/nowSite`),
+            fs_extra_1.mkdir(`${dirpath}/config`),
+            fs_extra_1.mkdir(`${dirpath}/sites`),
+            fs_extra_1.mkdir(`${dirpath}/assets`)
+        ]);
+    }
+    catch (e) {
+        if (autoreplace) {
+            await del(dirpath);
+            await fs_extra_1.mkdir(dirpath);
+        }
+        else {
+            console.log("创建子目录失败，此目录中可能已存在Blog");
+            return;
+        }
+    }
     console.log("目录创建完毕");
     await Promise.all([
         innerCopy(`${__dirname}/../sites/default`, `${dirpath}/sites/default`),
@@ -89,5 +106,6 @@ async function createBlog(dirpath, autocreate = true) {
 }
 exports.createBlog = createBlog;
 if (require.main == module) {
-    createBlog(process.argv[2]);
+    createBlog("./tst");
 }
+//# sourceMappingURL=init.js.map

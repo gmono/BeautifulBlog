@@ -126,3 +126,4 @@ pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|rem
 });
 pro.command("help").description("输出帮助").action(() => pro.outputHelp());
 pro.parseAsync(process.argv);
+//# sourceMappingURL=blog.js.map

@@ -72,3 +72,4 @@ if (require.main == module) {
     watchArticles();
     // watchSite("default");
 }
+//# sourceMappingURL=watch.js.map

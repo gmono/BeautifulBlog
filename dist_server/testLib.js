@@ -5,3 +5,4 @@ const generator_1 = require("./generator");
  * 此程序用作调试入口
  */
 generator_1.default("default", true);
+//# sourceMappingURL=testLib.js.map

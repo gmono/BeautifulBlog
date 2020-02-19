@@ -36,3 +36,4 @@ if (require.main == module) {
     changesite(config.site);
 }
 exports.default = changesite;
+//# sourceMappingURL=changesite.js.map

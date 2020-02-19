@@ -246,3 +246,4 @@ if (require.main == module) {
     generate("default", true);
 }
 exports.default = generate;
+//# sourceMappingURL=generator.js.map

@@ -16,3 +16,4 @@ async function sitegen(configname = "default") {
 if (require.main == module)
     sitegen();
 exports.default = sitegen;
+//# sourceMappingURL=sitegen.js.map

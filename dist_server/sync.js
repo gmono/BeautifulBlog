@@ -67,3 +67,4 @@ async function serve(port = 80, configname = "default") {
 exports.default = serve;
 if (require.main == module)
     serve();
+//# sourceMappingURL=sync.js.map

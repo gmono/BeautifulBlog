@@ -7,7 +7,17 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "init",
+            "program": "${workspaceFolder}/dist_server/init.js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+    
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "test",
             "skipFiles": [
                 "<node_internals>/**"
             ],
