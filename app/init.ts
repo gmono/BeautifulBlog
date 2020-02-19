@@ -61,18 +61,28 @@ async function innerCopy(src:string,dest:string){
     
 }
 
+async function runInDir(dirpath:string,func:Function){
+    const s=process.cwd()
+    process.chdir(dirpath);
+    await func();
+    process.chdir(s);
+}
 /**
  * 在目录中创建博客
  * @param dirpath 要创建博客的目录
+ * @param autocreate 是否在不存在目录时自动创建目录
+ * @param autoreplace 是否在创建子目录出现冲突时自信replace策略，删除dirpath后重建，请谨慎使用
  */
 export async function createBlog(dirpath:string,autocreate:boolean=true,autoreplace:boolean=false){
     if(!(await fse.pathExists(dirpath))) 
     if(autocreate) await fse.ensureDir(dirpath);
     else console.warn("目录不存在！");
     
-    //当前直接程序创建
-    //未来考虑使用模板解压
-    try{
+
+    /**
+     * 
+     */
+    let  createSubDir=async ()=>{
         await Promise.all([
             mkdir(`${dirpath}/articles`),
             mkdir(`${dirpath}/content`),
@@ -81,10 +91,17 @@ export async function createBlog(dirpath:string,autocreate:boolean=true,autorepl
             mkdir(`${dirpath}/sites`),
             mkdir(`${dirpath}/assets`)
         ]);
+    }
+    //当前直接程序创建
+    //未来考虑使用模板解压
+    try{
+        await createSubDir();
     }catch(e){
         if(autoreplace){
+            console.log("创建子目录失败，删除重建中");
             await del(dirpath);
             await mkdir(dirpath);
+            await createSubDir();
         }else{
             console.log("创建子目录失败，此目录中可能已存在Blog")
             return;
@@ -101,14 +118,19 @@ export async function createBlog(dirpath:string,autocreate:boolean=true,autorepl
     console.log("文件复制完毕");
     console.log("开始创建git仓库");
     //创建git仓库
-    await execa("git init",{
-        stdio:"inherit"
+    await runInDir(dirpath,async ()=>{
+        // console.log(process.cwd())
+        await execa("git init",{
+            stdio:"inherit",
+        });
+        await execa("git add .",{stdio:"inherit"});
+        await execa(`git commit -m "创建博客" `,{stdio:"inherit"});
     });
-    await execa("git add .",{stdio:"inherit"});
     console.log("创建完毕")
+    
 
 }
 
 if(require.main==module){
-    createBlog("./tst");
+    createBlog("./tst",true,true);
 }

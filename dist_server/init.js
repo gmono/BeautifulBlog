@@ -57,9 +57,17 @@ async function innerCopy(src, dest) {
         });
     }
 }
+async function runInDir(dirpath, func) {
+    const s = process.cwd();
+    process.chdir(dirpath);
+    await func();
+    process.chdir(s);
+}
 /**
  * 在目录中创建博客
  * @param dirpath 要创建博客的目录
+ * @param autocreate 是否在不存在目录时自动创建目录
+ * @param autoreplace 是否在创建子目录出现冲突时自信replace策略，删除dirpath后重建，请谨慎使用
  */
 async function createBlog(dirpath, autocreate = true, autoreplace = false) {
     if (!(await fse.pathExists(dirpath)))
@@ -67,9 +75,10 @@ async function createBlog(dirpath, autocreate = true, autoreplace = false) {
             await fse.ensureDir(dirpath);
         else
             console.warn("目录不存在！");
-    //当前直接程序创建
-    //未来考虑使用模板解压
-    try {
+    /**
+     *
+     */
+    let createSubDir = async () => {
         await Promise.all([
             fs_extra_1.mkdir(`${dirpath}/articles`),
             fs_extra_1.mkdir(`${dirpath}/content`),
@@ -78,11 +87,18 @@ async function createBlog(dirpath, autocreate = true, autoreplace = false) {
             fs_extra_1.mkdir(`${dirpath}/sites`),
             fs_extra_1.mkdir(`${dirpath}/assets`)
         ]);
+    };
+    //当前直接程序创建
+    //未来考虑使用模板解压
+    try {
+        await createSubDir();
     }
     catch (e) {
         if (autoreplace) {
+            console.log("创建子目录失败，删除重建中");
             await del(dirpath);
             await fs_extra_1.mkdir(dirpath);
+            await createSubDir();
         }
         else {
             console.log("创建子目录失败，此目录中可能已存在Blog");
@@ -98,14 +114,18 @@ async function createBlog(dirpath, autocreate = true, autoreplace = false) {
     console.log("文件复制完毕");
     console.log("开始创建git仓库");
     //创建git仓库
-    await execa("git init", {
-        stdio: "inherit"
+    await runInDir(dirpath, async () => {
+        // console.log(process.cwd())
+        await execa("git init", {
+            stdio: "inherit",
+        });
+        await execa("git add .", { stdio: "inherit" });
+        await execa(`git commit -m "创建博客" `, { stdio: "inherit" });
     });
-    await execa("git add .", { stdio: "inherit" });
     console.log("创建完毕");
 }
 exports.createBlog = createBlog;
 if (require.main == module) {
-    createBlog("./tst");
+    createBlog("./tst", true, true);
 }
 //# sourceMappingURL=init.js.map

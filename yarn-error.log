@@ -2,7 +2,7 @@ Arguments:
   D:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js init
 
 PATH: 
-  C:\Perl64\site\bin;C:\Perl64\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;C:\ProgramData\chocolatey\bin;C:\Program Files (x86)\Yarn\bin\;D:\Program Files\IBM\SPSS\Statistics\25\JRE\bin;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;D:\PostgreSQL\pg10\bin;C:\Program Files\Microsoft VS Code\bin;D:\Program Files\Calibre2\;C:\Program Files\Common Files\Autodesk Shared\;C:\Users\gaozijian\AppData\Roaming\nvm;D:\Program Files\nodejs;C:\Users\gaozijian\scoop\shims;C:\Users\gaozijian\.cargo\bin;D:\MiniConda3;D:\MiniConda3\Library\mingw-w64\bin;D:\MiniConda3\Library\usr\bin;D:\MiniConda3\Library\bin;D:\MiniConda3\Scripts;C:\Users\gaozijian\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Microsoft VS Code\bin;C:\Users\gaozijian\AppData\Roaming\npm;C:\Users\gaozijian\AppData\Local\Yarn\bin;D:\Program Files\Java\jdk-10.0.1\bin;C:\Users\gaozijian\.dotnet\tools;C:\Users\gaozijian\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\gaozijian\AppData\Local\atom\bin;C:\Users\gaozijian\AppData\Roaming\nvm;D:\Program Files\nodejs
+  C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\gaozijian\bin;C:\Perl64\site\bin;C:\Perl64\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\dotnet;C:\Program Files\Git\cmd;C:\ProgramData\chocolatey\bin;C:\Program Files (x86)\Yarn\bin;D:\Program Files\IBM\SPSS\Statistics\25\JRE\bin;C:\Program Files\Microsoft SQL Server\130\Tools\Binn;D:\PostgreSQL\pg10\bin;C:\Program Files\Microsoft VS Code\bin;D:\Program Files\Calibre2;C:\Program Files\Common Files\Autodesk Shared;C:\Users\gaozijian\AppData\Roaming\nvm;D:\Program Files\nodejs;C:\Users\gaozijian\scoop\shims;C:\Users\gaozijian\.cargo\bin;D:\MiniConda3;D:\MiniConda3\Library\mingw-w64\bin;D:\MiniConda3\Library\usr\bin;D:\MiniConda3\Library\bin;D:\MiniConda3\Scripts;C:\Users\gaozijian\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Microsoft VS Code\bin;C:\Users\gaozijian\AppData\Roaming\npm;C:\Users\gaozijian\AppData\Local\Yarn\bin;D:\Program Files\Java\jdk-10.0.1\bin;C:\Users\gaozijian\.dotnet\tools;C:\Users\gaozijian\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\gaozijian\AppData\Local\atom\bin;C:\Users\gaozijian\AppData\Roaming\nvm;D:\Program Files\nodejs
 
 Yarn version: 
   1.6.0
@@ -14,13 +14,17 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: Can't answer a question unless a user TTY
-      at ConsoleReporter.question (C:\Program Files (x86)\Yarn\lib\cli.js:93239:59)
-      at Object.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:86193:38)
-      at Generator.next (<anonymous>)
-      at step (C:\Program Files (x86)\Yarn\lib\cli.js:98:30)
-      at C:\Program Files (x86)\Yarn\lib\cli.js:109:13
-      at processTicksAndRejections (internal/process/task_queues.js:93:5)
+  Error: canceled
+      at Interface.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:129516:13)
+      at Interface.emit (events.js:210:5)
+      at Interface._ttyWrite (readline.js:887:16)
+      at ReadStream.onkeypress (readline.js:191:10)
+      at ReadStream.emit (events.js:210:5)
+      at emitKeys (internal/readline/utils.js:433:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (readline.js:1153:36)
+      at ReadStream.emit (events.js:210:5)
+      at addChunk (_stream_readable.js:309:12)
 
 npm manifest: 
   {
