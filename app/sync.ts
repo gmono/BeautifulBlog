@@ -55,18 +55,21 @@ export default async function serve(port:number=80,configname="default"){
         //删除原有content 全部重新生成
         await del("./content");
         console.log("已启动全部重新生成");
-        generate(configname)
+        await generate(configname)
         //开启监视进程
         let worker1=clu.fork();
         let worker2=clu.fork();
         //同时监控文章和网站
-        worker1.send("start");
+        worker1.send("article");
         worker2.send("site");
         app.listen(port);
     }
     else{
+        // console.log("asdfasd");
         process.on("message",(msg:"article"|"site")=>{
+            
             if(msg=="article"){
+                // console.log("开始监视文章");
                 watchArticles(configname);
             }
             else if(msg=="site"){

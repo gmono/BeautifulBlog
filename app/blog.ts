@@ -51,7 +51,7 @@ pro.command("watch [configname]")
     .description("监视文件改动并实时生成")
     .action(async (configname?:string)=>{
         console.log("正在监视文章改动......");
-        await watchArticles();
+        await watchArticles(configname);
     });
 pro.command("sync  [configname] [port]")
 .description("启动开发服务器(指定端口与配置文件）")

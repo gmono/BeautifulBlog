@@ -10,6 +10,8 @@ import * as fse from "fs-extra"
 import * as path from 'path';
 import * as walk from 'walk';
 import * as del from 'del';
+// import { fork } from 'child_process';
+import changesite from './changesite';
 
 
 //工具函数区域
@@ -123,6 +125,8 @@ export async function createBlog(dirpath:string,autocreate:boolean=true,autorepl
         innerCopy(`${__dirname}/../index.html`,`${dirpath}/index.html`)
     ]);
     console.log("文件复制完毕");
+    console.log("切换到默认site");
+    await runInDir(dirpath,async ()=>await changesite("default"));
     console.log("开始创建git仓库");
     //创建git仓库
     await runInDir(dirpath,async ()=>{
