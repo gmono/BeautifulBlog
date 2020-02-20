@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "博客系统，可自定义整个网站",
   "main": "generate.js",
-  "bin": "./dist_server/init.js",
+  "bin": "./dist_server/blog.js",
   "pkg": {
     "scripts": [
       "./node_modules/prismjs/components/*.js"
@@ -12,7 +12,8 @@
       "./static/**/*",
       "./sites/default/**/*",
       "./config/*.json",
-      "./assets/**/*"
+      "./assets/**/*",
+      "./index.html"
     ]
   },
   "scripts": {

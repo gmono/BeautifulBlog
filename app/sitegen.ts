@@ -10,7 +10,7 @@ import del = require("del");
 async function sitegen(configname:string="default")
 {
     //临时全部重新生成处理策略
-    del("../content");
+    del("./content");
     await generate()
     let config=(await fse.readJSON(`./config/${configname}.json`)) as IConfig
     await changesite(config.site);

@@ -109,7 +109,8 @@ async function createBlog(dirpath, autocreate = true, autoreplace = false) {
     await Promise.all([
         innerCopy(`${__dirname}/../sites/default`, `${dirpath}/sites/default`),
         innerCopy(`${__dirname}/../config/default.json`, `${dirpath}/config/default.json`),
-        innerCopy(`${__dirname}/../assets`, `${dirpath}/assets`)
+        innerCopy(`${__dirname}/../assets`, `${dirpath}/assets`),
+        innerCopy(`${__dirname}/../index.html`, `${dirpath}/index.html`)
     ]);
     console.log("文件复制完毕");
     console.log("开始创建git仓库");

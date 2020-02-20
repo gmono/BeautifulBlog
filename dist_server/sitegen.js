@@ -7,7 +7,7 @@ const fse = require("fs-extra");
 const del = require("del");
 async function sitegen(configname = "default") {
     //临时全部重新生成处理策略
-    del("../content");
+    del("./content");
     await generator_1.default();
     let config = (await fse.readJSON(`./config/${configname}.json`));
     await changesite_1.default(config.site);

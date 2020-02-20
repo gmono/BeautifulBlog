@@ -79,12 +79,13 @@ pro.command("dev [configname] [usesync] [serverport]")
         });
     }
 });
+const ph = require("path");
 //new命令与create程序对应
 pro.command("new <type> <path> <name> ")
     .description("创建文章或子类 type: a 文章 c 子类 ")
     .action(async (type, p, name) => {
     //合成相对于articles的地址
-    let basepath = `./articles/${p}`;
+    let basepath = ph.resolve("./articles", p);
     switch (type) {
         case "a":
             await create_1.createArticle(basepath, name);
