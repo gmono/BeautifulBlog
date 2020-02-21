@@ -16,11 +16,32 @@ import   * as clu from "cluster"
 
 import { IConfig } from "./Interface/IConfig";
 import * as fse from 'fs-extra';
-import * as cluster from 'cluster';
+
+
+//尝试使用此模块实现
+import * as thread from "worker_threads"
 
 
 
+function worker1(config:IConfig){
 
+}
+function worker2(config:IConfig){
+
+}
+
+/**
+ * 在新线程里运行一个函数 返回worker
+ * @param func 函数
+ * @param args 参数
+ */
+function runFunction(func:(...args)=>any,...args){
+    let worker=new thread.Worker(`
+        let __argv=require('worker_threads').workerData;
+        let __func=${func.toString()}
+        __func(...__argv);
+    `,{eval:true,workerData:args})
+};
 
 /**
  * 此函数一定要作为单独程序启动
@@ -53,41 +74,20 @@ export default async function serve(port:number=80,configname="default"){
         app.use(kstatic("."))
         app.listen(port);
     }
-    console.log("ttt")
-    //启动监视
-    if(clu.isMaster){
-        startServer(port);
-        console.log(`服务器启动，端口:${port},地址:http://localhost:${port}${config.base_url}`);
-        //删除原有content 全部重新生成
-        // await del("./content");
-        console.log("已启动全部重新生成");
-        // await generate(configname)
-        //开启监视进程
-        let worker1=clu.fork();
-        let worker2=clu.fork();
-        worker1.send("article");
-        worker2.send("site");
-    }
-    else{
-        process.send("helo");
-        cluster.addListener("message",(msg:"article"|"site")=>{
-            console.log("开始监视文章");
-            if(msg=="article"){
-                
-                watchArticles(configname);
-            }
-            else if(msg=="site"){
-                //监控网站 读取指定配置文件中的网站设置
-                
-                let sname=config.site;
-                watchSite(sname);
-            }
-        })
-        
-    }
-    
-    
+    //主线程 启动服务器
+    startServer(port);
+    console.log(`服务器启动，端口:${port},地址:http://localhost:${port}${config.base_url}`);
+    //删除原有content 全部重新生成
+    // await del("./content");
+    console.log("已启动全部重新生成");
+    // await generate(configname)
+    //开启监视线程
+    let w1=runFunction(worker1,config);
+    let w2=runFunction(worker2,config);
 }
+
+    
+    
 
 if(require.main==module)
     serve();

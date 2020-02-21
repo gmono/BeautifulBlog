@@ -136,4 +136,4 @@ pro.command("help").description("输出帮助").action(()=>pro.outputHelp());
 
 pro.parseAsync(process.argv);
 
-console.log("hhhh");
+// console.log("hhhh");

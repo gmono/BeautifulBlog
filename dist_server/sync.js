@@ -5,10 +5,26 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const koa = require("koa");
 const kstatic = require("koa-static");
-const watch_1 = require("./watch");
-const clu = require("cluster");
 const fse = require("fs-extra");
-const cluster = require("cluster");
+//尝试使用此模块实现
+const thread = require("worker_threads");
+function worker1(config) {
+}
+function worker2(config) {
+}
+/**
+ * 在新线程里运行一个函数 返回worker
+ * @param func 函数
+ * @param args 参数
+ */
+function runFunction(func, ...args) {
+    let worker = new thread.Worker(`
+        let __argv=require('worker_threads').workerData;
+        let __func=${func.toString()}
+        __func(...__argv);
+    `, { eval: true, workerData: args });
+}
+;
 /**
  * 此函数一定要作为单独程序启动
  * @param port 接口
@@ -39,35 +55,16 @@ async function serve(port = 80, configname = "default") {
         app.use(kstatic("."));
         app.listen(port);
     };
-    console.log("ttt");
-    //启动监视
-    if (clu.isMaster) {
-        startServer(port);
-        console.log(`服务器启动，端口:${port},地址:http://localhost:${port}${config.base_url}`);
-        //删除原有content 全部重新生成
-        // await del("./content");
-        console.log("已启动全部重新生成");
-        // await generate(configname)
-        //开启监视进程
-        let worker1 = clu.fork();
-        let worker2 = clu.fork();
-        worker1.send("article");
-        worker2.send("site");
-    }
-    else {
-        process.send("helo");
-        cluster.addListener("message", (msg) => {
-            console.log("开始监视文章");
-            if (msg == "article") {
-                watch_1.default(configname);
-            }
-            else if (msg == "site") {
-                //监控网站 读取指定配置文件中的网站设置
-                let sname = config.site;
-                watch_1.watchSite(sname);
-            }
-        });
-    }
+    //主线程 启动服务器
+    startServer(port);
+    console.log(`服务器启动，端口:${port},地址:http://localhost:${port}${config.base_url}`);
+    //删除原有content 全部重新生成
+    // await del("./content");
+    console.log("已启动全部重新生成");
+    // await generate(configname)
+    //开启监视线程
+    let w1 = runFunction(worker1, config);
+    let w2 = runFunction(worker2, config);
 }
 exports.default = serve;
 if (require.main == module)
