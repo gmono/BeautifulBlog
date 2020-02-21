@@ -41,6 +41,7 @@ function runFunction(func:(...args)=>any,...args){
         let __func=${func.toString()}
         __func(...__argv);
     `,{eval:true,workerData:args})
+    return worker;
 };
 
 /**
