@@ -23,11 +23,11 @@ import * as thread from "worker_threads"
 
 
 
-function worker1(config:IConfig){
-
+function worker1(configname:string){
+    watchArticles(configname);
 }
 function worker2(config:IConfig){
-
+    watchSite(config.site);
 }
 
 /**
@@ -83,8 +83,10 @@ export default async function serve(port:number=80,configname="default"){
     console.log("已启动全部重新生成");
     // await generate(configname)
     //开启监视线程
-    let w1=runFunction(worker1,config);
+    let w1=runFunction(worker1,configname);
+    w1.stdout.on("data",(c:Buffer)=>console.log(`[文章同步器] ${c.toString()}`))
     let w2=runFunction(worker2,config);
+    w2.stdout.on("data",(c:Buffer)=>console.log(`[网站同步器] ${c.toString()}`))
 
 }
 

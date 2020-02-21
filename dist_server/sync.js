@@ -5,12 +5,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const koa = require("koa");
 const kstatic = require("koa-static");
+const watch_1 = require("./watch");
 const fse = require("fs-extra");
 //尝试使用此模块实现
 const thread = require("worker_threads");
-function worker1(config) {
+function worker1(configname) {
+    watch_1.default(configname);
 }
 function worker2(config) {
+    watch_1.watchSite(config.site);
 }
 /**
  * 在新线程里运行一个函数 返回worker
@@ -65,8 +68,10 @@ async function serve(port = 80, configname = "default") {
     console.log("已启动全部重新生成");
     // await generate(configname)
     //开启监视线程
-    let w1 = runFunction(worker1, config);
+    let w1 = runFunction(worker1, configname);
+    w1.stdout.on("data", (c) => console.log(`[文章同步器] ${c.toString()}`));
     let w2 = runFunction(worker2, config);
+    w2.stdout.on("data", (c) => console.log(`[网站同步器] ${c.toString()}`));
 }
 exports.default = serve;
 if (require.main == module)
