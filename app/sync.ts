@@ -35,7 +35,7 @@ function worker2(config:IConfig){
  * @param func 函数
  * @param args 参数
  */
-function runFunction(func:(...args)=>any,...args){
+export function runFunction(func:(...args)=>any,...args){
     let worker=new thread.Worker(`
         let __argv=require('worker_threads').workerData;
         let __func=${func.toString()}
@@ -85,6 +85,7 @@ export default async function serve(port:number=80,configname="default"){
     //开启监视线程
     let w1=runFunction(worker1,config);
     let w2=runFunction(worker2,config);
+
 }
 
     

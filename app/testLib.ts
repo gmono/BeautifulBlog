@@ -1,6 +1,6 @@
-import { mkdir } from 'fs-extra';
-import generate from './generator';
-/**
- * 此程序用作调试入口
- */
-generate("default",true);
+import { runFunction } from './sync';
+let w=runFunction((arg,arg2)=>{
+    console.log(arg,typeof arg2);
+},"a",{a:2});
+w.stdout.on("data",(c:Buffer)=>console.log(c.toString()));
+

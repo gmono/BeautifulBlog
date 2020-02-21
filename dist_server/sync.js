@@ -25,6 +25,7 @@ function runFunction(func, ...args) {
     `, { eval: true, workerData: args });
     return worker;
 }
+exports.runFunction = runFunction;
 ;
 /**
  * 此函数一定要作为单独程序启动
