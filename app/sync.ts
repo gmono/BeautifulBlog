@@ -16,6 +16,7 @@ import   * as clu from "cluster"
 
 import { IConfig } from "./Interface/IConfig";
 import * as fse from 'fs-extra';
+import * as cluster from 'cluster';
 
 
 
@@ -29,47 +30,50 @@ import * as fse from 'fs-extra';
 export default async function serve(port:number=80,configname="default"){
     let config=(await fse.readJSON(`./config/${configname}.json`)) as IConfig;
     //启动服务器
-    const app=new koa();
-    //prefixify中间件
-    app.use(async (ctx,next)=>{
-        let p=ctx.path;
-        if(p.startsWith(config.base_url)){
+    let startServer=(port:number)=>{
+        //启动服务器
+        const app=new koa();
+        //prefixify中间件
+        app.use(async (ctx,next)=>{
+            let p=ctx.path;
+            if(p.startsWith(config.base_url)){
 
-            // if(p==config.base_url&&!p.endsWith("/")) (p+="/",ctx.redirect(p));
-            //去除
-            let ap=p.slice(config.base_url.length);
-            if(ap=="") ap="/";
-            
-            //使用去头后的调用next
-            ctx.path=ap;
-            return next();
-        }
-        //错误
-        ctx.redirect(config.base_url+"/");
-    })
-    app.use(kstatic("."))
-    
+                // if(p==config.base_url&&!p.endsWith("/")) (p+="/",ctx.redirect(p));
+                //去除
+                let ap=p.slice(config.base_url.length);
+                if(ap=="") ap="/";
+                
+                //使用去头后的调用next
+                ctx.path=ap;
+                return next();
+            }
+            //错误
+            ctx.redirect(config.base_url+"/");
+        })
+        app.use(kstatic("."))
+        app.listen(port);
+    }
+    console.log("ttt")
     //启动监视
     if(clu.isMaster){
+        startServer(port);
         console.log(`服务器启动，端口:${port},地址:http://localhost:${port}${config.base_url}`);
         //删除原有content 全部重新生成
-        await del("./content");
+        // await del("./content");
         console.log("已启动全部重新生成");
-        await generate(configname)
+        // await generate(configname)
         //开启监视进程
         let worker1=clu.fork();
         let worker2=clu.fork();
-        //同时监控文章和网站
         worker1.send("article");
         worker2.send("site");
-        app.listen(port);
     }
     else{
-        // console.log("asdfasd");
-        process.on("message",(msg:"article"|"site")=>{
-            
+        process.send("helo");
+        cluster.addListener("message",(msg:"article"|"site")=>{
+            console.log("开始监视文章");
             if(msg=="article"){
-                // console.log("开始监视文章");
+                
                 watchArticles(configname);
             }
             else if(msg=="site"){

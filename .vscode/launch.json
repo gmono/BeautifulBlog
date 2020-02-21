@@ -7,8 +7,20 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "sync",
+            "program": "${workspaceFolder}/dist_server/blog.js",
+            "args": ["sync","default","80"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+
+        {
+            "type": "node",
+            "request": "launch",
             "name": "init",
-            "program": "${workspaceFolder}/dist_server/init.js",
+            "program": "${workspaceFolder}/dist_server/blog.js",
+            "args": ["init","tst","y"],
             "skipFiles": [
                 "<node_internals>/**"
             ]
