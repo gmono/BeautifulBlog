@@ -8,15 +8,20 @@ const kstatic = require("koa-static");
 const fse = require("fs-extra");
 //尝试使用此模块实现
 const thread = require("worker_threads");
+const path = require("path");
 function wrequire(m) {
+    throw new Error("错误，此函数应在worker中被调用");
 }
 function worker1(configname) {
-    let watchArticles = require("./dist_server/watch").default;
-    console.log(watchArticles);
+    ("./watch");
+    let watchArticles = wrequire("./watch").default;
+    console.log("开始监视文章改动");
     watchArticles(configname);
 }
 function worker2(config) {
-    let watchSite = require("./dist_server/watch").watchSite;
+    ("./watch");
+    let watchSite = wrequire("./watch").watchSite;
+    console.log(`开始监视网站 [${config.site}] 改动`);
     watchSite(config.site);
 }
 /**
@@ -25,11 +30,14 @@ function worker2(config) {
  * @param args 参数
  */
 function runFunction(func, ...args) {
+    let rel = path.relative(".", __dirname).replace("\\", "/");
+    rel = "./" + rel;
+    if (rel != "./")
+        rel += "/";
     let worker = new thread.Worker(`
         let __argv=require('worker_threads').workerData;
-        __dirname="${__dirname}";
         function wrequire(mod){
-            return require("${__dirname}/"+mod);
+            return require("${rel}"+mod);
         }
         let __func=${func.toString()}
         __func(...__argv);

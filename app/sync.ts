@@ -20,18 +20,23 @@ import * as fse from 'fs-extra';
 
 //尝试使用此模块实现
 import * as thread from "worker_threads"
+import * as path from 'path';
 
 
-function wrequire(m):any{
-
+function wrequire<T>(m:string):T{
+    throw new Error("错误，此函数应在worker中被调用")
 }
+
 function worker1(configname:string){
-    let watchArticles=require("./dist_server/watch").default;
-    console.log(watchArticles);
+    type W=typeof import("./watch");
+    let watchArticles=wrequire<W>("./watch").default;
+    console.log("开始监视文章改动");
     watchArticles(configname);
 }
 function worker2(config:IConfig){
-    let watchSite=require("./dist_server/watch").watchSite;
+    type W=typeof import("./watch");
+    let watchSite=wrequire<W>("./watch").watchSite;
+    console.log(`开始监视网站 [${config.site}] 改动`)
     watchSite(config.site);
 }
 /**
@@ -40,11 +45,13 @@ function worker2(config:IConfig){
  * @param args 参数
  */
 export function runFunction(func:(...args)=>any,...args){
+    let rel=path.relative(".",__dirname).replace("\\","/");
+    rel="./"+rel;
+    if(rel!="./") rel+="/";
     let worker=new thread.Worker(`
         let __argv=require('worker_threads').workerData;
-        __dirname="${__dirname}";
         function wrequire(mod){
-            return require("${__dirname}/"+mod);
+            return require("${rel}"+mod);
         }
         let __func=${func.toString()}
         __func(...__argv);
