@@ -28,6 +28,9 @@ function wrequire<T>(m:string):T{
 }
 
 function worker1(configname:string){
+    // let path=require("path")
+    // console.log(path.resolve("."))
+    //
     type W=typeof import("./watch");
     let watchArticles=wrequire<W>("./watch").default;
     console.log("开始监视文章改动");
