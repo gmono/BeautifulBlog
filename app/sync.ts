@@ -8,57 +8,40 @@ import * as kstatic from "koa-static"
 import * as krouter from "koa-router"
 
 
-import { watchFile, watch } from "fs";
-import watchArticles, { watchSite } from "./watch";
 import del = require("del");
 import generate from "./generator";
-import   * as clu from "cluster"
+
 
 import { IConfig } from "./Interface/IConfig";
 import * as fse from 'fs-extra';
 
 
 //尝试使用此模块实现
-import * as thread from "worker_threads"
-import * as path from 'path';
 
 
-function wrequire<T>(m:string):T{
-    throw new Error("错误，此函数应在worker中被调用")
-}
 
-function worker1(configname:string){
+import { runFunction, IThreadContext } from './lib/runInThread';
+
+
+
+
+
+function worker1(context:IThreadContext,configname:string){
     // let path=require("path")
     // console.log(path.resolve("."))
     //
     type W=typeof import("./watch");
-    let watchArticles=wrequire<W>("./watch").default;
+    let watchArticles=context.localRequire<W>("./watch").default;
     console.log("开始监视文章改动");
     watchArticles(configname);
 }
-function worker2(config:IConfig){
+function worker2(context:IThreadContext,config:IConfig){
     type W=typeof import("./watch");
-    let watchSite=wrequire<W>("./watch").watchSite;
+    let watchSite=context.localRequire<W>("./watch").watchSite;
     console.log(`开始监视网站 [${config.site}] 改动`)
     watchSite(config.site);
 }
-/**
- * 在新线程里运行一个函数 返回worker
- * @param func 函数
- * @param args 参数
- */
-export function runFunction(func:(...args)=>any,...args){
-    let rel=__dirname.replace(/\\/g,"/")+"/";
-    let worker=new thread.Worker(`
-        let __argv=require('worker_threads').workerData;
-        function wrequire(mod){
-            return require("${rel}"+mod);
-        }
-        let __func=${func.toString()}
-        __func(...__argv);
-    `,{eval:true,workerData:args})
-    return worker;
-};
+;
 
 /**
  * 此函数一定要作为单独程序启动
@@ -95,13 +78,13 @@ export default async function serve(port:number=80,configname="default"){
     startServer(port);
     console.log(`服务器启动，端口:${port},地址:http://localhost:${port}${config.base_url}`);
     //删除原有content 全部重新生成
-    // await del("./content");
+    await del("./content");
     console.log("已启动全部重新生成");
-    // await generate(configname)
+    await generate(configname)
     //开启监视线程
-    let w1=runFunction(worker1,configname);
+    let w1=runFunction(__dirname,worker1,configname);
     // w1.stdout.on("data",(c:Buffer)=>console.log(`[文章同步器] ${c.toString()}`))
-    let w2=runFunction(worker2,config);
+    let w2=runFunction(__dirname,worker2,config);
     // w2.stdout.on("data",(c:Buffer)=>console.log(`[网站同步器] ${c.toString()}`))
 
 }

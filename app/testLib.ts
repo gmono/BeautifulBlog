@@ -1,4 +1,4 @@
-import { runFunction } from './sync';
+import { runFunction } from "./lib/runInThread";
 let w=runFunction((arg,arg2)=>{
     console.log(arg,typeof arg2);
 },"a",{a:2});

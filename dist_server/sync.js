@@ -5,42 +5,23 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const koa = require("koa");
 const kstatic = require("koa-static");
+const del = require("del");
+const generator_1 = require("./generator");
 const fse = require("fs-extra");
 //尝试使用此模块实现
-const thread = require("worker_threads");
-function wrequire(m) {
-    throw new Error("错误，此函数应在worker中被调用");
-}
-function worker1(configname) {
+const runInThread_1 = require("./lib/runInThread");
+function worker1(context, configname) {
     ("./watch");
-    let watchArticles = wrequire("./watch").default;
+    let watchArticles = context.localRequire("./watch").default;
     console.log("开始监视文章改动");
     watchArticles(configname);
 }
-function worker2(config) {
+function worker2(context, config) {
     ("./watch");
-    let watchSite = wrequire("./watch").watchSite;
+    let watchSite = context.localRequire("./watch").watchSite;
     console.log(`开始监视网站 [${config.site}] 改动`);
     watchSite(config.site);
 }
-/**
- * 在新线程里运行一个函数 返回worker
- * @param func 函数
- * @param args 参数
- */
-function runFunction(func, ...args) {
-    let rel = __dirname.replace(/\\/g, "/") + "/";
-    let worker = new thread.Worker(`
-        let __argv=require('worker_threads').workerData;
-        function wrequire(mod){
-            return require("${rel}"+mod);
-        }
-        let __func=${func.toString()}
-        __func(...__argv);
-    `, { eval: true, workerData: args });
-    return worker;
-}
-exports.runFunction = runFunction;
 ;
 /**
  * 此函数一定要作为单独程序启动
@@ -76,13 +57,13 @@ async function serve(port = 80, configname = "default") {
     startServer(port);
     console.log(`服务器启动，端口:${port},地址:http://localhost:${port}${config.base_url}`);
     //删除原有content 全部重新生成
-    // await del("./content");
+    await del("./content");
     console.log("已启动全部重新生成");
-    // await generate(configname)
+    await generator_1.default(configname);
     //开启监视线程
-    let w1 = runFunction(worker1, configname);
+    let w1 = runInThread_1.runFunction(__dirname, worker1, configname);
     // w1.stdout.on("data",(c:Buffer)=>console.log(`[文章同步器] ${c.toString()}`))
-    let w2 = runFunction(worker2, config);
+    let w2 = runInThread_1.runFunction(__dirname, worker2, config);
     // w2.stdout.on("data",(c:Buffer)=>console.log(`[网站同步器] ${c.toString()}`))
 }
 exports.default = serve;
