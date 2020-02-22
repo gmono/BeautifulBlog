@@ -8,7 +8,7 @@ import * as kstatic from "koa-static"
 import * as krouter from "koa-router"
 
 
-import { watchFile } from "fs";
+import { watchFile, watch } from "fs";
 import watchArticles, { watchSite } from "./watch";
 import del = require("del");
 import generate from "./generator";
@@ -22,14 +22,18 @@ import * as fse from 'fs-extra';
 import * as thread from "worker_threads"
 
 
+function wrequire(m):any{
 
+}
 function worker1(configname:string){
+    let watchArticles=require("./dist_server/watch").default;
+    console.log(watchArticles);
     watchArticles(configname);
 }
 function worker2(config:IConfig){
+    let watchSite=require("./dist_server/watch").watchSite;
     watchSite(config.site);
 }
-
 /**
  * 在新线程里运行一个函数 返回worker
  * @param func 函数
@@ -38,6 +42,10 @@ function worker2(config:IConfig){
 export function runFunction(func:(...args)=>any,...args){
     let worker=new thread.Worker(`
         let __argv=require('worker_threads').workerData;
+        __dirname="${__dirname}";
+        function wrequire(mod){
+            return require("${__dirname}/"+mod);
+        }
         let __func=${func.toString()}
         __func(...__argv);
     `,{eval:true,workerData:args})
@@ -84,9 +92,9 @@ export default async function serve(port:number=80,configname="default"){
     // await generate(configname)
     //开启监视线程
     let w1=runFunction(worker1,configname);
-    w1.stdout.on("data",(c:Buffer)=>console.log(`[文章同步器] ${c.toString()}`))
+    // w1.stdout.on("data",(c:Buffer)=>console.log(`[文章同步器] ${c.toString()}`))
     let w2=runFunction(worker2,config);
-    w2.stdout.on("data",(c:Buffer)=>console.log(`[网站同步器] ${c.toString()}`))
+    // w2.stdout.on("data",(c:Buffer)=>console.log(`[网站同步器] ${c.toString()}`))
 
 }
 
