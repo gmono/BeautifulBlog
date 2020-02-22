@@ -8,7 +8,6 @@ const kstatic = require("koa-static");
 const fse = require("fs-extra");
 //尝试使用此模块实现
 const thread = require("worker_threads");
-const path = require("path");
 function wrequire(m) {
     throw new Error("错误，此函数应在worker中被调用");
 }
@@ -30,10 +29,7 @@ function worker2(config) {
  * @param args 参数
  */
 function runFunction(func, ...args) {
-    let rel = path.relative(".", __dirname).replace("\\", "/");
-    rel = "./" + rel;
-    if (rel != "./")
-        rel += "/";
+    let rel = __dirname.replace(/\\/g, "/") + "/";
     let worker = new thread.Worker(`
         let __argv=require('worker_threads').workerData;
         function wrequire(mod){

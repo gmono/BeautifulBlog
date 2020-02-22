@@ -48,9 +48,7 @@ function worker2(config:IConfig){
  * @param args 参数
  */
 export function runFunction(func:(...args)=>any,...args){
-    let rel=path.relative(".",__dirname).replace("\\","/");
-    rel="./"+rel;
-    if(rel!="./") rel+="/";
+    let rel=__dirname.replace(/\\/g,"/")+"/";
     let worker=new thread.Worker(`
         let __argv=require('worker_threads').workerData;
         function wrequire(mod){
