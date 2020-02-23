@@ -21,6 +21,11 @@ import * as fse from 'fs-extra';
 
 
 import { runFunction, IThreadContext } from './lib/runInThread';
+import * as template from 'art-template';
+import * as path from 'path';
+import { WriteStream } from "fs-extra";
+import { ReadStream } from "tty";
+
 
 
 
@@ -43,6 +48,26 @@ function worker2(context:IThreadContext,config:IConfig){
 }
 ;
 
+//获取内容Frame中间件 通过art-template模板文件
+function getContentFrame(framefile:string){
+    return async (ctx:koa.ParameterizedContext<koa.DefaultState, koa.DefaultContext>,next)=>{
+        let ret=await next();
+        if(ctx.type!="text/html") return ret;
+        let body=ctx.body as ReadStream;
+        let str="";
+        for await (let t of body){
+            str+=(<Buffer>t).toString();
+        }
+        //给html加框架
+        let temp=template(framefile,{
+            content:str
+        });
+        // console.log(temp);
+        ctx.body=temp;
+        return ret;
+    }
+    
+}
 /**
  * 此函数一定要作为单独程序启动
  * @param port 接口
@@ -54,6 +79,9 @@ export default async function serve(port:number=80,configname="default"){
     let startServer=(port:number)=>{
         //启动服务器
         const app=new koa();
+        //html添加前缀中间件
+        let mid=getContentFrame(path.resolve(__dirname,"../static/head.html"));
+        app.use(mid);
         //prefixify中间件
         app.use(async (ctx,next)=>{
             let p=ctx.path;
@@ -93,4 +121,4 @@ export default async function serve(port:number=80,configname="default"){
     
 
 if(require.main==module)
-    serve();
+    serve(8000);

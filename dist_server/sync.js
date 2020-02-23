@@ -10,6 +10,8 @@ const generator_1 = require("./generator");
 const fse = require("fs-extra");
 //尝试使用此模块实现
 const runInThread_1 = require("./lib/runInThread");
+const template = require("art-template");
+const path = require("path");
 function worker1(context, configname) {
     ("./watch");
     let watchArticles = context.localRequire("./watch").default;
@@ -23,6 +25,26 @@ function worker2(context, config) {
     watchSite(config.site);
 }
 ;
+//获取内容Frame中间件 通过art-template模板文件
+function getContentFrame(framefile) {
+    return async (ctx, next) => {
+        let ret = await next();
+        if (ctx.type != "text/html")
+            return ret;
+        let body = ctx.body;
+        let str = "";
+        for await (let t of body) {
+            str += t.toString();
+        }
+        //给html加框架
+        let temp = template(framefile, {
+            content: str
+        });
+        // console.log(temp);
+        ctx.body = temp;
+        return ret;
+    };
+}
 /**
  * 此函数一定要作为单独程序启动
  * @param port 接口
@@ -34,6 +56,9 @@ async function serve(port = 80, configname = "default") {
     let startServer = (port) => {
         //启动服务器
         const app = new koa();
+        //html添加前缀中间件
+        let mid = getContentFrame(path.resolve(__dirname, "../static/head.html"));
+        app.use(mid);
         //prefixify中间件
         app.use(async (ctx, next) => {
             let p = ctx.path;
@@ -68,5 +93,5 @@ async function serve(port = 80, configname = "default") {
 }
 exports.default = serve;
 if (require.main == module)
-    serve();
+    serve(8000);
 //# sourceMappingURL=sync.js.map
