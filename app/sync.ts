@@ -20,15 +20,25 @@ import * as fse from 'fs-extra';
 
 
 
-import { runFunction, IThreadContext } from './lib/runInThread';
+import { runFunction, IThreadContext, IMessage } from './lib/runInThread';
 import * as template from 'art-template';
 import * as path from 'path';
 import { WriteStream } from "fs-extra";
 import { ReadStream } from "tty";
+import { IServerInfo } from './Interface/IServerInfo';
 
 
 
 
+
+//worker会发布updated消息 
+type UpdateMsg=IMessage<Date>;
+function getUpdatedMessage(date:Date){
+    return <IMessage<Date>>{
+        type:"updated",
+        data:date
+    }
+}
 
 
 function worker1(context:IThreadContext,configname:string){
@@ -36,14 +46,23 @@ function worker1(context:IThreadContext,configname:string){
     // console.log(path.resolve("."))
     //
     type W=typeof import("./watch");
-    let watchArticles=context.localRequire<W>("./watch").default;
+    let wh=context.localRequire<W>("./watch");
+    let watchArticles=wh.default;
     console.log("开始监视文章改动");
+    //发送更新消息
+    wh.OnArticleGenerated.subscribe(()=>{
+        context.sendMessage(getUpdatedMessage(new Date()))
+    })
     watchArticles(configname);
 }
 function worker2(context:IThreadContext,config:IConfig){
     type W=typeof import("./watch");
-    let watchSite=context.localRequire<W>("./watch").watchSite;
+    let wh=context.localRequire<W>("./watch");
+    let watchSite=wh.watchSite;
     console.log(`开始监视网站 [${config.site}] 改动`)
+    wh.OnSiteSynced.subscribe(()=>{
+        context.sendMessage(getUpdatedMessage(new Date()))
+    })
     watchSite(config.site);
 }
 ;
@@ -68,6 +87,16 @@ function getContentFrame(framefile:string){
     }
     
 }
+
+const serverInfo={
+    article_updateTime:new Date(),
+    site_updateTime:new Date()
+} as IServerInfo;
+
+//新方法之后学习用
+type t=Parameters<typeof serve>
+type s=ReturnType<typeof serve>;
+//
 /**
  * 此函数一定要作为单独程序启动
  * @param port 接口
@@ -76,9 +105,17 @@ function getContentFrame(framefile:string){
 export default async function serve(port:number=80,configname="default"){
     let config=(await fse.readJSON(`./config/${configname}.json`)) as IConfig;
     //启动服务器
+    
     let startServer=(port:number)=>{
         //启动服务器
         const app=new koa();
+        app.use(async (ctx,next)=>{
+            //这里拦截查询服务器信息的请求
+            if(ctx.path=="/info"){
+                ctx.body=JSON.stringify(serverInfo);
+                return;
+            }else return next();
+        })
         //html添加前缀中间件
         let mid=getContentFrame(path.resolve(__dirname,"../static/head.html"));
         app.use(mid);
@@ -110,10 +147,17 @@ export default async function serve(port:number=80,configname="default"){
     console.log("已启动全部重新生成");
     await generate(configname)
     //开启监视线程
-    let w1=runFunction(__dirname,worker1,configname);
-    // w1.stdout.on("data",(c:Buffer)=>console.log(`[文章同步器] ${c.toString()}`))
-    let w2=runFunction(__dirname,worker2,config);
-    // w2.stdout.on("data",(c:Buffer)=>console.log(`[网站同步器] ${c.toString()}`))
+    let w1=runFunction(__dirname,{},{getUpdatedMessage},worker1,configname);
+    w1.addListener("message",(m:IMessage<Date>)=>serverInfo.article_updateTime=m.data);
+    // w1.MessagePump<Date>("updated").subscribe((dt)=>{
+    //     serverInfo.article_updateTime=dt;
+    //     console.log(serverInfo);
+    // })
+    let w2=runFunction(__dirname,{},{getUpdatedMessage},worker2,config);
+    w2.addListener("message",(m:IMessage<Date>)=>serverInfo.site_updateTime=m.data);
+    // w2.onMessage<Date>("update",(dt)=>{
+    //     serverInfo.site_updateTime=dt;
+    // })
 
 }
 

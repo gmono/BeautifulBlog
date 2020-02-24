@@ -11,11 +11,13 @@ async function createMonitor(root) {
 }
 const generator_1 = require("./generator");
 const rxjs_1 = require("rxjs");
-exports.OnGenerated = new rxjs_1.Subject();
+//这里的设计可能不支持 启动多个监视器 后续考虑改为面向对象写法
+exports.OnArticleGenerated = new rxjs_1.Subject();
+exports.OnSiteSynced = new rxjs_1.Subject();
 async function generateFiles(configname) {
     //启动重新生成
     await generator_1.default(configname);
-    exports.OnGenerated.next();
+    exports.OnArticleGenerated.next();
 }
 async function watchArticles(configname = "default") {
     //等待更改 自动进行全部重新生成 如同服务器里一样
@@ -56,6 +58,7 @@ async function watchSite(sitename) {
         //这里直接使用changesite 后期考虑优化
         await changesite_1.default(sitename);
         console.log("网站同步完成!");
+        exports.OnSiteSynced.next();
     };
     mon.on("changed", async (f, c, p) => {
         await update(f);

@@ -37,6 +37,8 @@ date: ${JSON.stringify(new Date())}
 draft: true
 ---
     `;
+    //确保路径存在
+    await fse.ensureDir(path.parse(p).dir);
     //创建文件
     await fse.writeFile(p, templateContent);
     console.log(`创建文章完成，文章路径:${p}`);
