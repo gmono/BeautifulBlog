@@ -38,13 +38,14 @@ function transToExtraWorker(worker:thread.Worker){
     }
     return ret;
 }
+type WorkerFunc=(context:IThreadContext,...args) => any;
 /**
  * 在新线程里运行一个函数 返回worker
  * @param func 函数
  * @param args 参数
  * @param namedObjects 全局命名对象列表(不能包含函数)
  */
-export function runFunction(modpath:string,namedObjects:{[idx:string]:any},libFuncs:{[idx:string]:Function},func: (context:IThreadContext,...args) => any, ...args) {
+export function runFunction(modpath:string,namedObjects:{[idx:string]:any},libFuncs:{[idx:string]:Function},func: WorkerFunc, ...args) {
     let rel = modpath.replace(/\\/g, "/") + "/";
     let libstr=ld.map(libFuncs,(value,key,col)=>{
         return `const ${key}=${value.toString()};`

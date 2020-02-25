@@ -13,7 +13,6 @@ var Hooks = /** @class */ (function () {
         throw new Error("Method not implemented.");
     };
     Hooks.prototype.OnArticleChange = function (type, changelist) {
-        if (changelist === void 0) { changelist = ("../../app/Interface/IContentMeta").IContentMeta[]; }
         throw new Error("Method not implemented.");
     };
     return Hooks;

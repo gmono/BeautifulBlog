@@ -7,4 +7,6 @@ export interface IConfig{
     base_url:string;
     //配置使用哪个网站 名字为保存在sites目录的文件夹名字
     site:string;
+    //设置使用new创建文章时要启动用于编辑的编辑器(exe)
+    editor:""
 }

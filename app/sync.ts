@@ -99,10 +99,10 @@ type s=ReturnType<typeof serve>;
 //
 /**
  * 此函数一定要作为单独程序启动
- * @param port 接口
+ * @param port 接口 null时自动选择
  * @param configname 配置文件
  */
-export default async function serve(port:number=80,configname="default"){
+export default async function serve(port:number=null,configname="default"){
     let config=(await fse.readJSON(`./config/${configname}.json`)) as IConfig;
     //启动服务器
     
@@ -137,10 +137,19 @@ export default async function serve(port:number=80,configname="default"){
             ctx.redirect(config.base_url+"/");
         })
         app.use(kstatic("."))
+        // app.on("error",v=>console.log("hello"))
         app.listen(port);
     }
-    //主线程 启动服务器
-    startServer(port);
+    //主线程 启动服务器 这里错误捕捉不成功
+    try{
+        startServer(port);
+    }catch(e){
+        //此处重选端口并启动服务器
+        port=port+1+Math.random()*(65535-port);
+        port=Math.floor(port);
+        console.log("启动服务器失败，尝试重选端口");
+        startServer(port);
+    }
     console.log(`服务器启动，端口:${port},地址:http://localhost:${port}${config.base_url}`);
     //删除原有content 全部重新生成
     await del("./content");

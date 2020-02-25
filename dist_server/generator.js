@@ -129,7 +129,7 @@ async function generate(configname = "default", verbose = false, refresh = false
     let files = { useConfig: configname, fileList: {} };
     //此处不缩进表示双重条件
     //不刷新才考虑加载此前的配置文件
-    if (!refresh)
+    if (!refresh) //前缀检查写法
         if (await fs.pathExists("./content/files.json")) {
             //require基于模块路径
             let t = (await fs.readJSON("./content/files.json"));

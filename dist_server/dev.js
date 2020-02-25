@@ -8,7 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
-const tscCompileOK = (outcontent) => outcontent.indexOf("Compilation complete. Watching for file changes") != -1;
+const tscCompileOK = (outcontent) => outcontent.indexOf("Watching for file changes.") != -1;
 const ld = require("lodash");
 const fse = require("fs-extra");
 function hasError(outcontent) {
@@ -36,9 +36,16 @@ const tscCompileError = (outcontent) => {
     //提取每个错误行的信息
     let errors = errorlines.map((line, i) => {
         //把每行转换为一个对象 
-        let regex = /(.*)\((\d+),(\d+)\):\s*error\sTS(\d+):(.+)/;
+        //此处为文件中的error
+        let fileer_regex = /(.*)\((\d+),(\d+)\):\s*error\sTS(\d+):(.+)/;
+        //没有文件位置的系统错误
+        let syser_regex = /\s*error\sTS(\d+):(.+)/;
+        // console.log(line)
         //1:文件 2:行 3 列 4 错误号 5 错误描述
-        let result = line.match(regex);
+        let result = line.match(fileer_regex);
+        //此处暂时忽略非文件中的错误
+        if (result == null)
+            return null;
         //初始只记录一个文件的一个point
         let info = {
             errorCode: parseInt(result[4]),
@@ -50,7 +57,7 @@ const tscCompileError = (outcontent) => {
                 }]
         };
         return info;
-    });
+    }).filter(v => v != null);
     //合并操作 合并errorFile相同的info对象
     //此处需要groupBy函数 这里可以改变进而改变
     let conErrors = ld.groupBy(errors, (e) => e.errorCode);
@@ -150,6 +157,13 @@ async function tscWatch(name, dirpath) {
  * @param configname 主要用于确定“当前网站”  并对网站目录启动监视（目前为单一的tsc监视)
  */
 async function dev(configname = "default") {
+    const allowvers = ["3.8.2", "2.6.4"];
+    const ver = child_process_1.execSync("tsc -v").toString();
+    console.log("typescript 版本", ver);
+    if (allowvers.filter(v => ver.indexOf(v) != -1).length == 0) {
+        const desc = allowvers.reduce((prev, curr) => `${prev}\n${curr}`);
+        console.log(`正在使用未经测试的typescript版本,测试通过版本:${desc}\n`);
+    }
     console.log("正在启动处理进程......");
     let config = (await fse.readJSON(`./config/${configname}.json`));
     let sitename = config.site;

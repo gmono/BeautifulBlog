@@ -19,7 +19,6 @@ function getUpdatedMessage(date) {
     };
 }
 function worker1(context, configname) {
-    ("./watch");
     let wh = context.localRequire("./watch");
     let watchArticles = wh.default;
     console.log("开始监视文章改动");
@@ -30,7 +29,6 @@ function worker1(context, configname) {
     watchArticles(configname);
 }
 function worker2(context, config) {
-    ("./watch");
     let wh = context.localRequire("./watch");
     let watchSite = wh.watchSite;
     console.log(`开始监视网站 [${config.site}] 改动`);
@@ -67,10 +65,10 @@ const serverInfo = {
 //
 /**
  * 此函数一定要作为单独程序启动
- * @param port 接口
+ * @param port 接口 null时自动选择
  * @param configname 配置文件
  */
-async function serve(port = 80, configname = "default") {
+async function serve(port = null, configname = "default") {
     let config = (await fse.readJSON(`./config/${configname}.json`));
     //启动服务器
     let startServer = (port) => {
@@ -105,10 +103,20 @@ async function serve(port = 80, configname = "default") {
             ctx.redirect(config.base_url + "/");
         });
         app.use(kstatic("."));
+        // app.on("error",v=>console.log("hello"))
         app.listen(port);
     };
-    //主线程 启动服务器
-    startServer(port);
+    //主线程 启动服务器 这里错误捕捉不成功
+    try {
+        startServer(port);
+    }
+    catch (e) {
+        //此处重选端口并启动服务器
+        port = port + 1 + Math.random() * (65535 - port);
+        port = Math.floor(port);
+        console.log("启动服务器失败，尝试重选端口");
+        startServer(port);
+    }
     console.log(`服务器启动，端口:${port},地址:http://localhost:${port}${config.base_url}`);
     //删除原有content 全部重新生成
     await del("./content");
@@ -116,13 +124,10 @@ async function serve(port = 80, configname = "default") {
     await generator_1.default(configname);
     //开启监视线程
     let w1 = runInThread_1.runFunction(__dirname, {}, { getUpdatedMessage }, worker1, configname);
-    // w1.addListener("message",(m:IMessage<Date>)=>serverInfo.article_updateTime=m.data);
     w1.MessagePump("updated").subscribe((dt) => {
         serverInfo.article_updateTime = dt;
-        console.log(serverInfo);
     });
     let w2 = runInThread_1.runFunction(__dirname, {}, { getUpdatedMessage }, worker2, config);
-    // w2.addListener("message",(m:IMessage<Date>)=>serverInfo.site_updateTime=m.data);
     w2.onMessage("update", (dt) => {
         serverInfo.site_updateTime = dt;
     });

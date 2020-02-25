@@ -50,9 +50,13 @@ pro.command("watch [configname]")
 });
 pro.command("sync  [configname] [port]")
     .description("启动开发服务器(指定端口与配置文件）")
-    .action(async (configname = "default", port = "8080") => {
-    let p = parseInt(port);
-    await sync_1.default(p, configname);
+    .action(async (configname = "default", port = null) => {
+    if (port == null)
+        await sync_1.default(null, configname);
+    else {
+        let p = parseInt(port);
+        await sync_1.default(p, configname);
+    }
 });
 pro.command("refresh [configname]")
     .description("刷新，切换网站并重新生成内容，相当于changesite与generate的组合")
@@ -127,5 +131,5 @@ pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|rem
 });
 pro.command("help").description("输出帮助").action(() => pro.outputHelp());
 pro.parseAsync(process.argv);
-// console.log("hhhh"); 
+// console.log("hhhh");
 //# sourceMappingURL=blog.js.map

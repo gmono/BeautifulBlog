@@ -55,9 +55,12 @@ pro.command("watch [configname]")
     });
 pro.command("sync  [configname] [port]")
 .description("启动开发服务器(指定端口与配置文件）")
-.action(async (configname="default",port:string="8080")=>{
-    let p=parseInt(port);
-    await sync(p,configname);
+.action(async (configname="default",port:string=null)=>{
+    if(port==null) await sync(null,configname);
+    else{
+        let p=parseInt(port);
+        await sync(p,configname);
+    }
 });
 
 pro.command("refresh [configname]")
