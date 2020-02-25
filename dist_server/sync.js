@@ -71,6 +71,8 @@ const serverInfo = {
 async function serve(port = null, configname = "default") {
     let config = (await fse.readJSON(`./config/${configname}.json`));
     //启动服务器
+    if (port == null)
+        port = 1024 + Math.floor((Math.random() * 65535));
     let startServer = (port) => {
         //启动服务器
         const app = new koa();

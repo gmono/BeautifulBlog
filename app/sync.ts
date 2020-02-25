@@ -105,7 +105,7 @@ type s=ReturnType<typeof serve>;
 export default async function serve(port:number=null,configname="default"){
     let config=(await fse.readJSON(`./config/${configname}.json`)) as IConfig;
     //启动服务器
-    
+    if(port==null) port=1024+Math.floor((Math.random()*65535));
     let startServer=(port:number)=>{
         //启动服务器
         const app=new koa();
