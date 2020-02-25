@@ -5,6 +5,10 @@
 			"title": "关于博客",
 			"article_path": "./articles/about.md"
 		},
+		"/BeautifulBlog/content/testss/hhh.json": {
+			"title": "hhh",
+			"article_path": "./articles/testss/hhh.md"
+		},
 		"/BeautifulBlog/content/testdl/testmd.json": {
 			"title": "关于博客asdfasdfasd",
 			"article_path": "./articles/testdl/testmd.md"
@@ -52,10 +56,6 @@
 		"/BeautifulBlog/content/life/测试这个目录.json": {
 			"title": "测试一下这个目录",
 			"article_path": "./articles/life/测试这个目录.md"
-		},
-		"/BeautifulBlog/content/testss/hhh.json": {
-			"title": "hhh",
-			"article_path": "./articles/testss/hhh.md"
 		}
 	}
 }

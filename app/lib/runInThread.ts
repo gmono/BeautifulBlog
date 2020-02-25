@@ -2,10 +2,11 @@ import * as thread from "worker_threads"
 import { Observable, Subject } from 'rxjs';
 import * as ld from 'lodash';
 
+type InnerType<T extends IMessage<any>>=T extends IMessage<infer S>? S:never;
 interface ExtraWorker extends thread.Worker{
-    onMessage<DT>(type:string,cbk:(data:DT)=>any);
-    onceMessage<DT>(type:string):Promise<DT>;
-    MessagePump<DT>(type:string):Observable<DT>;
+    onMessage<MT extends IMessage<any>,DT=InnerType<MT>>(type:string,cbk:(data:DT)=>any);
+    onceMessage<MT extends IMessage<any>,DT=InnerType<MT>>(type:string):Promise<DT>;
+    MessagePump<MT extends IMessage<any>,DT=InnerType<MT>>(type:string):Observable<DT>;
 }
 /**
  * 转换worker为扩展worker 允许双向通信
@@ -15,7 +16,7 @@ function transToExtraWorker(worker:thread.Worker){
     //转换为扩展worker
     let ret=worker as ExtraWorker;
     ret.onMessage=(type:string,cbk:(data:any)=>any)=>{
-        process.addListener("message",(msg:IMessage)=>{
+        worker.addListener("message",(msg:IMessage)=>{
             if(msg.type==type){
                 cbk(msg.data);
             }
@@ -23,7 +24,7 @@ function transToExtraWorker(worker:thread.Worker){
     }
     ret.onceMessage=(type:string)=>{
         return new Promise<any>((resolve)=>{
-            process.once("message",(msg:IMessage)=>{
+            worker.once("message",(msg:IMessage)=>{
                 if(msg.type==type){
                     resolve(msg.data);
                 }

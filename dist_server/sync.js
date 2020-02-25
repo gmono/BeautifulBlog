@@ -116,16 +116,16 @@ async function serve(port = 80, configname = "default") {
     await generator_1.default(configname);
     //开启监视线程
     let w1 = runInThread_1.runFunction(__dirname, {}, { getUpdatedMessage }, worker1, configname);
-    w1.addListener("message", (m) => serverInfo.article_updateTime = m.data);
-    // w1.MessagePump<Date>("updated").subscribe((dt)=>{
-    //     serverInfo.article_updateTime=dt;
-    //     console.log(serverInfo);
-    // })
+    // w1.addListener("message",(m:IMessage<Date>)=>serverInfo.article_updateTime=m.data);
+    w1.MessagePump("updated").subscribe((dt) => {
+        serverInfo.article_updateTime = dt;
+        console.log(serverInfo);
+    });
     let w2 = runInThread_1.runFunction(__dirname, {}, { getUpdatedMessage }, worker2, config);
-    w2.addListener("message", (m) => serverInfo.site_updateTime = m.data);
-    // w2.onMessage<Date>("update",(dt)=>{
-    //     serverInfo.site_updateTime=dt;
-    // })
+    // w2.addListener("message",(m:IMessage<Date>)=>serverInfo.site_updateTime=m.data);
+    w2.onMessage("update", (dt) => {
+        serverInfo.site_updateTime = dt;
+    });
 }
 exports.default = serve;
 if (require.main == module)

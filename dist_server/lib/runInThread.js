@@ -11,7 +11,7 @@ function transToExtraWorker(worker) {
     //转换为扩展worker
     let ret = worker;
     ret.onMessage = (type, cbk) => {
-        process.addListener("message", (msg) => {
+        worker.addListener("message", (msg) => {
             if (msg.type == type) {
                 cbk(msg.data);
             }
@@ -19,7 +19,7 @@ function transToExtraWorker(worker) {
     };
     ret.onceMessage = (type) => {
         return new Promise((resolve) => {
-            process.once("message", (msg) => {
+            worker.once("message", (msg) => {
                 if (msg.type == type) {
                     resolve(msg.data);
                 }
