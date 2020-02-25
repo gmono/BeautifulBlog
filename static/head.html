@@ -3,14 +3,25 @@
 {{@ content}}
 <script>
     //自动刷新 测试
-    let flag="_inlistening";
-    if(!window[flag]){
-        window.addEventListener("load",(e)=>{
-            let func=()=>{
+    const serverInfo=Symbol("服务器信息");
+    async function QueryAndRefresh(){
+        let nowinfo=await(await fetch("/info")).json();
+        if(window[serverInfo]==null){
+            window[serverInfo]=nowinfo;
+        }
+        else{
+            let oldinfo=window[serverInfo];
+            if(oldinfo.article_updateTime!=nowinfo.article_updateTime||
+                oldinfo.site_updateTime!=nowinfo.site_updateTime)
+            {
                 window.location.reload();
             }
-            setInterval(func,5000);
-        })
-        window[flag]=true;
+        }
     }
+    async function listening(){
+        await QueryAndRefresh();
+        setTimeout(listening,1000);
+        //等待并延迟循环
+    }
+    listening();
 </script>
