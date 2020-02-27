@@ -18,6 +18,8 @@
 type RemoteItem={name:string,url:string};
 import * as ld from "lodash"
 import * as execa from 'execa';
+import { fork } from 'child_process';
+import generate from './generator';
 export async function getNames(){
     //执行git remote
     //all表示要手机process的所有输出
@@ -53,7 +55,9 @@ export async function listRemote(){
 
 export async function pushToRemote(name?:string){
     let push=async (name)=>{
-        //提交到url
+        //提交到某个仓库 generate add commit push 一条龙
+        //自动读取名称相同的配置文件
+        await generate()
         
     }
     if(name!=null){

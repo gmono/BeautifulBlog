@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const execa = require("execa");
+const generator_1 = require("./generator");
 async function getNames() {
     //执行git remote
     //all表示要手机process的所有输出
@@ -36,7 +37,9 @@ async function listRemote() {
 exports.listRemote = listRemote;
 async function pushToRemote(name) {
     let push = async (name) => {
-        //提交到url
+        //提交到某个仓库 generate add commit push 一条龙
+        //自动读取名称相同的配置文件
+        await generator_1.default();
     };
     if (name != null) {
         //提交到单个仓库

@@ -5,6 +5,18 @@
 			"title": "关于博客",
 			"article_path": "./articles/about.md"
 		},
+		"/content/helloaaa.json": {
+			"title": "helloaaa",
+			"article_path": "./articles/helloaaa.md"
+		},
+		"/content/helloaaaa.json": {
+			"title": "helloaaaa",
+			"article_path": "./articles/helloaaaa.md"
+		},
+		"/content/tttt.json": {
+			"title": "tttt",
+			"article_path": "./articles/tttt.md"
+		},
 		"/content/testss/hhh.json": {
 			"title": "hhh",
 			"article_path": "./articles/testss/hhh.md"

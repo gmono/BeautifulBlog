@@ -2,13 +2,16 @@ import * as thread from "worker_threads"
 import { Observable, Subject } from 'rxjs';
 import * as ld from 'lodash';
 
-type DataType< T extends new (data: any) => IMessage<any>>=T extends new <S=infer K>(data:S)=>IMessage<S>? K:never;
-
-type InnerType<T extends IMessage<any>>=T extends IMessage<infer S>? S:never;
+//表示类型 同一类型表示 表示可以产生指定类型的一切可能类型（包括base自身）
+type RepresentType<Base>=Base|(new (...args)=>Base)|((...args)=>Base);
+//表示拥有指定数据类型的消息类型
+type MSGType<T>=RepresentType<IMessage<T>>;
+//表示一个消息所包含的数据的类型
+type InnerType<T extends MSGType<any>>=T extends MSGType<infer S>? S:never;
 interface ExtraWorker extends thread.Worker{
-    onMessage<MT extends IMessage<any>,DT=InnerType<MT>>(type:string,cbk:(data:DT)=>any);
-    onceMessage<MT extends IMessage<any>,DT=InnerType<MT>>(type:string):Promise<DT>;
-    MessagePump<MT extends IMessage<any>,DT=InnerType<MT>>(type:string):Observable<DT>;
+    onMessage<MT extends MSGType<any>,DT=InnerType<MT>>(type:string,cbk:(data:DT)=>any);
+    onceMessage<MT extends MSGType<any>,DT=InnerType<MT>>(type:string):Promise<DT>;
+    MessagePump<MT extends MSGType<any>,DT=InnerType<MT>>(type:string):Observable<DT>;
 }
 /**
  * 转换worker为扩展worker 允许双向通信
@@ -95,7 +98,7 @@ export interface IMessage<DT=any>{
  * 制造一种消息类型(返回一个类)
  * @param type 消息类型字符串
  */
-function MakeMessageType<DT>(type:string):new (data:DT)=>IMessage<DT>{
+export function MakeMessageType<DT>(type:string):new (data:DT)=>IMessage<DT>{
     return class Message<MT=DT> implements IMessage<MT>{
         public type=type;
         constructor(public data:MT){
@@ -103,8 +106,13 @@ function MakeMessageType<DT>(type:string):new (data:DT)=>IMessage<DT>{
     }
     
 }
-let s=MakeMessageType<Date>("updated");
-let a=MakeMessageType<String>("updated");
-let aa=new s(new Date())
-type u=InnerType<typeof aa>;
-type kk=DataType<typeof s>
+/**
+ * 制造一种产生一种消息类型的函数
+ * @param type 消息类型字符串
+ */
+export function MakeMessageFactory<DT>(type:string):(data:DT)=>IMessage<DT>{
+    return (data:DT)=>({
+        type:type,
+        data:data
+    });
+}

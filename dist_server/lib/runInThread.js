@@ -85,7 +85,16 @@ function MakeMessageType(type) {
         }
     };
 }
-let s = MakeMessageType("updated");
-let a = MakeMessageType("updated");
-let aa = new s(new Date());
+exports.MakeMessageType = MakeMessageType;
+/**
+ * 制造一种产生一种消息类型的函数
+ * @param type 消息类型字符串
+ */
+function MakeMessageFactory(type) {
+    return (data) => ({
+        type: type,
+        data: data
+    });
+}
+exports.MakeMessageFactory = MakeMessageFactory;
 //# sourceMappingURL=runInThread.js.map
