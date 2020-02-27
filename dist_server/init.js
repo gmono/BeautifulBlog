@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_extra_1 = require("fs-extra");
-const execa = require("execa");
 /**
  * 主要用于在一个目录中创建基本的博客目录结构
  * 功能：
@@ -14,6 +13,8 @@ const walk = require("walk");
 const del = require("del");
 // import { fork } from 'child_process';
 const changesite_1 = require("./changesite");
+const manager_1 = require("./manager");
+const utils_1 = require("./lib/utils");
 //工具函数区域
 /**
  * 复制，通过write(read(file)) 功能继承自fse.copy
@@ -64,12 +65,6 @@ async function innerCopy(src, dest) {
             mon.on("end", () => resolve());
         });
     }
-}
-async function runInDir(dirpath, func) {
-    const s = process.cwd();
-    process.chdir(dirpath);
-    await func();
-    process.chdir(s);
 }
 /**
  * 在目录中创建博客
@@ -122,18 +117,8 @@ async function createBlog(dirpath, autocreate = true, autoreplace = false) {
     ]);
     console.log("文件复制完毕");
     console.log("切换到默认site");
-    await runInDir(dirpath, async () => await changesite_1.default("default"));
-    console.log("开始创建git仓库");
-    //创建git仓库
-    await runInDir(dirpath, async () => {
-        // console.log(process.cwd())
-        await execa("git init", {
-            stdio: "inherit",
-        });
-        await execa("git add .", { stdio: "inherit" });
-        await execa(`git commit -m "创建博客" `, { stdio: "inherit" });
-    });
-    console.log("创建完毕");
+    await utils_1.runInDir(dirpath, async () => await changesite_1.default("default"));
+    await manager_1.initGit(dirpath);
 }
 exports.createBlog = createBlog;
 if (require.main == module) {

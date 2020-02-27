@@ -12,6 +12,8 @@ import * as walk from 'walk';
 import * as del from 'del';
 // import { fork } from 'child_process';
 import changesite from './changesite';
+import { initGit } from "./manager";
+import { runInDir } from "./lib/utils";
 
 
 //工具函数区域
@@ -69,12 +71,7 @@ async function innerCopy(src:string,dest:string){
     
 }
 
-async function runInDir(dirpath:string,func:Function){
-    const s=process.cwd()
-    process.chdir(dirpath);
-    await func();
-    process.chdir(s);
-}
+
 /**
  * 在目录中创建博客
  * @param dirpath 要创建博客的目录
@@ -127,17 +124,7 @@ export async function createBlog(dirpath:string,autocreate:boolean=true,autorepl
     console.log("文件复制完毕");
     console.log("切换到默认site");
     await runInDir(dirpath,async ()=>await changesite("default"));
-    console.log("开始创建git仓库");
-    //创建git仓库
-    await runInDir(dirpath,async ()=>{
-        // console.log(process.cwd())
-        await execa("git init",{
-            stdio:"inherit",
-        });
-        await execa("git add .",{stdio:"inherit"});
-        await execa(`git commit -m "创建博客" `,{stdio:"inherit"});
-    });
-    console.log("创建完毕")
+    await initGit(dirpath);
     
 
 }
