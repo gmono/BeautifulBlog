@@ -2,6 +2,8 @@ import * as thread from "worker_threads"
 import { Observable, Subject } from 'rxjs';
 import * as ld from 'lodash';
 
+type DataType< T extends new (data: any) => IMessage<any>>=T extends new <S=infer K>(data:S)=>IMessage<S>? K:never;
+
 type InnerType<T extends IMessage<any>>=T extends IMessage<infer S>? S:never;
 interface ExtraWorker extends thread.Worker{
     onMessage<MT extends IMessage<any>,DT=InnerType<MT>>(type:string,cbk:(data:DT)=>any);
@@ -89,3 +91,20 @@ export interface IMessage<DT=any>{
     type:string;
     data:DT;
 }
+/**
+ * 制造一种消息类型(返回一个类)
+ * @param type 消息类型字符串
+ */
+function MakeMessageType<DT>(type:string):new (data:DT)=>IMessage<DT>{
+    return class Message<MT=DT> implements IMessage<MT>{
+        public type=type;
+        constructor(public data:MT){
+        }
+    }
+    
+}
+let s=MakeMessageType<Date>("updated");
+let a=MakeMessageType<String>("updated");
+let aa=new s(new Date())
+type u=InnerType<typeof aa>;
+type kk=DataType<typeof s>

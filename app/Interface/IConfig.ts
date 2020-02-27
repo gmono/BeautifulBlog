@@ -9,4 +9,6 @@ export interface IConfig{
     site:string;
     //设置使用new创建文章时要启动用于编辑的编辑器(exe)
     editor:""
+    //设置是否使用符号链接形式切换site
+    useSymbolLink:boolean
 }

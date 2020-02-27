@@ -3,7 +3,8 @@
 	"date": "2020-01-04T13:01:01.000Z",
 	"draft": false,
 	"from_dir": [
-		"tech\\frontend"
+		"tech",
+		"frontend"
 	],
 	"article_length": 5607,
 	"content_length": 30143,

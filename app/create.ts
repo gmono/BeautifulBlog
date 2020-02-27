@@ -1,6 +1,9 @@
 import * as fse from 'fs-extra';
 import * as path from "path"
 import async from './watch';
+import { format } from 'util';
+import * as execa from 'execa';
+import { IGlobalConfig } from './Interface/IGlobalConfig';
 /**
  * 专门处理各种创建操作
  * 包括但不限于：
@@ -18,6 +21,7 @@ let makeToClassBase=<T>(func:(tp:string,...args)=>T)=>{
         return func(p,...args);
     }
 }
+
  /**
   * 在指定目录中创建一个文章
   * @param basepath 要创建的文章的目录
@@ -42,7 +46,15 @@ draft: true
     //创建文件
     await fse.writeFile(p,templateContent);
     console.log(`创建文章完成，文章路径:${p}`)
+    //如果editor有配置则调用编辑器打开文件
+    
+    const gconfig=(await fse.readJson(path.resolve(__dirname,"../global.json"))) as IGlobalConfig;
+    if(gconfig.editor!=null){
+        //启动且并不等待返回
+        execa(gconfig.editor,[p])
+    }
 }
+
 
 
 /**

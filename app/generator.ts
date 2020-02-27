@@ -17,7 +17,7 @@ import * as path from "path"
 
 function getRel(p:string){
     //得到相对于第一个目录的相对路径
-    let ar=p.replace("\\","/").split("/").filter((v)=>v!=".").slice(1);
+    let ar=p.replace(/\\/g,"/").split("/").filter((v)=>v!=".").slice(1);
     let np=ar.join("/");
     // console.log(np);
     return np;
@@ -31,7 +31,7 @@ function getRel(p:string){
 function getContentPath(p:string,content:string){
     let np=getRel(p);
     np=np!=""?`${content}/${np}`:content;
-    return np.replace("\\","/");
+    return np.replace(/\\/g,"/");
 }
 
 
@@ -58,7 +58,7 @@ function changeExt(fpath:string,ext:string=".html"){
     obj.ext=ext;
     obj.base=obj.name+obj.ext;
     let npath=path.format(obj);
-    npath=npath.replace("\\","/");
+    npath=npath.replace(/\\/g,"/");
     return npath;
 }
 /**
@@ -78,7 +78,7 @@ function getUrlFile(root:string,filestat:walk.WalkStats,base_url:string){
     let baseu=base_url=="/"? "":base_url;
     let prefix=baseu+"/content";//相对前缀
     url=getContentPath(url,prefix);
-    url=url.replace("\\","/");
+    url=url.replace(/\\/g,"/");
     return url;
 
 }
@@ -225,7 +225,7 @@ async function generate(configname:string="default",verbose=false,refresh=false)
             url=changeExt(url,".json");
             files.fileList[url]={
                 title:title,
-                article_path:articlepath.replace("\\","/")
+                article_path:articlepath.replace(/\\/g,"/")
             }
         }
 

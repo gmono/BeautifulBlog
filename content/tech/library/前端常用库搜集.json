@@ -3,7 +3,8 @@
 	"date": "2020-01-04T14:38:54.000Z",
 	"draft": false,
 	"from_dir": [
-		"tech\\library"
+		"tech",
+		"library"
 	],
 	"article_length": 362,
 	"content_length": 1412,

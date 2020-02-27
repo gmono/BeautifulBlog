@@ -26,7 +26,7 @@
     "dev": "node ./dist_server/dev.js",
     "blog": "node ./dist_server/blog.js",
     "test": "node ./dist_server/testLib.js",
-    "initBlog":"node ./dist_server/init.js",
+    "initBlog": "node ./dist_server/init.js",
     "pkg": "pkg -t win,linux package.json -o ./bin/blog"
   },
   "author": "gmono",
@@ -68,6 +68,7 @@
     "lodash": "^4.17.15",
     "marked": "^0.8.0",
     "ndir": "^0.1.5",
+    "opn": "^6.0.0",
     "path-extra": "^4.3.0",
     "prismjs": "^1.18.0",
     "rxjs": "^6.5.4",

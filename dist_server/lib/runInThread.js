@@ -73,4 +73,19 @@ function runFunction(modpath, namedObjects, libFuncs, func, ...args) {
     return transToExtraWorker(worker);
 }
 exports.runFunction = runFunction;
+/**
+ * 制造一种消息类型(返回一个类)
+ * @param type 消息类型字符串
+ */
+function MakeMessageType(type) {
+    return class Message {
+        constructor(data) {
+            this.data = data;
+            this.type = type;
+        }
+    };
+}
+let s = MakeMessageType("updated");
+let a = MakeMessageType("updated");
+let aa = new s(new Date());
 //# sourceMappingURL=runInThread.js.map

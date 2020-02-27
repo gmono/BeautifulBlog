@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const fse = require("fs-extra");
 const path = require("path");
+const execa = require("execa");
 /**
  * 专门处理各种创建操作
  * 包括但不限于：
@@ -42,6 +43,12 @@ draft: true
     //创建文件
     await fse.writeFile(p, templateContent);
     console.log(`创建文章完成，文章路径:${p}`);
+    //如果editor有配置则调用编辑器打开文件
+    const gconfig = (await fse.readJson(path.resolve(__dirname, "../global.json")));
+    if (gconfig.editor != null) {
+        //启动且并不等待返回
+        execa(gconfig.editor, [p]);
+    }
 }
 exports.createArticle = createArticle;
 /**
