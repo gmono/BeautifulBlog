@@ -1,3 +1,4 @@
+import { TransformResult } from './transform';
 
 //转换器，用于把一个markdown转换为一个指定格式内容
 //html内容+json对象
@@ -31,6 +32,8 @@ import { IArticleMeta } from "./Interface/IArticleMeta";
 import { outputFile } from "fs-extra";
 import * as fse from 'fs-extra';
 import * as path from 'path';
+import { IGlobalConfig } from './Interface/IGlobalConfig';
+import { readConfig, readGlobalConfig } from './lib/utils';
 
 function htmlProcessing(html:string):string{
   //解析html并在code的pre标签添加class
@@ -52,14 +55,42 @@ export interface TransformResult
   //用于提供额外文件
   files?:{[idx:string]:Buffer}
 }
+
+
+type TransformFunc=((filepath:string,config:IConfig,globalconfig:IGlobalConfig,...args)=>Promise<TransformResult>);
+
+interface ITransformTable{
+  [index:string]:TransformFunc;
+}
+//文章后缀名到转换器的映射表
+const transformTable={
+  ".md":transformMD
+} as ITransformTable;
+//调用代理 会自动根据文件后缀名选择调用的转换器函数
+async function transform(filepath:string,configname:string="default",...args):Promise<TransformResult>{
+  let config=await readConfig(configname);
+  let globalconfig=await readGlobalConfig();
+  //最后传递可能的附加参数
+  const ext=path.parse(filepath).ext;
+  const func=transformTable[ext];
+  return func(filepath,config,globalconfig,...args);
+}
+
+async function transformTXT(filepath:string,config:IConfig,globalconfig:IGlobalConfig,...args){
+  //转换txt文件到html
+  let txt=(await fse.readFile(filepath)).toString();
+  let html=template(path.resolve(__dirname,"../static/txt_template.html"),{
+    content:txt
+  }) as string;
+  //返回
+}
+
 let first=true;
 let baseurl="/";
-async function transform(filepath:string,configname:string="default"):Promise<TransformResult>{
-  
-
+async function transformMD(filepath:string,config:IConfig,globalconfig:IGlobalConfig,...args):Promise<TransformResult>{
     if(first) {
       //加载配置文件并加载语法高亮
-      let config=(await fse.readJSON(`./config/${configname}.json`))  as IConfig;
+      
       let langs=config.code_languages;
       //处理当作root作为baseurl时的问题
       baseurl=config.base_url=="/"?"":config.base_url;

@@ -1,7 +1,7 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 //转换器，用于把一个markdown转换为一个指定格式内容
 //html内容+json对象
-Object.defineProperty(exports, "__esModule", { value: true });
 const fm = require("front-matter");
 const fs = require("fs");
 const mk = require("marked");
@@ -22,6 +22,7 @@ let readAsync = async (fpath) => {
 const cheerio = require("cheerio");
 const fse = require("fs-extra");
 const path = require("path");
+const utils_1 = require("./lib/utils");
 function htmlProcessing(html) {
     //解析html并在code的pre标签添加class
     let $ = cheerio.load(html);
@@ -33,12 +34,32 @@ function htmlProcessing(html) {
     });
     return $.html();
 }
+//文章后缀名到转换器的映射表
+const transformTable = {
+    ".md": transformMD
+};
+//调用代理 会自动根据文件后缀名选择调用的转换器函数
+async function transform(filepath, configname = "default", ...args) {
+    let config = await utils_1.readConfig(configname);
+    let globalconfig = await utils_1.readGlobalConfig();
+    //最后传递可能的附加参数
+    const ext = path.parse(filepath).ext;
+    const func = transformTable[ext];
+    return func(filepath, config, globalconfig, ...args);
+}
+async function transformTXT(filepath, config, globalconfig, ...args) {
+    //转换txt文件到html
+    let txt = (await fse.readFile(filepath)).toString();
+    let html = template(path.resolve(__dirname, "../static/txt_template.html"), {
+        content: txt
+    });
+    //返回
+}
 let first = true;
 let baseurl = "/";
-async function transform(filepath, configname = "default") {
+async function transformMD(filepath, config, globalconfig, ...args) {
     if (first) {
         //加载配置文件并加载语法高亮
-        let config = (await fse.readJSON(`./config/${configname}.json`));
         let langs = config.code_languages;
         //处理当作root作为baseurl时的问题
         baseurl = config.base_url == "/" ? "" : config.base_url;

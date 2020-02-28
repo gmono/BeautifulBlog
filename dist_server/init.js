@@ -8,64 +8,12 @@ const fs_extra_1 = require("fs-extra");
  * 如果目录不存在可自动创建目录（可选）
  */
 const fse = require("fs-extra");
-const path = require("path");
-const walk = require("walk");
 const del = require("del");
 // import { fork } from 'child_process';
 const changesite_1 = require("./changesite");
 const manager_1 = require("./manager");
 const utils_1 = require("./lib/utils");
-//工具函数区域
-/**
- * 复制，通过write(read(file)) 功能继承自fse.copy
- * @param src 源地址
- * @param dest 目的地址
- */
-async function innerCopy(src, dest) {
-    let info = await fse.lstat(src);
-    let copyFile = async (s, d) => {
-        let rd = fse.createReadStream(s);
-        let wd = fse.createWriteStream(d);
-        return new Promise((r) => {
-            wd.addListener("finish", () => {
-                // console.log(`复制文件 ${s} 到 ${d}`)
-                r();
-            });
-            rd.pipe(wd);
-        });
-    };
-    if (info.isFile()) {
-        await copyFile(src, dest);
-    }
-    else {
-        //目录
-        await fse.ensureDir(dest);
-        //开始复制目录 遍历src目录树
-        let mon = walk.walk(src);
-        mon.on("directory", (base, name, next) => {
-            // console.log(path.resolve(base,name.name));
-            next();
-        });
-        mon.on("file", async (dirpath, filename, next) => {
-            //把文件复制到对应位置 把dirpath和filename合成完整src路径 从中生成dest路径 复制文件
-            //不带src路径前缀的目录路径 从1开始截取是为了去掉path前面的/ 以免被认为是从root开始
-            let endDirpath = dirpath.slice(src.length).slice(1);
-            let allpath = path.resolve(dirpath, filename.name); //源地址
-            // console.log(allpath);
-            //在allpath中去除src的部分
-            let destdir = path.resolve(dest, endDirpath); //目的目录地址
-            let destpath = path.resolve(destdir, filename.name); //目的文件地址
-            console.log(dest, endDirpath, destdir);
-            await fse.ensureDir(destdir);
-            //复制文件
-            await copyFile(allpath, destpath);
-            next();
-        });
-        return new Promise((resolve) => {
-            mon.on("end", () => resolve());
-        });
-    }
-}
+const utils_2 = require("./lib/utils");
 /**
  * 在目录中创建博客
  * @param dirpath 要创建博客的目录
@@ -110,10 +58,10 @@ async function createBlog(dirpath, autocreate = true, autoreplace = false) {
     }
     console.log("目录创建完毕");
     await Promise.all([
-        innerCopy(`${__dirname}/../sites/default`, `${dirpath}/sites/default`),
-        innerCopy(`${__dirname}/../config/default.json`, `${dirpath}/config/default.json`),
-        innerCopy(`${__dirname}/../assets`, `${dirpath}/assets`),
-        innerCopy(`${__dirname}/../index.html`, `${dirpath}/index.html`)
+        utils_2.innerCopy(`${__dirname}/../sites/default`, `${dirpath}/sites/default`),
+        utils_2.innerCopy(`${__dirname}/../config/default.json`, `${dirpath}/config/default.json`),
+        utils_2.innerCopy(`${__dirname}/../assets`, `${dirpath}/assets`),
+        utils_2.innerCopy(`${__dirname}/../index.html`, `${dirpath}/index.html`)
     ]);
     console.log("文件复制完毕");
     console.log("切换到默认site");
