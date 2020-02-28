@@ -49,6 +49,8 @@ export interface TransformResult
   html:string;
   meta:IArticleMeta;
   raw:Buffer;
+  //用于提供额外文件
+  files?:{[idx:string]:Buffer}
 }
 let first=true;
 let baseurl="/";
