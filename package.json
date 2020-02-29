@@ -46,6 +46,7 @@
     "@types/react-dom": "^16.9.5",
     "@types/walk": "^2.3.0",
     "@types/watch": "^1.0.1",
+    "@types/yaml": "^1.2.0",
     "@wrote/ensure-path": "^1.1.0",
     "art-template": "^4.13.2",
     "blessed": "^0.1.81",
@@ -74,7 +75,8 @@
     "rxjs": "^6.5.4",
     "spinnies": "^0.5.1",
     "walk": "^2.3.14",
-    "watch": "^1.0.2"
+    "watch": "^1.0.2",
+    "yaml": "^1.7.2"
   },
   "devDependencies": {
     "@types/node": "^13.1.6",
