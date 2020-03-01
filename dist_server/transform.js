@@ -20,6 +20,7 @@ let readAsync = async (fpath) => {
     });
 };
 const cheerio = require("cheerio");
+const fs_extra_1 = require("fs-extra");
 const fse = require("fs-extra");
 const path = require("path");
 const utils_1 = require("./lib/utils");
@@ -36,7 +37,8 @@ function htmlProcessing(html) {
 }
 //文章后缀名到转换器的映射表
 const transformTable = {
-    ".md": transformMD
+    ".md": transformMD,
+    ".txt": transformTXT
 };
 //调用代理 会自动根据文件后缀名选择调用的转换器函数
 async function transform(filepath, configname = "default", ...args) {
@@ -48,6 +50,7 @@ async function transform(filepath, configname = "default", ...args) {
     return func(filepath, config, globalconfig, ...args);
 }
 const yaml = require("yaml");
+const ld = require("lodash");
 async function transformTXT(filepath, config, globalconfig, ...args) {
     //转换txt文件到html txt如果没有yaml的元数据则把第一行当作标题其余元数据为null
     //txt文件的meta由同名yaml提供
@@ -137,10 +140,60 @@ async function transformMD(filepath, config, globalconfig, ...args) {
      */
     return { html, meta, raw: Buffer.from(res.body) };
 }
+/**
+ *
+ * @param articlemeta 元信息
+ * @param from_dir 来源目录 为完整的article base目录（不包括文件名）
+ * @param html 内容字符串
+ * @param text 文章原文
+ */
+async function getContentMeta(articlemeta, from_dir, html, raw, articlefile) {
+    //得到文件信息
+    let articlestat = await fse.stat(articlefile);
+    //去掉最前面的 ./articles
+    //这里考虑去掉form_dir 此属性只在generator中有意义
+    let cmeta = JSON.parse(JSON.stringify(articlemeta));
+    cmeta.article_length = raw.length;
+    cmeta.content_length = html.length;
+    cmeta.modify_time = articlestat.mtime;
+    return cmeta;
+}
+/**
+ * 把一个原始article文件转换为conent（一个html 一个元数据 以及其他文件）
+ * @param srcfile 源文件名
+ * @param destfilename 目的文件名（不包括扩展名）
+ */
+async function transformFile(srcfile, destfilename) {
+    let res = await transform(srcfile);
+    //保存基本内容
+    let htmlpath = utils_1.changeExt(destfilename, ".html");
+    let jsonpath = utils_1.changeExt(destfilename, ".json");
+    //从res.meta构建ContentMeta
+    await Promise.all([
+        fse.writeFile(htmlpath, res.html),
+        fse.writeJson(jsonpath, res.meta)
+    ]);
+    //创建同名附件文件夹，保存附件文件(如果不能同名则加_files后缀)
+    const dirpath = destfilename;
+    await fs_extra_1.mkdir(dirpath);
+    //写入附件 key允许带有路径 但不能以/开头
+    if (res.files != null) {
+        //等待所有文件写入完成
+        await Promise.all(ld.map(res.files, async (value, key, obj) => {
+            //去掉不合法的/
+            if (key.startsWith("/"))
+                key = key.slice(1);
+            //合成目的文件地址
+            let p = path.resolve(dirpath, key);
+            let pdir = path.parse(p).dir;
+            await fse.ensureDir(pdir);
+            await fse.writeFile(p, value);
+        }));
+    }
+}
+exports.transformFile = transformFile;
 if (require.main == module)
-    transform("./articles/about.md").then((obj) => {
-        fs.writeFileSync("test.html", obj.html);
-    });
+    transformFile("./articles/about.md", "./test");
 //打开浏览器查看
 exports.default = transform;
 //# sourceMappingURL=transform.js.map

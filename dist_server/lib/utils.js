@@ -19,6 +19,20 @@ async function runInDir(dirpath, func) {
     process.chdir(s);
 }
 exports.runInDir = runInDir;
+/**
+ * 修改一个路径的扩展名并返回(原文件名无扩展名也可使用)
+ * @param fpath 文件路径
+ * @param ext 扩展名 .xxx
+ */
+function changeExt(fpath, ext = ".html") {
+    let obj = path.parse(fpath);
+    obj.ext = ext;
+    obj.base = obj.name + obj.ext;
+    let npath = path.format(obj);
+    npath = npath.replace(/\\/g, "/");
+    return npath;
+}
+exports.changeExt = changeExt;
 //工具函数区域
 /**
  * 复制，通过write(read(file)) 功能继承自fse.copy

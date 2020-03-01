@@ -5,8 +5,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const pro = require("commander");
 const transform_1 = require("./transform");
-const path = require("path-extra");
-const fs = require("fs-extra");
 const generator_1 = require("./generator");
 const changesite_1 = require("./changesite");
 const sitegen_1 = require("./sitegen");
@@ -20,13 +18,9 @@ const manager_1 = require("./manager");
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename, dest) => {
-    let res = await transform_1.default(filename);
     //生成输出文件名
     dest || (dest = filename);
-    let hpath = path.replaceExt(dest, ".html");
-    let mpath = path.replaceExt(dest, ".json");
-    await Promise.all([fs.writeFile(hpath, res.html),
-        fs.writeFile(mpath, res.meta)]);
+    await transform_1.transformFile(filename, dest);
     console.log("转换完成");
 });
 pro.command("generate [configname] [refresh] [verbose]")
@@ -108,17 +102,11 @@ pro.command("init <dir> [autoCreateDir]")
     let auto = autocreate == "y";
     init_1.createBlog(dirpath, auto);
 });
-pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|remove|push,p1为name,p2为url")
+pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|push,p1为name,p2为url")
     .action(async (cmd, p1, p2) => {
     let cmds = {
         list() {
             manager_1.listRemote();
-        },
-        add() {
-            manager_1.addRemote(p1, p2);
-        },
-        remove() {
-            manager_1.removeRemote(p1);
         },
         push() {
             if (p1 != null)

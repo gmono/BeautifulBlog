@@ -48,19 +48,7 @@ function getContentFile(root:string,filestat:walk.WalkStats){
     let cpath=getContentPath(apath,"./content");
     return cpath;
 }
-/**
- * 修改一个路径的扩展名并返回
- * @param fpath 文件路径
- * @param ext 扩展名 .xxx
- */
-function changeExt(fpath:string,ext:string=".html"){
-    let obj=path.parse(fpath);
-    obj.ext=ext;
-    obj.base=obj.name+obj.ext;
-    let npath=path.format(obj);
-    npath=npath.replace(/\\/g,"/");
-    return npath;
-}
+import {changeExt} from "./lib/utils"
 /**
  * 替换content=./articles
  */
@@ -183,6 +171,13 @@ async function generate(configname:string="default",verbose=false,refresh=false)
 
     //转换每个文件
     walker.on("file",async (base,name,next)=>{
+        //这里应该过滤后缀名（目前允许txt md 以后应该以transformer声明的为主)
+        const extlist=[".txt",".md"]
+        if(extlist.indexOf(path.parse(name.name).ext)==-1){
+            next()
+            return;
+            //跳过
+        }
         //转换文件
         let articlepath=getArticleFile(base,name);
         let contentpath=getContentFile(base,name);

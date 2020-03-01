@@ -1,4 +1,5 @@
-import { TransformResult } from './transform';
+import { IContentMeta } from './Interface/IContentMeta';
+
 
 //转换器，用于把一个markdown转换为一个指定格式内容
 //html内容+json对象
@@ -29,11 +30,11 @@ let readAsync=async (fpath:string)=>{
 
 import * as cheerio from "cheerio"
 import { IArticleMeta } from "./Interface/IArticleMeta";
-import { outputFile } from "fs-extra";
+import { outputFile, mkdir } from 'fs-extra';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import { IGlobalConfig } from './Interface/IGlobalConfig';
-import { readConfig, readGlobalConfig } from './lib/utils';
+import { readConfig, readGlobalConfig, changeExt } from './lib/utils';
 
 function htmlProcessing(html:string):string{
   //解析html并在code的pre标签添加class
@@ -52,7 +53,7 @@ export interface TransformResult
   html:string;
   meta:IArticleMeta;
   raw:Buffer;
-  //用于提供额外文件
+  //用于提供额外文件(文件名不能包含路径)
   files?:{[idx:string]:Buffer}
 }
 
@@ -64,7 +65,8 @@ interface ITransformTable{
 }
 //文章后缀名到转换器的映射表
 const transformTable={
-  ".md":transformMD
+  ".md":transformMD,
+  ".txt":transformTXT
 } as ITransformTable;
 //调用代理 会自动根据文件后缀名选择调用的转换器函数
 async function transform(filepath:string,configname:string="default",...args):Promise<TransformResult>{
@@ -77,6 +79,7 @@ async function transform(filepath:string,configname:string="default",...args):Pr
 }
 
 import * as yaml from "yaml"
+import * as ld from 'lodash';
 async function transformTXT(filepath:string,config:IConfig,globalconfig:IGlobalConfig,...args){
   //转换txt文件到html txt如果没有yaml的元数据则把第一行当作标题其余元数据为null
   //txt文件的meta由同名yaml提供
@@ -178,11 +181,68 @@ async function transformMD(filepath:string,config:IConfig,globalconfig:IGlobalCo
     return {html,meta,raw:Buffer.from(res.body)};
   
 }
-if(require.main==module)
-transform("./articles/about.md").then((obj)=>{
-  fs.writeFileSync("test.html",obj.html);
-})
+
+
+
+
+/**
+ * 
+ * @param articlemeta 元信息
+ * @param from_dir 来源目录 为完整的article base目录（不包括文件名）
+ * @param html 内容字符串
+ * @param text 文章原文
+ */
+async function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,raw:Buffer,articlefile:string){  //从文章信息提取得到内容附加信息
   
+  //得到文件信息
+  let articlestat=await fse.stat(articlefile)
+  //去掉最前面的 ./articles
+  //这里考虑去掉form_dir 此属性只在generator中有意义
+  let cmeta=JSON.parse(JSON.stringify(articlemeta)) as IContentMeta;
+  cmeta.article_length=raw.length;
+  cmeta.content_length=html.length;
+  cmeta.modify_time=articlestat.mtime;
+  return cmeta;
+}
+
+
+/**
+ * 把一个原始article文件转换为conent（一个html 一个元数据 以及其他文件）
+ * @param srcfile 源文件名
+ * @param destfilename 目的文件名（不包括扩展名）
+ */
+export async function transformFile(srcfile:string,destfilename:string){
+  let res=await transform(srcfile);
+  //保存基本内容
+  let htmlpath=changeExt(destfilename,".html");
+  let jsonpath=changeExt(destfilename,".json");
+  //从res.meta构建ContentMeta
+  await Promise.all([
+    fse.writeFile(htmlpath,res.html),
+    fse.writeJson(jsonpath,res.meta)
+  ]);
+  //创建同名附件文件夹，保存附件文件(如果不能同名则加_files后缀)
+  const dirpath=destfilename;
+  await mkdir(dirpath);
+  //写入附件 key允许带有路径 但不能以/开头
+  if(res.files!=null){
+    //等待所有文件写入完成
+    await Promise.all(ld.map(res.files,async (value,key,obj)=>{
+      //去掉不合法的/
+      if(key.startsWith("/")) key=key.slice(1);
+      //合成目的文件地址
+      let p=path.resolve(dirpath,key);
+      let pdir=path.parse(p).dir;
+      await fse.ensureDir(pdir);
+      await fse.writeFile(p,value);
+    }));
+  }
+
+}
+
+
+if(require.main==module)
+  transformFile("./articles/about.md","./test")
 //打开浏览器查看
 
 export default transform;

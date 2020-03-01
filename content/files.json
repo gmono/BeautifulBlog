@@ -17,6 +17,10 @@
 			"title": "tttt",
 			"article_path": "./articles/tttt.md"
 		},
+		"/content/测试.json": {
+			"title": "标题\r",
+			"article_path": "./articles/测试.txt"
+		},
 		"/content/testss/hhh.json": {
 			"title": "hhh",
 			"article_path": "./articles/testss/hhh.md"
