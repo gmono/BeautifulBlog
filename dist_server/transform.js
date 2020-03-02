@@ -38,21 +38,24 @@ function htmlProcessing(html) {
 //其中 yaml json toml ini 是配置文件保留格式
 const transformTable = {
     ".md": transformMD,
-    ".txt": transformTXT
+    ".txt": transformTXT,
+    ".pdf": transformPDF
 };
+//外部使用的用于得到此程序可转换的文件类型后缀
+exports.allowFileExts = ld.keys(transformTable);
 //调用代理 会自动根据文件后缀名选择调用的转换器函数
 //transform系列函数只负责转换数据并返回转换结果，不负责提供其他信息
-async function transform(filepath, configname = "default", ...args) {
+async function transform(filepath, destpath, configname = "default", ...args) {
     let config = await utils_1.readConfig(configname);
     let globalconfig = await utils_1.readGlobalConfig();
     //最后传递可能的附加参数
     const ext = path.parse(filepath).ext;
     const func = transformTable[ext];
-    return func(filepath, config, globalconfig, ...args);
+    return func(filepath, destpath, config, globalconfig, ...args);
 }
 const yaml = require("yaml");
 const ld = require("lodash");
-async function transformTXT(filepath, config, globalconfig, ...args) {
+async function transformTXT(filepath, destpath, config, globalconfig, ...args) {
     //转换txt文件到html txt如果没有yaml的元数据则把第一行当作标题其余元数据为null
     //txt文件的meta由同名yaml提供
     let txt = (await fse.readFile(filepath)).toString();
@@ -93,7 +96,7 @@ async function transformTXT(filepath, config, globalconfig, ...args) {
 }
 let first = true;
 let baseurl = "/";
-async function transformMD(filepath, config, globalconfig, ...args) {
+async function transformMD(filepath, destpath, config, globalconfig, ...args) {
     if (first) {
         //加载配置文件并加载语法高亮
         let langs = config.code_languages;
@@ -142,6 +145,23 @@ async function transformMD(filepath, config, globalconfig, ...args) {
     return { html, meta, raw: Buffer.from(res.body) };
 }
 /**
+ * 转换pdf文件的转换函数
+ * 采取直接复制pdf文件并提取元数据（当前未实现）
+ * 并直接在文章页中嵌入pdf embed节点的方式处理
+ */
+async function transformPDF(filepath, destpath, config, globalconfig, ...args) {
+    //读取pdf文件原始数据
+    let raw = await fse.readFile(filepath);
+    //确定复制地址
+    const destpdf = getFileFromDest(destpath, "article.pdf");
+    //生成html
+    let html = template(path.resolve(__dirname, "../static/pdf_template.html"), {
+        pdfurl: destpdf
+    });
+    //生成元数据
+    let ret = {};
+}
+/**
  * 从转换结果得到content元数据
  * @param res 转换得到的结果，用于计算contentmeta
  */
@@ -164,13 +184,22 @@ async function getContentMeta(res, articlePath) {
     return cmeta;
 }
 /**
+ * 获取附件地址
+ * @param destpath 目标地址
+ * @param filename 要获取的附件文件地址或文件名
+ */
+function getFileFromDest(destpath, filename) {
+    return path.resolve(destpath, filename);
+}
+exports.getFileFromDest = getFileFromDest;
+/**
  * 把一个原始article文件转换为conent（一个html 一个元数据 以及其他文件）
  * @param srcfile 源文件名
  * @param destfilename 目的文件名（不包括扩展名）
  */
 async function transformFile(srcfile, destfilename) {
     await fse.ensureDir(path.parse(destfilename).dir);
-    let res = await transform(srcfile);
+    let res = await transform(srcfile, destfilename);
     //保存基本内容
     let htmlpath = utils_1.changeExt(destfilename, ".html");
     let jsonpath = utils_1.changeExt(destfilename, ".json");

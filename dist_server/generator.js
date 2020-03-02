@@ -74,6 +74,7 @@ function getUrlFile(root, filestat, base_url) {
  */
 const transform_1 = require("./transform");
 const fs = require("fs-extra");
+const transform_2 = require("./transform");
 const del = require("del");
 /**
  *
@@ -154,8 +155,7 @@ async function generate(configname = "default", verbose = false, refresh = false
     //转换每个文件
     walker.on("file", async (base, name, next) => {
         //这里应该过滤后缀名（目前允许txt md 以后应该以transformer声明的为主)
-        const extlist = [".txt", ".md"];
-        if (extlist.indexOf(path.parse(name.name).ext) == -1) {
+        if (transform_2.allowFileExts.indexOf(path.parse(name.name).ext) == -1) {
             next();
             return;
             //跳过
