@@ -20,7 +20,6 @@ let readAsync = async (fpath) => {
     });
 };
 const cheerio = require("cheerio");
-const fs_extra_1 = require("fs-extra");
 const fse = require("fs-extra");
 const path = require("path");
 const utils_1 = require("./lib/utils");
@@ -42,6 +41,7 @@ const transformTable = {
     ".txt": transformTXT
 };
 //调用代理 会自动根据文件后缀名选择调用的转换器函数
+//transform系列函数只负责转换数据并返回转换结果，不负责提供其他信息
 async function transform(filepath, configname = "default", ...args) {
     let config = await utils_1.readConfig(configname);
     let globalconfig = await utils_1.readGlobalConfig();
@@ -145,9 +145,13 @@ async function transformMD(filepath, config, globalconfig, ...args) {
  * 从转换结果得到content元数据
  * @param res 转换得到的结果，用于计算contentmeta
  */
-async function getContentMeta(res) {
+async function getContentMeta(res, articlePath) {
+    //从文章信息提取得到内容附加信息
+    //articlePath必须存在
+    if (!articlePath)
+        return;
     //得到文件信息
-    let articlestat = await fse.stat(res.articlePath);
+    let articlestat = await fse.stat(articlePath);
     //去掉最前面的 ./articles
     //这里考虑去掉form_dir 此属性只在generator中有意义
     let cmeta = JSON.parse(JSON.stringify(res.meta));
@@ -168,15 +172,16 @@ async function transformFile(srcfile, destfilename) {
     //保存基本内容
     let htmlpath = utils_1.changeExt(destfilename, ".html");
     let jsonpath = utils_1.changeExt(destfilename, ".json");
-    //从res.meta构建ContentMeta
-    let contentMeta = getContentMeta(res);
+    //构建contentmeta
+    let contentMeta = await getContentMeta(res, srcfile);
     await Promise.all([
         fse.writeFile(htmlpath, res.html),
         fse.writeJson(jsonpath, contentMeta)
     ]);
     //创建同名附件文件夹，保存附件文件(如果不能同名则加_files后缀)
     const dirpath = destfilename;
-    await fs_extra_1.mkdir(dirpath);
+    //由于下方有ensure保证路径存在不需要手动mkdir
+    // await mkdir(dirpath);
     //写入附件 key允许带有路径 但不能以/开头
     if (res.files != null) {
         //等待所有文件写入完成
