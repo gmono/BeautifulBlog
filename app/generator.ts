@@ -78,7 +78,7 @@ function getUrlFile(root:string,filestat:walk.WalkStats,base_url:string){
  * getUrlFile:相对于base_url的路径（可直接做为网站链接）
  */
 
-import transform from "./transform";
+import transform, { transformFile } from "./transform";
 import * as fs from "fs-extra"
 import * as ensurePath from '@wrote/ensure-path'
 import { IArticleMeta } from './Interface/IArticleMeta';
@@ -178,36 +178,23 @@ async function generate(configname:string="default",verbose=false,refresh=false)
             return;
             //跳过
         }
-        //转换文件
+        //生成源文件与目的文件地址
         let articlepath=getArticleFile(base,name);
         let contentpath=getContentFile(base,name);
-        //内容路径
-        contentpath=changeExt(contentpath,".html");
+        //去除目的文件地址的后缀名
+        contentpath=changeExt(contentpath,"");
         //内容元数据路径
         let confpath=changeExt(contentpath,".json");
         
-        //生成函数
-        let generate=async ()=>{
-                
+        //生成函数 生成并写入到文件
+        let generate=async ()=>{   
             //开始转换
-            let {html,meta,raw}=await transform(articlepath);
-            //得到contentmeta.
-            let cmeta=getContentMeta(meta,base,html,raw,name);
-            cmeta.article_path=articlepath;
+            let {res,content_meta:meta}=await transformFile(articlepath,contentpath)
             //输出转换进度
             if(verbose)
                 console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`)
-            await ensurePath(contentpath);
-            fs.writeFile(contentpath,html,(e)=>{
-                e&&console.log(e);
-            });
-            //写入文章元文件
-            
-            fs.writeFile(confpath,JSON.stringify(cmeta,null,"\t"),(e)=>{
-                e&&console.log(e);
-            });
             //生成后记录
-            CurrFileRecordToFiles(cmeta.title);
+            CurrFileRecordToFiles(meta.title);
         };
 
         /**

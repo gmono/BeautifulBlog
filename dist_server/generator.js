@@ -74,7 +74,6 @@ function getUrlFile(root, filestat, base_url) {
  */
 const transform_1 = require("./transform");
 const fs = require("fs-extra");
-const ensurePath = require("@wrote/ensure-path");
 const del = require("del");
 /**
  *
@@ -161,33 +160,22 @@ async function generate(configname = "default", verbose = false, refresh = false
             return;
             //跳过
         }
-        //转换文件
+        //生成源文件与目的文件地址
         let articlepath = getArticleFile(base, name);
         let contentpath = getContentFile(base, name);
-        //内容路径
-        contentpath = utils_1.changeExt(contentpath, ".html");
+        //去除目的文件地址的后缀名
+        contentpath = utils_1.changeExt(contentpath, "");
         //内容元数据路径
         let confpath = utils_1.changeExt(contentpath, ".json");
-        //生成函数
+        //生成函数 生成并写入到文件
         let generate = async () => {
             //开始转换
-            let { html, meta, raw } = await transform_1.default(articlepath);
-            //得到contentmeta.
-            let cmeta = getContentMeta(meta, base, html, raw, name);
-            cmeta.article_path = articlepath;
+            let { res, content_meta: meta } = await transform_1.transformFile(articlepath, contentpath);
             //输出转换进度
             if (verbose)
                 console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`);
-            await ensurePath(contentpath);
-            fs.writeFile(contentpath, html, (e) => {
-                e && console.log(e);
-            });
-            //写入文章元文件
-            fs.writeFile(confpath, JSON.stringify(cmeta, null, "\t"), (e) => {
-                e && console.log(e);
-            });
             //生成后记录
-            CurrFileRecordToFiles(cmeta.title);
+            CurrFileRecordToFiles(meta.title);
         };
         /**
          * 把当前文件记录到记录到files.json

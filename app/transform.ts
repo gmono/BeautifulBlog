@@ -206,16 +206,23 @@ async function getContentMeta(res:TransformResult,articlePath:string){
   //提取原始文章文件信息
   //修改时间
   cmeta.modify_time=articlestat.mtime;
+  cmeta.article_path=articlePath;
   return cmeta;
 }
 
 
+
+type TransformFileResult={
+  res:TransformResult,
+  content_meta:IContentMeta
+}
 /**
  * 把一个原始article文件转换为conent（一个html 一个元数据 以及其他文件）
  * @param srcfile 源文件名
  * @param destfilename 目的文件名（不包括扩展名）
  */
-export async function transformFile(srcfile:string,destfilename:string){
+export async function transformFile(srcfile:string,destfilename:string):Promise<TransformFileResult>{
+  await fse.ensureDir(path.parse(destfilename).dir);
   let res=await transform(srcfile);
   //保存基本内容
   let htmlpath=changeExt(destfilename,".html");
@@ -245,7 +252,9 @@ export async function transformFile(srcfile:string,destfilename:string){
       await fse.writeFile(p,value);
     }));
   }
-
+  return {
+    res,content_meta:contentMeta
+  }
 }
 
 

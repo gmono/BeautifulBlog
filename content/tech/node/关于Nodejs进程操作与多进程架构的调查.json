@@ -1,13 +1,1 @@
-{
-	"title": "关于Nodejs进程操作与多进程架构的调查",
-	"date": "2020-01-04T14:38:54.000Z",
-	"draft": false,
-	"from_dir": [
-		"tech",
-		"node"
-	],
-	"article_length": 687,
-	"content_length": 2385,
-	"modify_time": "2020-01-29T05:58:11.932Z",
-	"article_path": "./articles/tech/node/关于Nodejs进程操作与多进程架构的调查.md"
-}
+{"title":"关于Nodejs进程操作与多进程架构的调查","date":"2020-01-04T14:38:54.000Z","draft":false,"article_length":687,"content_length":2385,"modify_time":"2020-01-29T05:58:11.932Z","article_path":"./articles/tech/node/关于Nodejs进程操作与多进程架构的调查.md"}

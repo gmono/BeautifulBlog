@@ -160,6 +160,7 @@ async function getContentMeta(res, articlePath) {
     //提取原始文章文件信息
     //修改时间
     cmeta.modify_time = articlestat.mtime;
+    cmeta.article_path = articlePath;
     return cmeta;
 }
 /**
@@ -168,6 +169,7 @@ async function getContentMeta(res, articlePath) {
  * @param destfilename 目的文件名（不包括扩展名）
  */
 async function transformFile(srcfile, destfilename) {
+    await fse.ensureDir(path.parse(destfilename).dir);
     let res = await transform(srcfile);
     //保存基本内容
     let htmlpath = utils_1.changeExt(destfilename, ".html");
@@ -197,6 +199,9 @@ async function transformFile(srcfile, destfilename) {
             await fse.writeFile(p, value);
         }));
     }
+    return {
+        res, content_meta: contentMeta
+    };
 }
 exports.transformFile = transformFile;
 if (require.main == module)

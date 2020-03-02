@@ -24,7 +24,7 @@ export async function runInDir(dirpath:string,func:Function){
  * @param fpath 文件路径
  * @param ext 扩展名 .xxx
  */
-export function changeExt(fpath:string,ext:string=".html"){
+export function changeExt(fpath:string,ext:string=""){
     let obj=path.parse(fpath);
     obj.ext=ext;
     obj.base=obj.name+obj.ext;

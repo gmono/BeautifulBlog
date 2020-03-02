@@ -24,7 +24,7 @@ exports.runInDir = runInDir;
  * @param fpath 文件路径
  * @param ext 扩展名 .xxx
  */
-function changeExt(fpath, ext = ".html") {
+function changeExt(fpath, ext = "") {
     let obj = path.parse(fpath);
     obj.ext = ext;
     obj.base = obj.name + obj.ext;

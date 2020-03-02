@@ -1,12 +1,1 @@
-{
-	"title": "helloworld",
-	"date": "Mon Feb 03 2020 17:23:06 GMT+0800 (GMT+08:00)",
-	"draft": true,
-	"from_dir": [
-		"life"
-	],
-	"article_length": 0,
-	"content_length": 532,
-	"modify_time": "2020-02-03T09:28:28.656Z",
-	"article_path": "./articles/life/helloworld.md"
-}
+{"title":"helloworld","date":"Mon Feb 03 2020 17:23:06 GMT+0800 (GMT+08:00)","draft":true,"article_length":0,"content_length":532,"modify_time":"2020-02-03T09:28:28.656Z","article_path":"./articles/life/helloworld.md"}
