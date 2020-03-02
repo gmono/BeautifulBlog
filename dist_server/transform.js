@@ -36,6 +36,7 @@ function htmlProcessing(html) {
     return $.html();
 }
 //文章后缀名到转换器的映射表
+//其中 yaml json toml ini 是配置文件保留格式
 const transformTable = {
     ".md": transformMD,
     ".txt": transformTXT
@@ -141,20 +142,19 @@ async function transformMD(filepath, config, globalconfig, ...args) {
     return { html, meta, raw: Buffer.from(res.body) };
 }
 /**
- *
- * @param articlemeta 元信息
- * @param from_dir 来源目录 为完整的article base目录（不包括文件名）
- * @param html 内容字符串
- * @param text 文章原文
+ * 从转换结果得到content元数据
+ * @param res 转换得到的结果，用于计算contentmeta
  */
-async function getContentMeta(articlemeta, from_dir, html, raw, articlefile) {
+async function getContentMeta(res) {
     //得到文件信息
-    let articlestat = await fse.stat(articlefile);
+    let articlestat = await fse.stat(res.articlePath);
     //去掉最前面的 ./articles
     //这里考虑去掉form_dir 此属性只在generator中有意义
-    let cmeta = JSON.parse(JSON.stringify(articlemeta));
-    cmeta.article_length = raw.length;
-    cmeta.content_length = html.length;
+    let cmeta = JSON.parse(JSON.stringify(res.meta));
+    cmeta.article_length = res.raw.length;
+    cmeta.content_length = res.html.length;
+    //提取原始文章文件信息
+    //修改时间
     cmeta.modify_time = articlestat.mtime;
     return cmeta;
 }
@@ -169,9 +169,10 @@ async function transformFile(srcfile, destfilename) {
     let htmlpath = utils_1.changeExt(destfilename, ".html");
     let jsonpath = utils_1.changeExt(destfilename, ".json");
     //从res.meta构建ContentMeta
+    let contentMeta = getContentMeta(res);
     await Promise.all([
         fse.writeFile(htmlpath, res.html),
-        fse.writeJson(jsonpath, res.meta)
+        fse.writeJson(jsonpath, contentMeta)
     ]);
     //创建同名附件文件夹，保存附件文件(如果不能同名则加_files后缀)
     const dirpath = destfilename;
@@ -185,6 +186,7 @@ async function transformFile(srcfile, destfilename) {
                 key = key.slice(1);
             //合成目的文件地址
             let p = path.resolve(dirpath, key);
+            //确保目的文件目录存在
             let pdir = path.parse(p).dir;
             await fse.ensureDir(pdir);
             await fse.writeFile(p, value);
