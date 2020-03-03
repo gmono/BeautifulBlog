@@ -5,6 +5,10 @@
 			"title": "关于博客",
 			"article_path": "./articles/about.md"
 		},
+		"/content/ceshi.json": {
+			"title": "ceshi",
+			"article_path": "./articles/ceshi.pdf"
+		},
 		"/content/helloaaa.json": {
 			"title": "helloaaa",
 			"article_path": "./articles/helloaaa.md"

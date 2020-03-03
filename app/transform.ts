@@ -12,7 +12,7 @@ import * as Prism from "prismjs"
 //这行问题导致pkg打包时运行失败
 import * as loadLanguages from 'prismjs/components/'
 import { IConfig } from "./Interface/IConfig";
-
+import * as toml from "toml"
 // import * as config from "../config.json"
 //如果使用ts加载config会直接被编译到js文件里 这里使用node加载json模块
 
@@ -71,7 +71,7 @@ const transformTable={
   ".pdf":transformPDF
 } as ITransformTable;
 
-
+import * as ld from 'lodash';
 //外部使用的用于得到此程序可转换的文件类型后缀
 export const allowFileExts=ld.keys(transformTable);
 
@@ -86,29 +86,23 @@ async function transform(filepath:string,destpath:string,configname:string="defa
   return func(filepath,destpath,config,globalconfig,...args);
 }
 
-import * as yaml from "yaml"
-import * as ld from 'lodash';
+
+
 async function transformTXT(filepath:string,destpath:string,config:IConfig,globalconfig:IGlobalConfig,...args){
   //转换txt文件到html txt如果没有yaml的元数据则把第一行当作标题其余元数据为null
   //txt文件的meta由同名yaml提供
   let txt=(await fse.readFile(filepath)).toString();
   //读取元数据
   let read=async (filepath:string)=>{
-    
-    //读取元数据(从yaml 与frontmatter可兼容)
-    let info=path.parse(filepath);
-    let name=path.resolve(info.dir,info.name);
-    let metaname=`${name}.yaml`;
       //如果不存在则把txt的第一行做标题 第二行当作时间(yyyy-MM-dd hh:mm:ss) 第三行往下当作正文
     //如果存在则把txt整个当作正文
-    let meta={} as IArticleMeta;
-    if(!(await fse.pathExists(metaname))){
-      meta.title=txt.split("\n")[0];
-      meta.date=new Date(txt.split("\n")[1]);
+    let meta=await readMetaFromArticle(filepath);
+    if(meta==null){
+      meta={
+        title:txt.split("\n")[0],
+        date:new Date(txt.split("\n")[1])
+      };
       txt=txt.split("\n").slice(2).join("\n");
-    }
-    else{
-      meta=yaml.parse(metaname);
     }
     //返回元数据与正文
     return {
@@ -198,15 +192,29 @@ async function transformMD(filepath:string,destpath:string,config:IConfig,global
 async function transformPDF(filepath:string,destpath:string,config:IConfig,globalconfig:IGlobalConfig,...args):Promise<TransformResult>{
   //读取pdf文件原始数据
   let raw=await fse.readFile(filepath);
-  //确定复制地址
+  //确定复制地址 并转换为相对blog根目录的url
   const destpdf=getFileFromDest(destpath,"article.pdf")
+  const pdfurl="/"+path.relative(".",destpdf).replace(/\\/g,"/");
   //生成html
   let html=template(path.resolve(__dirname,"../static/pdf_template.html"),{
-    pdfurl:destpdf;
-  })
+    pdfurl:pdfurl
+  });
   //生成元数据
-  let ret=<TransformResult>{
-
+  //pdf可从配置文件中读取
+  let meta=await readMetaFromArticle(filepath);
+  if(meta==null){
+    //这里在没有配置文件的情况下推断元数据
+    //标题为文件名 日期为修改日期
+    meta={
+      title:path.parse(filepath).name,
+      date:(await fse.stat(filepath)).mtime
+    }
+  }
+  //附加一个附件 把原始的pdf文件复制到附件目录
+  return <TransformResult>{
+    html,meta,raw,files:{
+      "article.pdf":raw
+    }
   }
 }
 
@@ -235,6 +243,16 @@ async function getContentMeta(res:TransformResult,articlePath:string){
 
 
 
+/**
+ * 读取文章的meta定义文件（同一规范 toml)
+ * @param articlePathOrDestPath 给定的来源path（不带后缀名）或article文件地址
+ */
+async function readMetaFromArticle(articlePathOrSrcPath:string){
+  const metapath=changeExt(articlePathOrSrcPath,".toml");
+  if(!(await fse.pathExists(metapath))) return null;
+  return toml.parse((await fse.readFile(metapath)).toString()) as IArticleMeta;
+}
+
 type TransformFileResult={
   res:TransformResult,
   content_meta:IContentMeta
@@ -242,11 +260,18 @@ type TransformFileResult={
 
 /**
  * 获取附件地址
- * @param destpath 目标地址
+ * @param destpath 目标地址或目的文章相关文件（比如json和转换后的html文件）
  * @param filename 要获取的附件文件地址或文件名 
  */
 export  function getFileFromDest(destpath:string,filename:string){
-  return path.resolve(destpath,filename);
+  return path.resolve(getFilesDir(destpath),filename);
+}
+/**
+ * 获取附件文件夹地址
+ * @param destpath 目标地址或目的文章相关文件（比如json和转换后的html文件）
+ */
+export function getFilesDir(destpath:string){
+  return changeExt(destpath,"")+".dir";
 }
 /**
  * 把一个原始article文件转换为conent（一个html 一个元数据 以及其他文件）
@@ -267,7 +292,7 @@ export async function transformFile(srcfile:string,destfilename:string):Promise<
     fse.writeJson(jsonpath,contentMeta)
   ]);
   //创建同名附件文件夹，保存附件文件(如果不能同名则加_files后缀)
-  const dirpath=destfilename;
+  const dirpath=getFilesDir(destfilename);
   //由于下方有ensure保证路径存在不需要手动mkdir
   // await mkdir(dirpath);
   //写入附件 key允许带有路径 但不能以/开头
