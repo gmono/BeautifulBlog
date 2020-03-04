@@ -96,8 +96,8 @@ export async function pushToRepos(name:string){
     //提交到某个仓库 generate changesite add commit push 一条龙
         //自动读取名称相同的配置文件
         await generate(name)
-        const config=await readConfig(name);
-        await changesite(config.site);
+        // const config=await readConfig(name);
+        // await changesite(config.site);
         //add 由于存在默认的.gitignore 会自动跳过添加articles sites config目录
         await execa("git add .");
         //合成提交消息
@@ -165,6 +165,7 @@ export async function push(){
         type:"autocompleteMultiselect",
         name:"select",
         message:"请选择你要提交到的仓库",
+        choices:choices,
         initial:"all"
     });
     //提交

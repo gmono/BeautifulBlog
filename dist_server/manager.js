@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const execa = require("execa");
 const generator_1 = require("./generator");
-const changesite_1 = require("./changesite");
 const path = require("path");
 const utils_1 = require("./lib/utils");
 const prompts = require("prompts");
@@ -73,8 +72,8 @@ async function pushToRepos(name) {
     //提交到某个仓库 generate changesite add commit push 一条龙
     //自动读取名称相同的配置文件
     await generator_1.default(name);
-    const config = await utils_1.readConfig(name);
-    await changesite_1.default(config.site);
+    // const config=await readConfig(name);
+    // await changesite(config.site);
     //add 由于存在默认的.gitignore 会自动跳过添加articles sites config目录
     await execa("git add .");
     //合成提交消息
@@ -139,6 +138,7 @@ async function push() {
         type: "autocompleteMultiselect",
         name: "select",
         message: "请选择你要提交到的仓库",
+        choices: choices,
         initial: "all"
     });
     //提交
