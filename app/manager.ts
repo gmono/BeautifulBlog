@@ -130,6 +130,12 @@ export async function removeRepos(reposname:string){
 }
 
 
+export async function changeUserAndPass(name:string,username:string,password:string){
+    //执行获取带用户名密码的url 分离其中的纯url部分 使用新的username 和password合成新的giturl
+    //使用set-url 更新repos的url
+    //有待实现
+}
+
 
 ///用户接口部分
 
@@ -162,7 +168,14 @@ export async function pushToRemote(name?:string){
     }
 }
 
+function hasUndefined(obj){
+    for(let pro in obj){
+        if(obj[pro]==undefined)
+            return true;
+    }
+    return false;
 
+}
 
 /**
  * 用户接口 添加仓库 提示输入名字和url
@@ -178,6 +191,7 @@ export async function add()
         name:"url",
         message:"请输入Remote仓库地址(GIT地址):"
     }]);
+    if(hasUndefined(response)) return;
     //判断是否为https链接 如果是则要求输入用户名密码
     let url=(response.url as string).trim();
     if(url.startsWith("https://")){
@@ -191,6 +205,7 @@ export async function add()
             name:"password",
             message:"请输入密码:"
         }]);
+        if(hasUndefined(response)) return;
         //转义@符号
         let username=(userinfo.username as string).replace(/@/g,"%40");
         let password=(userinfo.password as string).replace(/@/g,"%40");
@@ -220,10 +235,15 @@ export async function remove(repos:string[]=null)
             message:"请输入要删除的仓库",
             choices:reposes
         });
+        if(hasUndefined(res)) return;
         repos=res.removes as string[];
     }
     //执行删除操作
     await Promise.all(repos.map(v=>removeRepos(v)));
     //输出提示
     console.log("删除成功");
+}
+
+if(require.main==module){
+    listRemote();
 }

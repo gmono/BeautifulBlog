@@ -5,6 +5,7 @@ const generator_1 = require("./generator");
 const changesite_1 = require("./changesite");
 const path = require("path");
 const utils_1 = require("./lib/utils");
+const prompts = require("prompts");
 ///基本功能函数部分
 ///获取信息系列 包括获取仓库url和名字等
 async function getNames() {
@@ -105,6 +106,12 @@ async function removeRepos(reposname) {
     await execa(`git remove ${reposname}`);
 }
 exports.removeRepos = removeRepos;
+async function changeUserAndPass(name, username, password) {
+    //执行获取带用户名密码的url 分离其中的纯url部分 使用新的username 和password合成新的giturl
+    //使用set-url 更新repos的url
+    //有待实现
+}
+exports.changeUserAndPass = changeUserAndPass;
 ///用户接口部分
 /**
  * 用户接口，列出所有仓库
@@ -114,30 +121,101 @@ async function listRemote() {
     (await getRemoteList()).forEach(v => {
         console.log(`Name:${v.name} URL:${v.url}`);
     });
-    /**
-     * 用户接口，提交到某个仓库
-     * @param name 仓库名，如果不提供则提交到所有仓库
-     */
-    export async function pushToRemote(name) {
-        if (name != null) {
-            //提交到单个仓库
-            await pushToRepos((await getRemote(name)).url);
-            console.log(`成功提交到:${name}`);
-        }
-        else {
-            //提交到所有仓库
-            (await getRemoteList()).map(v => ({ name: v.name, res: pushToRepos(v.url) })).forEach(async (v) => {
-                await v.res;
-                console.log(`成功提交到:${v.name}`);
-            });
-        }
-    }
-    import * as prompt from "prompts";
-    /**
-     * 用户接口 添加仓库 提示输入名字和url
-     */
-    export async function add() {
-    }
 }
 exports.listRemote = listRemote;
+/**
+ * 用户接口，提交到某个仓库
+ * @param name 仓库名，如果不提供则提交到所有仓库
+ */
+async function pushToRemote(name) {
+    if (name != null) {
+        //提交到单个仓库
+        await pushToRepos((await getRemote(name)).url);
+        console.log(`成功提交到:${name}`);
+    }
+    else {
+        //提交到所有仓库
+        (await getRemoteList()).map(v => ({ name: v.name, res: pushToRepos(v.url) })).forEach(async (v) => {
+            await v.res;
+            console.log(`成功提交到:${v.name}`);
+        });
+    }
+}
+exports.pushToRemote = pushToRemote;
+function hasUndefined(obj) {
+    for (let pro in obj) {
+        if (obj[pro] == undefined)
+            return true;
+    }
+    return false;
+}
+/**
+ * 用户接口 添加仓库 提示输入名字和url
+ */
+async function add() {
+    const response = await prompts([{
+            type: "text",
+            name: "name",
+            message: "请输入Remote仓库名:"
+        }, {
+            type: "text",
+            name: "url",
+            message: "请输入Remote仓库地址(GIT地址):"
+        }]);
+    if (hasUndefined(response))
+        return;
+    //判断是否为https链接 如果是则要求输入用户名密码
+    let url = response.url.trim();
+    if (url.startsWith("https://")) {
+        //要求输入用户名密码
+        const userinfo = await prompts([{
+                type: "text",
+                name: "username",
+                message: "请输入用户名:"
+            }, {
+                type: "password",
+                name: "password",
+                message: "请输入密码:"
+            }]);
+        if (hasUndefined(response))
+            return;
+        //转义@符号
+        let username = userinfo.username.replace(/@/g, "%40");
+        let password = userinfo.password.replace(/@/g, "%40");
+        //合成url 把https://xxxx.xxx改为 https://username:password@xxxx.xxx的形式
+        //其中 用户名中的@字符需要转义为%40
+        const urlwithOutProc = url.slice(8);
+        url = `https://${username}:${password}${urlwithOutProc}`;
+    }
+    //执行添加命令
+    await addRepos(response.name, url);
+    //执行
+    //输出提示
+    console.log `成功添加仓库${response.name}`;
+}
+exports.add = add;
+async function remove(repos = null) {
+    if (repos == null) {
+        //这里不需要url value直接是name
+        const reposes = (await getRemoteList()).map(v => ({ title: v.name, value: v.name }));
+        //提示选择要删除的仓库
+        const res = await prompts({
+            type: "autocompleteMultiselect",
+            name: "removes",
+            message: "请输入要删除的仓库",
+            choices: reposes
+        });
+        if (hasUndefined(res))
+            return;
+        repos = res.removes;
+    }
+    //执行删除操作
+    await Promise.all(repos.map(v => removeRepos(v)));
+    //输出提示
+    console.log("删除成功");
+}
+exports.remove = remove;
+if (require.main == module) {
+    listRemote();
+}
 //# sourceMappingURL=manager.js.map

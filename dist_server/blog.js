@@ -102,7 +102,7 @@ pro.command("init <dir> [autoCreateDir]")
     let auto = autocreate == "y";
     init_1.createBlog(dirpath, auto);
 });
-pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|push,p1为name,p2为url")
+pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|remove|push,p1为name,p2为url")
     .action(async (cmd, p1, p2) => {
     let cmds = {
         list() {
@@ -113,6 +113,12 @@ pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|push,p1
                 manager_1.pushToRemote(p1);
             else
                 manager_1.pushToRemote();
+        },
+        add() {
+            manager_1.add();
+        },
+        remove() {
+            manager_1.remove();
         }
     };
     cmds[cmd]();

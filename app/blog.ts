@@ -17,7 +17,7 @@ import { createArticle, createClass } from "./create";
 import { exec, fork } from "child_process";
 import watchArticles from "./watch";
 import { createBlog } from "./init";
-import { listRemote,  pushToRemote } from "./manager";
+import { listRemote,  pushToRemote, add, remove } from "./manager";
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename:string,dest?:string)=>{
@@ -113,7 +113,7 @@ pro.command("init <dir> [autoCreateDir]")
         let auto=autocreate=="y";
         createBlog(dirpath,auto);
     });
-pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|push,p1为name,p2为url")
+pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|remove|push,p1为name,p2为url")
     .action(async (cmd:string,p1:string,p2:string)=>{
         let cmds={
             list(){
@@ -123,6 +123,12 @@ pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|push,p1
                 if(p1!=null)
                     pushToRemote(p1);
                 else pushToRemote();
+            },
+            add(){
+                add()
+            },
+            remove(){
+                remove()
             }
         }
         cmds[cmd]();
