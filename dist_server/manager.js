@@ -142,9 +142,9 @@ async function pushToRemote(name) {
     }
 }
 exports.pushToRemote = pushToRemote;
-function hasUndefined(obj) {
-    for (let pro in obj) {
-        if (obj[pro] == undefined)
+function hasUndefined(obj, names) {
+    for (let k of names) {
+        if (obj[k] == undefined)
             return true;
     }
     return false;
@@ -162,7 +162,7 @@ async function add() {
             name: "url",
             message: "请输入Remote仓库地址(GIT地址):"
         }]);
-    if (hasUndefined(response))
+    if (hasUndefined(response, ["name", "url"]))
         return;
     //判断是否为https链接 如果是则要求输入用户名密码
     let url = response.url.trim();
@@ -177,7 +177,7 @@ async function add() {
                 name: "password",
                 message: "请输入密码:"
             }]);
-        if (hasUndefined(response))
+        if (hasUndefined(response, ["username", "password"]))
             return;
         //转义@符号
         let username = userinfo.username.replace(/@/g, "%40");
@@ -205,7 +205,7 @@ async function remove(repos = null) {
             message: "请输入要删除的仓库",
             choices: reposes
         });
-        if (hasUndefined(res))
+        if (hasUndefined(res, ["removes"]))
             return;
         repos = res.removes;
     }
