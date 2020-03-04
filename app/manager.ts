@@ -205,3 +205,25 @@ export async function add()
     //输出提示
     console.log`成功添加仓库${response.name}`
 }
+
+
+export async function remove(repos:string[]=null)
+{
+    if(repos==null)
+    {
+        //这里不需要url value直接是name
+        const reposes=(await getRemoteList()).map(v=>(<prompts.Choice>{title:v.name,value:v.name}))
+        //提示选择要删除的仓库
+        const res=await prompts({
+            type:"autocompleteMultiselect",
+            name:"removes",
+            message:"请输入要删除的仓库",
+            choices:reposes
+        });
+        repos=res.removes as string[];
+    }
+    //执行删除操作
+    await Promise.all(repos.map(v=>removeRepos(v)));
+    //输出提示
+    console.log("删除成功");
+}
