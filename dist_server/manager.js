@@ -127,21 +127,34 @@ exports.listRemote = listRemote;
  * 用户接口，提交到某个仓库
  * @param name 仓库名，如果不提供则提交到所有仓库
  */
-async function pushToRemote(name) {
-    if (name != null) {
-        //提交到单个仓库
-        await pushToRepos((await getRemote(name)).url);
-        console.log(`成功提交到:${name}`);
+async function push() {
+    //获取所有仓库
+    const allrepos = await getRemoteList();
+    //转换为选项
+    let allc = allrepos.map(v => ({ title: v.name, value: v.name }));
+    let choices = [{ title: "所有", value: "all" }];
+    choices.push(...allc);
+    //询问
+    const res = await prompts({
+        type: "autocompleteMultiselect",
+        name: "select",
+        message: "请选择你要提交到的仓库",
+        initial: "all"
+    });
+    //提交
+    if (res.select == undefined)
+        return;
+    if (res.select == "all") {
+        //提交到所有仓库
+        const tasks = allrepos.map(v => v.name).map(v => pushToRepos(v));
+        await Promise.all(tasks);
     }
     else {
-        //提交到所有仓库
-        (await getRemoteList()).map(v => ({ name: v.name, res: pushToRepos(v.url) })).forEach(async (v) => {
-            await v.res;
-            console.log(`成功提交到:${v.name}`);
-        });
+        //提交到单个仓库
+        await pushToRepos(res.select);
     }
 }
-exports.pushToRemote = pushToRemote;
+exports.push = push;
 function hasUndefined(obj, names) {
     for (let k of names) {
         if (obj[k] == undefined)

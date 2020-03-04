@@ -17,7 +17,7 @@ import { createArticle, createClass } from "./create";
 import { exec, fork } from "child_process";
 import watchArticles from "./watch";
 import { createBlog } from "./init";
-import { listRemote,  pushToRemote, add, remove } from "./manager";
+import { listRemote,  push, add, remove } from "./manager";
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename:string,dest?:string)=>{
@@ -121,8 +121,8 @@ pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|rem
             },
             push(){
                 if(p1!=null)
-                    pushToRemote(p1);
-                else pushToRemote();
+                    push(p1);
+                else push();
             },
             add(){
                 add()

@@ -110,9 +110,9 @@ pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|rem
         },
         push() {
             if (p1 != null)
-                manager_1.pushToRemote(p1);
+                manager_1.push(p1);
             else
-                manager_1.pushToRemote();
+                manager_1.push();
         },
         add() {
             manager_1.add();
