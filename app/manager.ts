@@ -24,6 +24,7 @@ import changesite from './changesite';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import { readConfig,runInDir, innerCopy } from './lib/utils';
+import prompts = require("prompts");
 
 ///基本功能函数部分
 
@@ -113,7 +114,7 @@ export async function pushToRepos(name:string){
  * @param reposname 仓库名
  * @param giturl remote url
  */
-export async function addRepos(reposname:string,giturl:URL){
+export async function addRepos(reposname:string,giturl:string){
     //指定git指令添加仓库，并进行初次提交
     //目前的冲突解决策略是直接放弃显示失败，因此务必保持remote仓库为空
     await execa(`git remote add ${reposname} ${giturl}`)
@@ -140,7 +141,7 @@ export async function listRemote(){
     (await getRemoteList()).forEach(v=>{
         console.log(`Name:${v.name} URL:${v.url}`);
     })
-
+}
     
 /**
  * 用户接口，提交到某个仓库   
@@ -161,11 +162,46 @@ export async function pushToRemote(name?:string){
     }
 }
 
-import * as prompt from "prompts"
+
+
 /**
  * 用户接口 添加仓库 提示输入名字和url
  */
 export async function add()
 {
-    
+    const response=await prompts([{
+        type:"text",
+        name:"name",
+        message:"请输入Remote仓库名:"
+    },{
+        type:"text",
+        name:"url",
+        message:"请输入Remote仓库地址(GIT地址):"
+    }]);
+    //判断是否为https链接 如果是则要求输入用户名密码
+    let url=(response.url as string).trim();
+    if(url.startsWith("https://")){
+        //要求输入用户名密码
+        const userinfo=await prompts([{
+            type:"text",
+            name:"username",
+            message:"请输入用户名:"
+        },{
+            type:"password",
+            name:"password",
+            message:"请输入密码:"
+        }]);
+        //转义@符号
+        let username=(userinfo.username as string).replace(/@/g,"%40");
+        let password=(userinfo.password as string).replace(/@/g,"%40");
+        //合成url 把https://xxxx.xxx改为 https://username:password@xxxx.xxx的形式
+        //其中 用户名中的@字符需要转义为%40
+        const urlwithOutProc=url.slice(8)
+        url=`https://${username}:${password}${urlwithOutProc}`
+    }
+    //执行添加命令
+    await addRepos(response.name,url);
+    //执行
+    //输出提示
+    console.log`成功添加仓库${response.name}`
 }
