@@ -56,7 +56,7 @@ export async function getRemoteList():Promise<RemoteItem[]>{
 async function getChangeInfoText(){
     //获取更改信息文本 主要用于合成提交消息
     //这里需要generator和watch等程序做log操作 因此这里展示只返回固定的消息
-    return "更新文章";
+    return "当前为manager提交";
 }
 
 
