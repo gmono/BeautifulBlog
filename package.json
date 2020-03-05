@@ -7,7 +7,7 @@
   "pkg": {
     "scripts": [
       "./node_modules/prismjs/components/*.js",
-      "./dist_server/transforms/*.js"
+      "./dist_server/transforms/**/*.js"
     ],
     "assets": [
       "./static/**/*",

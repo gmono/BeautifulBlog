@@ -152,10 +152,12 @@ async function generate(configname = "default", verbose = false, refresh = false
         dtasks.push(del(jpath));
     }
     await Promise.all(dtasks); //等待所有任务完成
+    //获取允许的所有文件类型
+    const allowFileExts = await transform_2.getAllowFileExts();
     //转换每个文件
     walker.on("file", async (base, name, next) => {
         //这里应该过滤后缀名（目前允许txt md 以后应该以transformer声明的为主)
-        if (transform_2.allowFileExts.indexOf(path.parse(name.name).ext) == -1) {
+        if (allowFileExts.indexOf(path.parse(name.name).ext) == -1) {
             next();
             return;
             //跳过

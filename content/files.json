@@ -1,22 +1,6 @@
 {
 	"useConfig": "default",
 	"fileList": {
-		"/content/about.json": {
-			"title": "关于博客",
-			"article_path": "./articles/about.md"
-		},
-		"/content/ceshi.json": {
-			"title": "ceshi",
-			"article_path": "./articles/ceshi.pdf"
-		},
-		"/content/helloaaa.json": {
-			"title": "helloaaa",
-			"article_path": "./articles/helloaaa.md"
-		},
-		"/content/helloaaaa.json": {
-			"title": "helloaaaa",
-			"article_path": "./articles/helloaaaa.md"
-		},
 		"/content/tttt.json": {
 			"title": "tttt",
 			"article_path": "./articles/tttt.md"

@@ -87,7 +87,7 @@ import { IContentMeta } from './Interface/IContentMeta';
 import * as format from "dateformat"
 import { IConfig } from "./Interface/IConfig";
 import { IFiles } from './Interface/IFiles';
-import { allowFileExts } from './transform';
+import {getAllowFileExts}  from './transform';
 import del = require("del");
 
 /**
@@ -170,6 +170,8 @@ async function generate(configname:string="default",verbose=false,refresh=false)
     }
     await Promise.all(dtasks) //等待所有任务完成
 
+    //获取允许的所有文件类型
+    const allowFileExts=await getAllowFileExts();
     //转换每个文件
     walker.on("file",async (base,name,next)=>{
         //这里应该过滤后缀名（目前允许txt md 以后应该以transformer声明的为主)

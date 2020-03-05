@@ -34,7 +34,7 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import { readConfig, readGlobalConfig, changeExt } from './lib/utils';
 import * as ld from 'lodash';
-import { TransformFunc, TransformResult } from './Interface/IS_Transform';
+import { TransformFunc, TransformResult, ITransformer } from './Interface/IS_Transform';
 import * as walk from 'walk';
 
 
@@ -51,22 +51,50 @@ interface ITransformTable{
 /**
  * 从transforms目录加载所有脚本并返回转换表
  */
-async function getTransformers():ITransformTable{
+async function getTransformers():Promise<ITransformTable>{
   const basedir=path.resolve(__dirname,"./transforms");
   let mon=walk.walk(basedir);
-  mon.on("file",(base,name,next)=>{
-    //有待实现
-  })
+  //ext->转换函数
+  let ret=<ITransformTable>{
 
+  }
+  //扫描并加载transformer目录的所有脚本文件（包括子目录)
+  mon.on("file",(base,name,next)=>{
+    //跳过非js文件
+    // console.log((path.extname(name.name)));
+    if(path.extname(name.name)!=".js") {next();return;}
+    //生成脚本文件名 加载脚本 放入表中 此处name于parse中的不同 为全名
+    const jspath=path.resolve(basedir,name.name);
+    //动态加载脚本 如果导出非ITransformer类型则会出错
+    //未来可使用reflect metadata解决 或通过ts自带的反射库解决
+    const obj=require(jspath) as ITransformer;
+    if(ld.has(ret,obj.ext)){
+      //警告 存在文件类型重复的transformer
+      console.warn("警告:存在文件类型重复的转换器脚本,文件类型:",obj.ext);
+    }
+    else{
+      //加入表中
+      ret[obj.ext]=obj.transformer;
+    }
+    //调用next
+    next();
+    
+  })
+  //异步返回 当加载结束时调用resolve返回实际值
+  return new Promise<ITransformTable>((r,j)=>{
+    mon.on("end",()=>r(ret));
+  })
 }
 //文章后缀名到转换器的映射表
 //其中 yaml json toml ini 是配置文件保留格式
+
+//此为Promise
 const transformTable=getTransformers();
-
-
 //外部使用的用于得到此程序可转换的文件类型后缀
-export const allowFileExts=ld.keys(transformTable);
-
+// export const allowFileExts=ld.keys(transformTable);
+export async function getAllowFileExts(){
+  return ld.keys(await transformTable);
+}
 //调用代理 会自动根据文件后缀名选择调用的转换器函数
 //transform系列函数只负责转换数据并返回转换结果，不负责提供其他信息
 async function transform(filepath:string,destpath:string,configname:string="default",...args):Promise<TransformResult>{
@@ -74,7 +102,7 @@ async function transform(filepath:string,destpath:string,configname:string="defa
   let globalconfig=await readGlobalConfig();
   //最后传递可能的附加参数
   const ext=path.parse(filepath).ext;
-  const func=transformTable[ext];
+  const func=(await transformTable)[ext];
   return func(filepath,destpath,config,globalconfig,...args);
 }
 
