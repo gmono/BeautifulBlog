@@ -35,21 +35,33 @@ import * as path from 'path';
 import { readConfig, readGlobalConfig, changeExt } from './lib/utils';
 import * as ld from 'lodash';
 import { TransformFunc, TransformResult } from './Interface/IS_Transform';
-import { transformMD } from './transforms/transformMD';
-import { transformTXT } from './transforms/transformTXT';
-import { transformPDF } from './transforms/transformPDF';
+import * as walk from 'walk';
 
 
+
+
+
+/**
+ * 转换表定义
+ */
 interface ITransformTable{
   [index:string]:TransformFunc;
 }
+
+/**
+ * 从transforms目录加载所有脚本并返回转换表
+ */
+async function getTransformers():ITransformTable{
+  const basedir=path.resolve(__dirname,"./transforms");
+  let mon=walk.walk(basedir);
+  mon.on("file",(base,name,next)=>{
+    //有待实现
+  })
+
+}
 //文章后缀名到转换器的映射表
 //其中 yaml json toml ini 是配置文件保留格式
-const transformTable={
-  ".md":transformMD,
-  ".txt":transformTXT,
-  ".pdf":transformPDF
-} as ITransformTable;
+const transformTable=getTransformers();
 
 
 //外部使用的用于得到此程序可转换的文件类型后缀

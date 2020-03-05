@@ -1,6 +1,6 @@
 import { IConfig } from "../Interface/IConfig";
 import { IGlobalConfig } from '../Interface/IGlobalConfig';
-import { TransformResult } from '../Interface/IS_Transform';
+import { TransformResult, ITransformer } from '../Interface/IS_Transform';
 import { getFileFromDest, readMetaFromArticle } from '../transform';
 import * as fse from 'fs-extra';
 import * as template from 'art-template';
@@ -10,7 +10,7 @@ import path = require("path");
  * 采取直接复制pdf文件并提取元数据（当前未实现）
  * 并直接在文章页中嵌入pdf embed节点的方式处理
  */
-export async function transformPDF(filepath: string, destpath: string, config: IConfig, globalconfig: IGlobalConfig, ...args): Promise<TransformResult> {
+async function transformPDF(filepath: string, destpath: string, config: IConfig, globalconfig: IGlobalConfig, ...args): Promise<TransformResult> {
   //读取pdf文件原始数据
   let raw = await fse.readFile(filepath);
   //确定复制地址 并转换为相对blog根目录的url
@@ -37,4 +37,9 @@ export async function transformPDF(filepath: string, destpath: string, config: I
       "article.pdf": raw
     }
   };
+}
+
+export=<ITransformer>{
+  ext:".pdf",
+  transformer:transformPDF
 }

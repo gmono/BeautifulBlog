@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const transform_1 = require("../transform");
 const fse = require("fs-extra");
 const template = require("art-template");
@@ -37,5 +36,8 @@ async function transformPDF(filepath, destpath, config, globalconfig, ...args) {
         }
     };
 }
-exports.transformPDF = transformPDF;
+module.exports = {
+    ext: ".pdf",
+    transformer: transformPDF
+};
 //# sourceMappingURL=transformPDF.js.map

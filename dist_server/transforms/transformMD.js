@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const fm = require("front-matter");
 const cheerio = require("cheerio");
 const path = require("path");
@@ -69,5 +68,8 @@ async function transformMD(filepath, destpath, config, globalconfig, ...args) {
      */
     return { html, meta, raw: Buffer.from(res.body) };
 }
-exports.transformMD = transformMD;
+module.exports = {
+    ext: ".md",
+    transformer: transformMD
+};
 //# sourceMappingURL=transformMD.js.map

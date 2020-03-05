@@ -13,16 +13,20 @@ const fse = require("fs-extra");
 const path = require("path");
 const utils_1 = require("./lib/utils");
 const ld = require("lodash");
-const transformMD_1 = require("./transforms/transformMD");
-const transformTXT_1 = require("./transforms/transformTXT");
-const transformPDF_1 = require("./transforms/transformPDF");
+const walk = require("walk");
+/**
+ * 从transforms目录加载所有脚本并返回转换表
+ */
+async function getTransformers() {
+    const basedir = path.resolve(__dirname, "./transforms");
+    let mon = walk.walk(basedir);
+    mon.on("file", (base, name, next) => {
+        //有待实现
+    });
+}
 //文章后缀名到转换器的映射表
 //其中 yaml json toml ini 是配置文件保留格式
-const transformTable = {
-    ".md": transformMD_1.transformMD,
-    ".txt": transformTXT_1.transformTXT,
-    ".pdf": transformPDF_1.transformPDF
-};
+const transformTable = getTransformers();
 //外部使用的用于得到此程序可转换的文件类型后缀
 exports.allowFileExts = ld.keys(transformTable);
 //调用代理 会自动根据文件后缀名选择调用的转换器函数

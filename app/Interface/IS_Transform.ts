@@ -18,6 +18,7 @@ export type TransformFunc=((filepath:string,destpath:string,config:IConfig,globa
 
 /**
  * 转换器导出接口
+ * 规定所有transformer导出均以export={} 形式 而不以 export default 和 export xxx形式
  */
 export interface ITransformer{
     //声明可以处理的文件扩展名 如 .md .pdf .xls等

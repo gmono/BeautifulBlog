@@ -6,7 +6,8 @@
   "bin": "./dist_server/blog.js",
   "pkg": {
     "scripts": [
-      "./node_modules/prismjs/components/*.js"
+      "./node_modules/prismjs/components/*.js",
+      "./dist_server/transforms/*.js"
     ],
     "assets": [
       "./static/**/*",

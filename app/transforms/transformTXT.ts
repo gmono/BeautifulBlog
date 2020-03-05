@@ -1,11 +1,11 @@
 import { IConfig } from "../Interface/IConfig";
 import { IGlobalConfig } from '../Interface/IGlobalConfig';
-import { TransformResult } from '../Interface/IS_Transform';
+import { TransformResult, ITransformer } from '../Interface/IS_Transform';
 import { readMetaFromArticle } from '../transform';
 import * as fse from 'fs-extra';
 import * as template from "art-template";
 import path = require("path");
-export async function transformTXT(filepath: string, destpath: string, config: IConfig, globalconfig: IGlobalConfig, ...args) {
+async function transformTXT(filepath: string, destpath: string, config: IConfig, globalconfig: IGlobalConfig, ...args) {
   //转换txt文件到html txt如果没有yaml的元数据则把第一行当作标题其余元数据为null
   //txt文件的meta由同名yaml提供
   let txt = (await fse.readFile(filepath)).toString();
@@ -38,4 +38,9 @@ export async function transformTXT(filepath: string, destpath: string, config: I
     raw: Buffer.from(txt),
     meta: obj.meta
   };
+}
+
+export=<ITransformer>{
+  ext:".txt",
+  transformer:transformTXT
 }

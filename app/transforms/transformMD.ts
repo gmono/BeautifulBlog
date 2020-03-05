@@ -2,7 +2,7 @@ import { IConfig } from "../Interface/IConfig";
 
 import { IGlobalConfig } from "../Interface/IGlobalConfig";
 
-import { TransformResult } from "../Interface/IS_Transform";
+import { TransformResult, ITransformer } from '../Interface/IS_Transform';
 
 import fm = require("front-matter");
 
@@ -33,7 +33,7 @@ function htmlProcessing(html:string):string{
   
 let first=true;
 let baseurl="/";
-export async function transformMD(filepath:string,destpath:string,config:IConfig,globalconfig:IGlobalConfig,...args):Promise<TransformResult>{
+async function transformMD(filepath:string,destpath:string,config:IConfig,globalconfig:IGlobalConfig,...args):Promise<TransformResult>{
     if(first) {
       //加载配置文件并加载语法高亮
       
@@ -84,4 +84,9 @@ export async function transformMD(filepath:string,destpath:string,config:IConfig
      */
     return {html,meta,raw:Buffer.from(res.body)};
   
+}
+
+export=<ITransformer>{
+  ext:".md",
+  transformer:transformMD
 }
