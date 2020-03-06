@@ -31,7 +31,7 @@ export interface ITransformer{
       description:string;
     };
     //扩展的初始化函数 在加载时调用
-    init():void;
+    init():Promise<void>;
 }
 //允许导出一组transformer(同一个文件)
 export type TransformerExports=ITransformer|ITransformer[];

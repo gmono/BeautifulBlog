@@ -59,10 +59,13 @@ async function getTransformers():Promise<ITransformTable>{
 
   }
   //独立的装载函数 同一个文件可装载多个transformer
-  const loadTransformer=(obj:ITransformer)=>{
+  //异步初始化 转载时等待init函数完成
+  const loadTransformer=async (obj:ITransformer)=>{
       if(ld.has(ret,obj.ext)){
         //警告 存在文件类型重复的transformer
-        console.warn("警告:存在文件类型重复的转换器脚本,文件类型:",obj.ext);
+        console.warn("警告:存在文件类型重复的转换器脚本(已跳过加载),文件类型:",obj.ext);
+        //取消加载
+        return;
       }
       //加载
       //加入表中
@@ -70,10 +73,10 @@ async function getTransformers():Promise<ITransformTable>{
       //输出加载信息
       console.log(`转换器:${obj.desc.name}已加载,可处理 ${obj.ext} 文件`)
       //初始化
-      obj.init()
+      await obj.init()
   }
   //扫描并加载transformer目录的所有脚本文件（包括子目录)
-  mon.on("file",(base,name,next)=>{
+  mon.on("file",async (base,name,next)=>{
     //跳过非js文件
     // console.log((path.extname(name.name)));
     if(path.extname(name.name)!=".js") {next();return;}
@@ -84,10 +87,11 @@ async function getTransformers():Promise<ITransformTable>{
     const obj=require(jspath) as TransformerExports;
     if(obj instanceof Array){
       //这里是数组情况
-      obj.forEach(v=>loadTransformer(v));
+      //等待所有加载任务完成
+      await Promise.all(obj.map(v=>loadTransformer(v)));
     }
     else{
-      loadTransformer(obj);
+      await loadTransformer(obj);
     }
     //调用next
     next();

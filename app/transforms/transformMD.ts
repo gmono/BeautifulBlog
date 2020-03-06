@@ -86,7 +86,7 @@ async function transformMD(filepath:string,destpath:string,config:IConfig,global
   
 }
 
-export=<TransformerExports>{
+export=<TransformerExports>[{
   ext:".md",
   transformer:transformMD,
   desc:{
@@ -96,4 +96,4 @@ export=<TransformerExports>{
   init(){
     console.log("作者:上清");
   }
-}
+}]
