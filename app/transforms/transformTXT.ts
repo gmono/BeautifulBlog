@@ -1,6 +1,6 @@
 import { IConfig } from "../Interface/IConfig";
 import { IGlobalConfig } from '../Interface/IGlobalConfig';
-import { TransformResult, ITransformer } from '../Interface/IS_Transform';
+import { TransformResult, ITransformer, TransformerExports } from '../Interface/IS_Transform';
 import { readMetaFromArticle } from '../transform';
 import * as fse from 'fs-extra';
 import * as template from "art-template";
@@ -40,7 +40,7 @@ async function transformTXT(filepath: string, destpath: string, config: IConfig,
   };
 }
 
-export=<ITransformer>{
+export=<TransformerExports>{
   ext:".txt",
   transformer:transformTXT,
   desc:{

@@ -2,7 +2,7 @@ import { IConfig } from "../Interface/IConfig";
 
 import { IGlobalConfig } from "../Interface/IGlobalConfig";
 
-import { TransformResult, ITransformer } from '../Interface/IS_Transform';
+import { TransformResult, ITransformer, TransformerExports } from '../Interface/IS_Transform';
 
 import fm = require("front-matter");
 
@@ -86,7 +86,7 @@ async function transformMD(filepath:string,destpath:string,config:IConfig,global
   
 }
 
-export=<ITransformer>{
+export=<TransformerExports>{
   ext:".md",
   transformer:transformMD,
   desc:{
