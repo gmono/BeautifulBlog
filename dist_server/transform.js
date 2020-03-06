@@ -22,6 +22,20 @@ async function getTransformers() {
     let mon = walk.walk(basedir);
     //ext->转换函数
     let ret = {};
+    //独立的装载函数 同一个文件可装载多个transformer
+    const loadTransformer = (obj) => {
+        if (ld.has(ret, obj.ext)) {
+            //警告 存在文件类型重复的transformer
+            console.warn("警告:存在文件类型重复的转换器脚本,文件类型:", obj.ext);
+        }
+        //加载
+        //加入表中
+        ret[obj.ext] = obj.transformer;
+        //输出加载信息
+        console.log(`转换器:${obj.desc.name}已加载,可处理 ${obj.ext} 文件`);
+        //初始化
+        obj.init();
+    };
     //扫描并加载transformer目录的所有脚本文件（包括子目录)
     mon.on("file", (base, name, next) => {
         //跳过非js文件
@@ -35,18 +49,12 @@ async function getTransformers() {
         //动态加载脚本 如果导出非ITransformer类型则会出错
         //未来可使用reflect metadata解决 或通过ts自带的反射库解决
         const obj = require(jspath);
-        if (ld.has(ret, obj.ext)) {
-            //警告 存在文件类型重复的transformer
-            console.warn("警告:存在文件类型重复的转换器脚本,文件类型:", obj.ext);
+        if (obj instanceof Array) {
+            //这里是数组情况
+            obj.forEach(v => loadTransformer(v));
         }
         else {
-            //加载
-            //加入表中
-            ret[obj.ext] = obj.transformer;
-            //输出加载信息
-            console.log(`转换器:${obj.desc.name}已加载,可处理 ${obj.ext} 文件`);
-            //初始化
-            obj.init();
+            loadTransformer(obj);
         }
         //调用next
         next();
