@@ -14,7 +14,8 @@
       "./sites/default/**/*",
       "./config/*.json",
       "./assets/**/*",
-      "./index.html"
+      "./index.html",
+      "./global.json"
     ]
   },
   "scripts": {
@@ -28,7 +29,8 @@
     "blog": "node ./dist_server/blog.js",
     "test": "node ./dist_server/testLib.js",
     "initBlog": "node ./dist_server/init.js",
-    "pkg": "pkg -t win,linux package.json -o ./bin/blog"
+    "pkgall": "pkg -t win,linux package.json -o ./bin/blog-release",
+    "pkg":"pkg package.json -o ./blog"
   },
   "author": "gmono",
   "license": "MIT",

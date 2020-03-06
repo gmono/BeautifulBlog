@@ -25,4 +25,11 @@ export interface ITransformer{
     ext:string;
     //转换函数
     transformer:TransformFunc;
+    //扩展的描述信息
+    desc:{
+      name:string;
+      description:string;
+    };
+    //扩展的初始化函数 在加载时调用
+    init():void;
 }

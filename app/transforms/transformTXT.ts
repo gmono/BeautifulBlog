@@ -42,5 +42,13 @@ async function transformTXT(filepath: string, destpath: string, config: IConfig,
 
 export=<ITransformer>{
   ext:".txt",
-  transformer:transformTXT
+  transformer:transformTXT,
+  desc:{
+    name:"Txt转换器",
+    description:`官方转换器，转换TXT文件(.txt),可添加toml格式元数据配置（配置标题等）
+否则自动以第一行为标题，第二行为时间`
+  },
+  init(){
+    console.log("作者:上清");
+  }
 }

@@ -38,6 +38,13 @@ async function transformPDF(filepath, destpath, config, globalconfig, ...args) {
 }
 module.exports = {
     ext: ".pdf",
-    transformer: transformPDF
+    transformer: transformPDF,
+    desc: {
+        name: "PDF转换器",
+        description: "官方转换器，转换PDF文件(.pdf),pdf文件可以toml同名文件配置元数据，否则以文件名为标题，修改时间为发布时间"
+    },
+    init() {
+        console.log("作者:上清");
+    }
 };
 //# sourceMappingURL=transformPDF.js.map

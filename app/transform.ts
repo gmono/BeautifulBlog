@@ -73,8 +73,13 @@ async function getTransformers():Promise<ITransformTable>{
       console.warn("警告:存在文件类型重复的转换器脚本,文件类型:",obj.ext);
     }
     else{
+      //加载
       //加入表中
       ret[obj.ext]=obj.transformer;
+      //输出加载信息
+      console.log(`转换器:${obj.desc.name}已加载,可处理 ${obj.ext} 文件`)
+      //初始化
+      obj.init()
     }
     //调用next
     next();

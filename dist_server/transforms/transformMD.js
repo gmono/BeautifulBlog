@@ -70,6 +70,13 @@ async function transformMD(filepath, destpath, config, globalconfig, ...args) {
 }
 module.exports = {
     ext: ".md",
-    transformer: transformMD
+    transformer: transformMD,
+    desc: {
+        name: "Markdown转换器",
+        description: "官方转换器，转换Markdown文件(.md)"
+    },
+    init() {
+        console.log("作者:上清");
+    }
 };
 //# sourceMappingURL=transformMD.js.map
