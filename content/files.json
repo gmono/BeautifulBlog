@@ -67,7 +67,7 @@
 			"filesDir_url": "/BeautifulBlog/content/helo/ceshiaaa.dir"
 		},
 		"/BeautifulBlog/content/ceshiccc/hello.json": {
-			"title": "",
+			"title": "标题\r",
 			"article_path": "./articles/ceshiccc/hello.txt",
 			"filesDir_url": "/BeautifulBlog/content/ceshiccc/hello.dir"
 		}
