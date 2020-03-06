@@ -72,9 +72,8 @@ function getUrlFile(root, filestat, base_url) {
  * getArticleFile:相对于articles目录的路径
  * getUrlFile:相对于base_url的路径（可直接做为网站链接）
  */
-const transform_1 = require("./transform");
 const fs = require("fs-extra");
-const transform_2 = require("./transform");
+const transform_1 = require("./transform");
 const del = require("del");
 /**
  *
@@ -153,7 +152,7 @@ async function generate(configname = "default", verbose = false, refresh = false
     }
     await Promise.all(dtasks); //等待所有任务完成
     //获取允许的所有文件类型
-    const allowFileExts = await transform_2.getAllowFileExts();
+    const allowFileExts = await transform_1.getAllowFileExts();
     //转换每个文件
     walker.on("file", async (base, name, next) => {
         //这里应该过滤后缀名（目前允许txt md 以后应该以transformer声明的为主)
@@ -189,7 +188,7 @@ async function generate(configname = "default", verbose = false, refresh = false
             let url = getUrlFile(base, name, config.base_url);
             url = utils_1.changeExt(url, ".json");
             //生成附件文件夹url
-            const fdir = transform_2.getFilesDir(contentpath); //附件文件夹本地地址
+            const fdir = transform_1.getFilesDir(contentpath); //附件文件夹本地地址
             const furl = utils_1.getUrlFromPath(fdir, config.base_url); //附加文件夹基本url
             files.fileList[url] = {
                 title: title,

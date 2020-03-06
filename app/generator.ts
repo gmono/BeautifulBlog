@@ -78,7 +78,7 @@ function getUrlFile(root:string,filestat:walk.WalkStats,base_url:string){
  * getUrlFile:相对于base_url的路径（可直接做为网站链接）
  */
 
-import transform, { transformFile } from "./transform";
+
 import * as fs from "fs-extra"
 import * as ensurePath from '@wrote/ensure-path'
 import { IArticleMeta } from './Interface/IArticleMeta';
@@ -87,7 +87,7 @@ import { IContentMeta } from './Interface/IContentMeta';
 import * as format from "dateformat"
 import { IConfig } from "./Interface/IConfig";
 import { IFiles } from './Interface/IFiles';
-import { getAllowFileExts, getFilesDir } from './transform';
+import { getAllowFileExts, getFilesDir,transformFile } from './transform';
 import del = require("del");
 
 /**

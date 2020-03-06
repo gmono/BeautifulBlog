@@ -25,6 +25,7 @@ async function getTransformers() {
     //独立的装载函数 同一个文件可装载多个transformer
     //异步初始化 转载时等待init函数完成
     const loadTransformer = async (obj) => {
+        //暂时取消输出
         if (ld.has(ret, obj.ext)) {
             //警告 存在文件类型重复的transformer
             console.warn("警告:存在文件类型重复的转换器脚本(已跳过加载),文件类型:", obj.ext);
@@ -71,11 +72,18 @@ async function getTransformers() {
 //文章后缀名到转换器的映射表
 //其中 yaml json toml ini 是配置文件保留格式
 //此为Promise
-const transformTable = getTransformers();
+let transformTable = null;
+async function ensureTransformTable() {
+    //保证转换器表已加载
+    if (transformTable == null)
+        transformTable = await getTransformers();
+}
+exports.ensureTransformTable = ensureTransformTable;
 //外部使用的用于得到此程序可转换的文件类型后缀
 // export const allowFileExts=ld.keys(transformTable);
 async function getAllowFileExts() {
-    return ld.keys(await transformTable);
+    await ensureTransformTable();
+    return ld.keys(transformTable);
 }
 exports.getAllowFileExts = getAllowFileExts;
 //调用代理 会自动根据文件后缀名选择调用的转换器函数
@@ -85,7 +93,9 @@ async function transform(filepath, destpath, configname = "default", ...args) {
     let globalconfig = await utils_1.readGlobalConfig();
     //最后传递可能的附加参数
     const ext = path.parse(filepath).ext;
-    const func = (await transformTable)[ext];
+    //确保转换器加载完成
+    await ensureTransformTable();
+    const func = transformTable[ext];
     return func(filepath, destpath, config, globalconfig, ...args);
 }
 /**
