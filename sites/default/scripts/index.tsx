@@ -62,7 +62,7 @@ class Item extends React.Component<ItemInfo,{
             <div style={{
                 color:"blue",
                 fontSize:"0.7em"
-            }}>{this.props.info.date.toString()}</div>
+            }}>{this.props.info.date?.toString()}</div>
     
             <div style={this.props.isExpanded? expstyle:uexpstyle} onClick={this.props.OnSummaryClick}>
                 <div ref="content"  dangerouslySetInnerHTML={{__html:this.props.summary}}></div>

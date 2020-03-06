@@ -1,9 +1,11 @@
 "use strict";
-
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -11,10 +13,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -25,8 +28,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
         while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
                 case 0: case 1: t = op; break;
                 case 4: _.label++; return { value: op[1], done: false };
@@ -72,6 +75,7 @@ var Item = /** @class */ (function (_super) {
         }
     };
     Item.prototype.render = function () {
+        var _a;
         var uexpstyle = {
             height: "100px",
             overflow: "hidden",
@@ -93,7 +97,7 @@ var Item = /** @class */ (function (_super) {
             React.createElement("div", { style: {
                     color: "blue",
                     fontSize: "0.7em"
-                } }, this.props.info.date.toString()),
+                } }, (_a = this.props.info.date) === null || _a === void 0 ? void 0 : _a.toString()),
             React.createElement("div", { style: this.props.isExpanded ? expstyle : uexpstyle, onClick: this.props.OnSummaryClick },
                 React.createElement("div", { ref: "content", dangerouslySetInnerHTML: { __html: this.props.summary } }))));
     };
@@ -185,7 +189,7 @@ var ArticleItem = /** @class */ (function (_super) {
                     article_path: "未知",
                     from_dir: [],
                     modify_time: new Date()
-                }, summary: "加载中......", OnTitleClick: function () { }, OnSummaryClick: this.summarySwitch.bind(this), isExpanded: this.state.isExpanded }));
+                }, summary: "\u52A0\u8F7D\u4E2D......", OnTitleClick: function () { }, OnSummaryClick: this.summarySwitch.bind(this), isExpanded: this.state.isExpanded }));
         }
         else {
             return (React.createElement(Item, { info: this.state.info, summary: this.state.html, OnTitleClick: this.enterArticle.bind(this), OnSummaryClick: this.summarySwitch.bind(this), isExpanded: this.state.isExpanded }));

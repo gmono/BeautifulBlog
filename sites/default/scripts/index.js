@@ -75,6 +75,7 @@ var Item = /** @class */ (function (_super) {
         }
     };
     Item.prototype.render = function () {
+        var _a;
         var uexpstyle = {
             height: "100px",
             overflow: "hidden",
@@ -96,7 +97,7 @@ var Item = /** @class */ (function (_super) {
             React.createElement("div", { style: {
                     color: "blue",
                     fontSize: "0.7em"
-                } }, this.props.info.date.toString()),
+                } }, (_a = this.props.info.date) === null || _a === void 0 ? void 0 : _a.toString()),
             React.createElement("div", { style: this.props.isExpanded ? expstyle : uexpstyle, onClick: this.props.OnSummaryClick },
                 React.createElement("div", { ref: "content", dangerouslySetInnerHTML: { __html: this.props.summary } }))));
     };
