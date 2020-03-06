@@ -22,22 +22,23 @@ async function generateFiles(configname) {
 async function watchArticles(configname = "default") {
     //等待更改 自动进行全部重新生成 如同服务器里一样
     let mon = await createMonitor("./articles");
-    mon.on("changed", async (f, curr, prev) => {
+    //刷新函数 
+    let refresh = async (f, stat, msgtype) => {
+        //检测是否为文件（可能是目录）
+        if (!stat.isFile())
+            return;
         console.clear();
-        console.log(`更改:${f}`);
+        console.log(`${msgtype}:${f}`);
         await generateFiles(configname);
+    };
+    mon.on("changed", async (f, curr, prev) => {
+        await refresh(f, curr, "更改");
     });
     mon.on("created", async (f, stat) => {
-        //创建了文章
-        console.clear();
-        console.log(`新文章:${f}`);
-        await generateFiles(configname);
+        await refresh(f, stat, "新文章");
     });
     mon.on("removed", async (f, stat) => {
-        //移除文章 
-        console.clear();
-        console.log(`删除:${f}`);
-        await generateFiles(configname);
+        await refresh(f, stat, "删除");
     });
 }
 exports.default = watchArticles;

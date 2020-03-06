@@ -24,22 +24,22 @@ async function generateFiles(configname:string){
 export default async function watchArticles(configname:string="default"){
     //等待更改 自动进行全部重新生成 如同服务器里一样
     let mon=await createMonitor("./articles");
-    mon.on("changed",async (f:string,curr,prev)=>{
+    //刷新函数 
+    let refresh=async (f:string,stat:fs.Stats,msgtype:string)=>{
+        //检测是否为文件（可能是目录）
+        if(!stat.isFile()) return;
         console.clear();
-        console.log(`更改:${f}`);
+        console.log(`${msgtype}:${f}`);
         await generateFiles(configname);
+    }
+    mon.on("changed",async (f:string,curr,prev)=>{
+        await refresh(f,curr,"更改");
     });
     mon.on("created",async (f:string,stat)=>{
-        //创建了文章
-        console.clear();
-        console.log(`新文章:${f}`);
-        await generateFiles(configname);
+        await refresh(f,stat,"新文章");
     })
     mon.on("removed",async (f:string,stat)=>{
-        //移除文章 
-        console.clear();
-        console.log(`删除:${f}`);
-        await generateFiles(configname);
+        await refresh(f,stat,"删除");
     })
 }
 import * as path from "path"

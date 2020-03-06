@@ -90,6 +90,16 @@
 			"title": "测试一下这个目录",
 			"article_path": "./articles/life/测试这个目录.md",
 			"filesDir_url": "/content/life/测试这个目录.dir"
+		},
+		"/content/helo/ceshiaaa.json": {
+			"title": "ceshiaaa",
+			"article_path": "./articles/helo/ceshiaaa.md",
+			"filesDir_url": "/content/helo/ceshiaaa.dir"
+		},
+		"/content/ceshiccc/hello.json": {
+			"title": "",
+			"article_path": "./articles/ceshiccc/hello.txt",
+			"filesDir_url": "/content/ceshiccc/hello.dir"
 		}
 	}
 }
