@@ -1,105 +1,75 @@
 {
-	"useConfig": "default",
+	"useConfig": "origin",
 	"fileList": {
-		"/content/ceshi.json": {
-			"title": "ceshi",
-			"article_path": "./articles/ceshi.pdf",
-			"filesDir_url": "/content/ceshi.dir"
-		},
-		"/content/helloaaa.json": {
-			"title": "helloaaa",
-			"article_path": "./articles/helloaaa.md",
-			"filesDir_url": "/content/helloaaa.dir"
-		},
-		"/content/helloaaaa.json": {
-			"title": "helloaaaa",
-			"article_path": "./articles/helloaaaa.md",
-			"filesDir_url": "/content/helloaaaa.dir"
-		},
-		"/content/tttt.json": {
-			"title": "tttt",
-			"article_path": "./articles/tttt.md",
-			"filesDir_url": "/content/tttt.dir"
-		},
-		"/content/测试.json": {
-			"title": "标题\r",
-			"article_path": "./articles/测试.txt",
-			"filesDir_url": "/content/测试.dir"
-		},
-		"/content/testss/hhh.json": {
-			"title": "hhh",
-			"article_path": "./articles/testss/hhh.md",
-			"filesDir_url": "/content/testss/hhh.dir"
-		},
-		"/content/testdl/testmd.json": {
+		"/BeautifulBlog/content/testdl/testmd.json": {
 			"title": "关于博客asdfasdfasd",
 			"article_path": "./articles/testdl/testmd.md",
-			"filesDir_url": "/content/testdl/testmd.dir"
+			"filesDir_url": "/BeautifulBlog/content/testdl/testmd.dir"
 		},
-		"/content/tech/设计一个新的静态博客系统.json": {
+		"/BeautifulBlog/content/tech/设计一个新的静态博客系统.json": {
 			"title": "设计一个新的静态博客系统",
 			"article_path": "./articles/tech/设计一个新的静态博客系统.md",
-			"filesDir_url": "/content/tech/设计一个新的静态博客系统.dir"
+			"filesDir_url": "/BeautifulBlog/content/tech/设计一个新的静态博客系统.dir"
 		},
-		"/content/tech/node/关于Nodejs进程操作与多进程架构的调查.json": {
+		"/BeautifulBlog/content/tech/node/关于Nodejs进程操作与多进程架构的调查.json": {
 			"title": "关于Nodejs进程操作与多进程架构的调查",
 			"article_path": "./articles/tech/node/关于Nodejs进程操作与多进程架构的调查.md",
-			"filesDir_url": "/content/tech/node/关于Nodejs进程操作与多进程架构的调查.dir"
+			"filesDir_url": "/BeautifulBlog/content/tech/node/关于Nodejs进程操作与多进程架构的调查.dir"
 		},
-		"/content/tech/library/前端常用库搜集.json": {
+		"/BeautifulBlog/content/tech/library/前端常用库搜集.json": {
 			"title": "设计一个新的静态博客系统",
 			"article_path": "./articles/tech/library/前端常用库搜集.md",
-			"filesDir_url": "/content/tech/library/前端常用库搜集.dir"
+			"filesDir_url": "/BeautifulBlog/content/tech/library/前端常用库搜集.dir"
 		},
-		"/content/tech/frontend/React Component的基本逻辑.json": {
+		"/BeautifulBlog/content/tech/frontend/React Component的基本逻辑.json": {
 			"title": "React Component的基本逻辑",
 			"article_path": "./articles/tech/frontend/React Component的基本逻辑.md",
-			"filesDir_url": "/content/tech/frontend/React Component的基本逻辑.dir"
+			"filesDir_url": "/BeautifulBlog/content/tech/frontend/React Component的基本逻辑.dir"
 		},
-		"/content/tech/frontend/Winform与React等技术的区别.json": {
+		"/BeautifulBlog/content/tech/frontend/Winform与React等技术的区别.json": {
 			"title": "Winform与React等技术的区别",
 			"article_path": "./articles/tech/frontend/Winform与React等技术的区别.md",
-			"filesDir_url": "/content/tech/frontend/Winform与React等技术的区别.dir"
+			"filesDir_url": "/BeautifulBlog/content/tech/frontend/Winform与React等技术的区别.dir"
 		},
-		"/content/tech/frontend/在React中构建类Winform体系.json": {
+		"/BeautifulBlog/content/tech/frontend/在React中构建类Winform体系.json": {
 			"title": "在React中构建类Winform体系",
 			"article_path": "./articles/tech/frontend/在React中构建类Winform体系.md",
-			"filesDir_url": "/content/tech/frontend/在React中构建类Winform体系.dir"
+			"filesDir_url": "/BeautifulBlog/content/tech/frontend/在React中构建类Winform体系.dir"
 		},
-		"/content/life/hello world.json": {
+		"/BeautifulBlog/content/life/hello world.json": {
 			"title": "hello world",
 			"article_path": "./articles/life/hello world.md",
-			"filesDir_url": "/content/life/hello world.dir"
+			"filesDir_url": "/BeautifulBlog/content/life/hello world.dir"
 		},
-		"/content/life/hello world2.json": {
+		"/BeautifulBlog/content/life/hello world2.json": {
 			"title": "hello world2",
 			"article_path": "./articles/life/hello world2.md",
-			"filesDir_url": "/content/life/hello world2.dir"
+			"filesDir_url": "/BeautifulBlog/content/life/hello world2.dir"
 		},
-		"/content/life/helloworld.json": {
+		"/BeautifulBlog/content/life/helloworld.json": {
 			"title": "helloworld",
 			"article_path": "./articles/life/helloworld.md",
-			"filesDir_url": "/content/life/helloworld.dir"
+			"filesDir_url": "/BeautifulBlog/content/life/helloworld.dir"
 		},
-		"/content/life/测试文章.json": {
+		"/BeautifulBlog/content/life/测试文章.json": {
 			"title": "测试文章",
 			"article_path": "./articles/life/测试文章.md",
-			"filesDir_url": "/content/life/测试文章.dir"
+			"filesDir_url": "/BeautifulBlog/content/life/测试文章.dir"
 		},
-		"/content/life/测试这个目录.json": {
+		"/BeautifulBlog/content/life/测试这个目录.json": {
 			"title": "测试一下这个目录",
 			"article_path": "./articles/life/测试这个目录.md",
-			"filesDir_url": "/content/life/测试这个目录.dir"
+			"filesDir_url": "/BeautifulBlog/content/life/测试这个目录.dir"
 		},
-		"/content/helo/ceshiaaa.json": {
+		"/BeautifulBlog/content/helo/ceshiaaa.json": {
 			"title": "ceshiaaa",
 			"article_path": "./articles/helo/ceshiaaa.md",
-			"filesDir_url": "/content/helo/ceshiaaa.dir"
+			"filesDir_url": "/BeautifulBlog/content/helo/ceshiaaa.dir"
 		},
-		"/content/ceshiccc/hello.json": {
+		"/BeautifulBlog/content/ceshiccc/hello.json": {
 			"title": "",
 			"article_path": "./articles/ceshiccc/hello.txt",
-			"filesDir_url": "/content/ceshiccc/hello.dir"
+			"filesDir_url": "/BeautifulBlog/content/ceshiccc/hello.dir"
 		}
 	}
 }
