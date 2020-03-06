@@ -109,6 +109,7 @@ async function readMetaFromArticle(articlePathOrSrcPath) {
     return toml.parse((await fse.readFile(metapath)).toString());
 }
 exports.readMetaFromArticle = readMetaFromArticle;
+//工具函数区域
 /**
  * 获取附件地址
  * @param destpath 目标地址或目的文章相关文件（比如json和转换后的html文件）
@@ -126,6 +127,7 @@ function getFilesDir(destpath) {
     return utils_1.changeExt(destpath, "") + ".dir";
 }
 exports.getFilesDir = getFilesDir;
+//主函数
 /**
  * 把一个原始article文件转换为conent（一个html 一个元数据 以及其他文件）
  * @param srcfile 源文件名

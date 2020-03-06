@@ -48,7 +48,7 @@ function getContentFile(root:string,filestat:walk.WalkStats){
     let cpath=getContentPath(apath,"./content");
     return cpath;
 }
-import {changeExt} from "./lib/utils"
+import { changeExt, getUrlFromPath } from './lib/utils';
 /**
  * 替换content=./articles
  */
@@ -87,7 +87,7 @@ import { IContentMeta } from './Interface/IContentMeta';
 import * as format from "dateformat"
 import { IConfig } from "./Interface/IConfig";
 import { IFiles } from './Interface/IFiles';
-import {getAllowFileExts}  from './transform';
+import { getAllowFileExts, getFilesDir } from './transform';
 import del = require("del");
 
 /**
@@ -208,9 +208,13 @@ async function generate(configname:string="default",verbose=false,refresh=false)
             //记录文章记录到files.json 修bug 替换//
             let url=getUrlFile(base,name,config.base_url);
             url=changeExt(url,".json");
+            //生成附件文件夹url
+            const fdir=getFilesDir(contentpath);//附件文件夹本地地址
+            const furl=getUrlFromPath(fdir,config.base_url);//附加文件夹基本url
             files.fileList[url]={
                 title:title,
-                article_path:articlepath.replace(/\\/g,"/")
+                article_path:articlepath.replace(/\\/g,"/"),
+                filesDir_url:furl
             }
         }
 

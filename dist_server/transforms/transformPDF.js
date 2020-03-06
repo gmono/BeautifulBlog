@@ -2,6 +2,7 @@
 const transform_1 = require("../transform");
 const fse = require("fs-extra");
 const template = require("art-template");
+const utils_1 = require("../lib/utils");
 const path = require("path");
 /**
  * 转换pdf文件的转换函数
@@ -13,7 +14,7 @@ async function transformPDF(filepath, destpath, config, globalconfig, ...args) {
     let raw = await fse.readFile(filepath);
     //确定复制地址 并转换为相对blog根目录的url
     const destpdf = transform_1.getFileFromDest(destpath, "article.pdf");
-    const pdfurl = "/" + path.relative(".", destpdf).replace(/\\/g, "/");
+    const pdfurl = utils_1.getUrlFromPath(destpdf, config.base_url);
     //生成html
     let html = template(path.resolve(__dirname, "../../static/pdf_template.html"), {
         pdfurl: pdfurl

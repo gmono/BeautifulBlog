@@ -188,9 +188,13 @@ async function generate(configname = "default", verbose = false, refresh = false
             //记录文章记录到files.json 修bug 替换//
             let url = getUrlFile(base, name, config.base_url);
             url = utils_1.changeExt(url, ".json");
+            //生成附件文件夹url
+            const fdir = transform_2.getFilesDir(contentpath); //附件文件夹本地地址
+            const furl = utils_1.getUrlFromPath(fdir, config.base_url); //附加文件夹基本url
             files.fileList[url] = {
                 title: title,
-                article_path: articlepath.replace(/\\/g, "/")
+                article_path: articlepath.replace(/\\/g, "/"),
+                filesDir_url: furl
             };
         };
         //前缀选择写法 加功能专用

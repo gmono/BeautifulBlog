@@ -4,6 +4,7 @@ import { TransformResult, ITransformer } from '../Interface/IS_Transform';
 import { getFileFromDest, readMetaFromArticle } from '../transform';
 import * as fse from 'fs-extra';
 import * as template from 'art-template';
+import { getUrlFromPath } from '../lib/utils';
 import path = require("path");
 /**
  * 转换pdf文件的转换函数
@@ -15,7 +16,7 @@ async function transformPDF(filepath: string, destpath: string, config: IConfig,
   let raw = await fse.readFile(filepath);
   //确定复制地址 并转换为相对blog根目录的url
   const destpdf = getFileFromDest(destpath, "article.pdf");
-  const pdfurl = "/" + path.relative(".", destpdf).replace(/\\/g, "/");
+  const pdfurl = getUrlFromPath(destpdf,config.base_url);
   //生成html
   let html = template(path.resolve(__dirname, "../../static/pdf_template.html"), {
     pdfurl: pdfurl

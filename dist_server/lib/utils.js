@@ -85,4 +85,15 @@ async function innerCopy(src, dest) {
     }
 }
 exports.innerCopy = innerCopy;
+/**
+ * 从path获取服务器的url
+ * @param fpath 文件path
+ * @param baseurl 服务器的baseurl，在config中定义
+ */
+function getUrlFromPath(fpath, baseurl = "/") {
+    let url = path.relative(".", fpath).replace(/\\/g, "/").trim();
+    url = path.posix.resolve(baseurl, url).trim();
+    return url;
+}
+exports.getUrlFromPath = getUrlFromPath;
 //# sourceMappingURL=utils.js.map
