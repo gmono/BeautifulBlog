@@ -176,7 +176,7 @@ async function generate(configname:string="default",verbose=false,refresh=false)
     walker.on("file",async (base,name,next)=>{
         //这里应该过滤后缀名（目前允许txt md 以后应该以transformer声明的为主)
         //由于此处原因导致generate漏文件，生成不全 原因不明
-        if(allowFileExts.indexOf(path.parse(name.name).ext)==-1){
+        if(allowFileExts.indexOf(path.parse(name.name).ext.trim())==-1){
             next()
             return;
             //跳过
