@@ -5,10 +5,12 @@ import IContextInfo from './IContextInfo';
 
 
 export default interface ISiteHooks{
-    init(context:IContextInfo);
-    OnSiteChanged();
-    //全部重新生成
-    OnAllGenerated();
-    //增删改
-    OnArticleChange(type:"change"|"add"|"remove",changelist:IContentMeta[]);
+    //执行changesit装载此site后触发，只有loaded的site才会被触发其他事件
+    loaded(context:IContextInfo);
+    //文章重新生成 
+    generated(context:IContextInfo);
+    //文章增删改并生成内容后 dest为目标文章生成地址（不带后缀名)
+    //此事件并不会在new命令执行时触发，而是在watch或sync监视到改动并同步到content后触发
+    articleChanged(context:IContextInfo,type:"change"|"add"|"remove",dest:string);
+    //
 }
