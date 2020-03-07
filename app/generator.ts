@@ -128,6 +128,9 @@ async function generate(configname:string="default",verbose=false,refresh=false)
     }
     /////
     const config=(await fs.readJSON(`./config/${configname}.json`))as IConfig;
+    //获取允许的所有文件类型
+    const allowFileExts=await getAllowFileExts();
+    
     //主函数
     let walker=walk.walk("./articles");
     //文件表 key:元数据路径  value:文章标题  key相对于content目录 后期考虑换为 相对于base_url的路径
@@ -170,8 +173,7 @@ async function generate(configname:string="default",verbose=false,refresh=false)
     }
     await Promise.all(dtasks) //等待所有任务完成
 
-    //获取允许的所有文件类型
-    const allowFileExts=await getAllowFileExts();
+    
     //转换每个文件
     walker.on("file",async (base,name,next)=>{
         //这里应该过滤后缀名（目前允许txt md 以后应该以transformer声明的为主)

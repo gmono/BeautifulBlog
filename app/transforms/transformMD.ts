@@ -34,6 +34,7 @@ function htmlProcessing(html:string):string{
 let first=true;
 let baseurl="/";
 async function transformMD(filepath:string,destpath:string,config:IConfig,globalconfig:IGlobalConfig,...args):Promise<TransformResult>{
+  
     if(first) {
       //加载配置文件并加载语法高亮
       

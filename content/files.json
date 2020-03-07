@@ -1,6 +1,41 @@
 {
-	"useConfig": "origin",
+	"useConfig": "default",
 	"fileList": {
+		"/BeautifulBlog/content/about.json": {
+			"title": "关于博客",
+			"article_path": "./articles/about.md",
+			"filesDir_url": "/BeautifulBlog/content/about.dir"
+		},
+		"/BeautifulBlog/content/ceshi.json": {
+			"title": "ceshi",
+			"article_path": "./articles/ceshi.pdf",
+			"filesDir_url": "/BeautifulBlog/content/ceshi.dir"
+		},
+		"/BeautifulBlog/content/helloaaa.json": {
+			"title": "helloaaa",
+			"article_path": "./articles/helloaaa.md",
+			"filesDir_url": "/BeautifulBlog/content/helloaaa.dir"
+		},
+		"/BeautifulBlog/content/helloaaaa.json": {
+			"title": "helloaaaa",
+			"article_path": "./articles/helloaaaa.md",
+			"filesDir_url": "/BeautifulBlog/content/helloaaaa.dir"
+		},
+		"/BeautifulBlog/content/tttt.json": {
+			"title": "tttt",
+			"article_path": "./articles/tttt.md",
+			"filesDir_url": "/BeautifulBlog/content/tttt.dir"
+		},
+		"/BeautifulBlog/content/测试.json": {
+			"title": "标题\r",
+			"article_path": "./articles/测试.txt",
+			"filesDir_url": "/BeautifulBlog/content/测试.dir"
+		},
+		"/BeautifulBlog/content/testss/hhh.json": {
+			"title": "hhh",
+			"article_path": "./articles/testss/hhh.md",
+			"filesDir_url": "/BeautifulBlog/content/testss/hhh.dir"
+		},
 		"/BeautifulBlog/content/testdl/testmd.json": {
 			"title": "关于博客asdfasdfasd",
 			"article_path": "./articles/testdl/testmd.md",
