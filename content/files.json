@@ -1,5 +1,5 @@
 {
-	"useConfig": "default",
+	"useConfig": "origin",
 	"fileList": {
 		"/BeautifulBlog/content/about.json": {
 			"title": "关于博客",

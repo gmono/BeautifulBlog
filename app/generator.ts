@@ -88,6 +88,7 @@ import * as format from "dateformat"
 import { IConfig } from "./Interface/IConfig";
 import { IFiles } from './Interface/IFiles';
 import { getAllowFileExts, getFilesDir,transformFile } from './transform';
+import * as ld from 'lodash';
 import del = require("del");
 
 /**
@@ -130,7 +131,7 @@ async function generate(configname:string="default",verbose=false,refresh=false)
     const config=(await fs.readJSON(`./config/${configname}.json`))as IConfig;
     //获取允许的所有文件类型
     const allowFileExts=await getAllowFileExts();
-    
+
     //主函数
     let walker=walk.walk("./articles");
     //文件表 key:元数据路径  value:文章标题  key相对于content目录 后期考虑换为 相对于base_url的路径
@@ -174,6 +175,12 @@ async function generate(configname:string="default",verbose=false,refresh=false)
     await Promise.all(dtasks) //等待所有任务完成
 
     
+    //生成有记录文件表
+    const recordedFiles=ld.map(files.fileList,(value,key,col)=>{
+        return path.resolve(value.article_path);
+    })
+    //文件记录查询函数
+    const isRecorded=(articlepath:string)=>recordedFiles.includes(path.resolve(articlepath));
     //转换每个文件
     walker.on("file",async (base,name,next)=>{
         //这里应该过滤后缀名（目前允许txt md 以后应该以transformer声明的为主)
@@ -203,7 +210,7 @@ async function generate(configname:string="default",verbose=false,refresh=false)
         };
 
         /**
-         * 把当前文件记录到记录到files.json
+         * 内部函数，把当前文件记录到记录到files.json
          * @param title 文章标题（一般从元数据中获取或从文章中提取）
          */
         let CurrFileRecordToFiles=(title:string)=>{
@@ -220,8 +227,15 @@ async function generate(configname:string="default",verbose=false,refresh=false)
             }
         }
 
-        //前缀选择写法 加功能专用
+        /** 
+        * 这里需要确保如下原则：
+        * * 如果refresh设为true则直接调用generate生成每篇文章
+        * * 除此之外，保证只有在files列表中的文件（有记录文件）才考虑是否复用，否则直接重新生成
+        * 因此使用如下两个前置检查条件
+        */
         if(refresh) await generate();
+        else
+        if(!isRecorded(articlepath)) await generate();
         else
         //获取articles的时间戳 如果不存在或不同就生成并写入元数据到files.json
         if(await fs.pathExists(confpath)){
