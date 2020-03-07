@@ -3,6 +3,7 @@ const transform_1 = require("../transform");
 const fse = require("fs-extra");
 const template = require("art-template");
 const path = require("path");
+const dateFormat = require("dateformat");
 async function transformTXT(filepath, destpath, config, globalconfig, ...args) {
     //转换txt文件到html txt如果没有yaml的元数据则把第一行当作标题其余元数据为null
     //txt文件的meta由同名yaml提供
@@ -47,6 +48,15 @@ module.exports = {
     },
     init() {
         console.log("作者:上清");
+    },
+    async templateContent(title, date) {
+        //返回模板
+        const str = template(path.resolve(__dirname, "../../static/transformer_files/md.md"), {
+            title: title,
+            date: dateFormat(date, "yyyy-mm-dd hh:MM:ss"),
+            simple: "模板内容"
+        });
+        return Buffer.from(str);
     }
 };
 //# sourceMappingURL=transformTXT.js.map

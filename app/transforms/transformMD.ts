@@ -34,7 +34,7 @@ function htmlProcessing(html:string):string{
 let first=true;
 let baseurl="/";
 async function transformMD(filepath:string,destpath:string,config:IConfig,globalconfig:IGlobalConfig,...args):Promise<TransformResult>{
-  
+
     if(first) {
       //加载配置文件并加载语法高亮
       
@@ -96,5 +96,14 @@ export=<TransformerExports>[{
   },
   init(){
     console.log("作者:上清");
+  },
+  async templateContent(title,date){
+    //返回模板
+    const str= template(path.resolve(__dirname,"../../static/transformer_files/md.md"),{
+      title:title,
+      date:JSON.stringify(date),
+      simple:"模板内容"
+    });
+    return Buffer.from(str);
   }
 }]

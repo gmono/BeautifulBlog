@@ -16,6 +16,7 @@ export interface TransformResult
 
 export type TransformFunc=((filepath:string,destpath:string,config:IConfig,globalconfig:IGlobalConfig,...args)=>Promise<TransformResult>);
 
+
 /**
  * 转换器导出接口
  * 规定所有transformer导出均以export={} 形式 而不以 export default 和 export xxx形式
@@ -30,6 +31,8 @@ export interface ITransformer{
       name:string;
       description:string;
     };
+    //返回模板内容
+    templateContent?(title:string,date:Date):Promise<Buffer>;
     //扩展的初始化函数 在加载时调用
     init():Promise<void>;
 }
