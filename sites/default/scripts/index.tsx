@@ -314,8 +314,10 @@ let Page=(<ScrollWidthContainer>
     <h1 style={{
         margin:"0",
         marginBottom:"1rem",
-        padding:"2rem"
-    }}>我的博客</h1>
+        padding:"2rem",
+        position:"sticky"
+    }}>我的博客</h1> 
+    <h3 style={{fontStyle:"italic",position:"sticky"}}></h3>
     <hr style={{marginBottom:"30px"}}></hr>
     <ArticleList filesPath="../content/files.json" />
 </ScrollWidthContainer>);

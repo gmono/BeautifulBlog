@@ -344,8 +344,10 @@ var Page = (React.createElement(ScrollWidthContainer, null,
     React.createElement("h1", { style: {
             margin: "0",
             marginBottom: "1rem",
-            padding: "2rem"
+            padding: "2rem",
+            position: "sticky"
         } }, "\u6211\u7684\u535A\u5BA2"),
+    React.createElement("h3", { style: { fontStyle: "italic", position: "sticky" } }),
     React.createElement("hr", { style: { marginBottom: "30px" } }),
     React.createElement(ArticleList, { filesPath: "../content/files.json" })));
 ReactDOM.render(Page, document.querySelector("#page"));
