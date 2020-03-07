@@ -144,14 +144,14 @@ class ArticleItem extends React.Component<ArticleInfo,ArticleItemState>{
             }} 
             summary="加载中......" 
             OnTitleClick={()=>{}} 
-            OnSummaryClick={this.summarySwitch.bind(this)}
+            OnSummaryClick={()=>{}}
             isExpanded={this.state.isExpanded} />)
-        }
+        } 
         else{
             return (
             <Item info={this.state.info} summary={this.state.html}
-            OnTitleClick={this.enterArticle.bind(this)} 
-            OnSummaryClick={this.summarySwitch.bind(this)}
+            OnTitleClick={this.summarySwitch.bind(this)} 
+            OnSummaryClick={()=>{}}
             isExpanded={this.state.isExpanded}
             />)
         }

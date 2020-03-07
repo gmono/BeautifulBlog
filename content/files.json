@@ -1,5 +1,5 @@
 {
-	"useConfig": "origin",
+	"useConfig": "default",
 	"fileList": {
 		"/BeautifulBlog/content/about.json": {
 			"title": "关于博客",
@@ -20,6 +20,11 @@
 			"title": "helloaaaa",
 			"article_path": "./articles/helloaaaa.md",
 			"filesDir_url": "/BeautifulBlog/content/helloaaaa.dir"
+		},
+		"/BeautifulBlog/content/ts.json": {
+			"title": "ceshi\r",
+			"article_path": "./articles/ts.txt",
+			"filesDir_url": "/BeautifulBlog/content/ts.dir"
 		},
 		"/BeautifulBlog/content/tttt.json": {
 			"title": "tttt",

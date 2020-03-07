@@ -189,10 +189,10 @@ var ArticleItem = /** @class */ (function (_super) {
                     article_path: "未知",
                     from_dir: [],
                     modify_time: new Date()
-                }, summary: "\u52A0\u8F7D\u4E2D......", OnTitleClick: function () { }, OnSummaryClick: this.summarySwitch.bind(this), isExpanded: this.state.isExpanded }));
+                }, summary: "\u52A0\u8F7D\u4E2D......", OnTitleClick: function () { }, OnSummaryClick: function () { }, isExpanded: this.state.isExpanded }));
         }
         else {
-            return (React.createElement(Item, { info: this.state.info, summary: this.state.html, OnTitleClick: this.enterArticle.bind(this), OnSummaryClick: this.summarySwitch.bind(this), isExpanded: this.state.isExpanded }));
+            return (React.createElement(Item, { info: this.state.info, summary: this.state.html, OnTitleClick: this.summarySwitch.bind(this), OnSummaryClick: function () { }, isExpanded: this.state.isExpanded }));
         }
     };
     return ArticleItem;
