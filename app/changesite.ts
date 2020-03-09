@@ -25,7 +25,11 @@ import  {mkdir}  from "fs-extra";
 import * as path from "path"
 async function changesite(sitename:string){
     
-    
+    //事件相关
+    const changesiteHook=changedSite();
+    //执行此前的before
+    await changesiteHook.next();
+
     let spath=path.resolve("./sites",sitename);
     let dpath="./nowSite"
     // console.log(spath,dpath)
@@ -39,12 +43,18 @@ async function changesite(sitename:string){
         },(err)=>{
     
             err&&(console.log("切换失败:",err),j(err));
-            err||(console.log("切换完成"),r())
+            err||(async ()=>{
+                console.log("切换完成");
+                //调用loaded钩子
+                await changesiteHook.next();
+                r()
+            })();
         })
     })
     
 }
 import * as fs from "fs-extra"
+import { changedSite } from './hooks';
 //按照配置的来复制
 if(require.main==module){
     

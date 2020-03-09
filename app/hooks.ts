@@ -13,6 +13,9 @@ import * as path from 'path';
  * 功能如下：
  * * 自动生成context并调用nowSite的hooks.js文件
  * * 自动让hook函数在其本目录下运行
+ * 目前设定 由changesite程序调用changedSite钩子(watting test)
+ *          由generator程序在refresh为true时，重新生成后调用refresh(watting test)
+ *          由watch程序监视到改动时调用generated钩子(watting test)
  */
 
 
@@ -53,10 +56,8 @@ const getNowSiteHooks=cached(():ISiteHooks=>{
 
 /**
  * 切换网站完成后调用
- * @param oldsitename 之前要切换走的site
- * @param sitename 新load的网站名
  */
-export async function *changedSite(oldsitename:string,sitename:string){
+export async function *changedSite(){
 
     //调用之前site的beforeUnload钩子
     //调用新site的loaded钩子
@@ -78,7 +79,7 @@ export async function *changedSite(oldsitename:string,sitename:string){
   * 重新生成所有内容时调用
   * 
   */
-export async function refresh(){
+export async function afterRefresh(){
     const ctx=await getContext();
     const obj=getNowSiteHooks();
     await runInDir("./nowSite",()=>{
@@ -118,7 +119,7 @@ export async function changed(articlepath:string,destpath:string){
 
 if(require.main==module){
     (async ()=>{
-        let obj=changedSite("default","default");
+        let obj=changedSite();
         await obj.next();
         console.log("执行完毕");
         await obj.next();

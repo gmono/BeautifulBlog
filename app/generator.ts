@@ -90,7 +90,7 @@ import { IFiles } from './Interface/IFiles';
 import { getAllowFileExts, getFilesDir,transformFile } from './transform';
 import * as ld from 'lodash';
 import del = require("del");
-
+import {afterRefresh} from "./hooks"
 /**
  * 
  * @param articlemeta 元信息
@@ -256,17 +256,26 @@ async function generate(configname:string="default",verbose=false,refresh=false)
         
         next();
     });
-    walker.on("end",async ()=>{
-        //写入files.json
-        //如果已经存在就先删除
-
-        if(await fs.pathExists(filesjsonpath)){
-            await del(filesjsonpath);
-        }
-        //确定是这里导致的已存在的files.json消失
-        await fs.writeFile(filesjsonpath,JSON.stringify(files,null,"\t"));
-        console.log("生成完毕");
-    })
+    //等待写入完成，并调用钩子
+    return new Promise<void>((resolve,reject)=>{
+        walker.on("end",async ()=>{
+            //写入files.json
+            //如果已经存在就先删除
+    
+            if(await fs.pathExists(filesjsonpath)){
+                await del(filesjsonpath);
+            }
+            //确定是这里导致的已存在的files.json消失
+            await fs.writeFile(filesjsonpath,JSON.stringify(files,null,"\t"));
+            console.log("生成完毕");
+            //调用钩子
+            if(refresh){
+                await afterRefresh();
+            }
+            resolve();
+        })
+    });
+    
     
 }
 if(require.main==module){

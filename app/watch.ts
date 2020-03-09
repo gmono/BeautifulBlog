@@ -31,6 +31,10 @@ export default async function watchArticles(configname:string="default"){
         console.clear();
         console.log(`${msgtype}:${f}`);
         await generateFiles(configname);
+        //生成文章完毕 调用文章修改钩子
+        //合成destpath
+        const dest=pathMap(f,"./articles","./content");
+        await changed(f,dest);
     }
     mon.on("changed",async (f:string,curr,prev)=>{
         await refresh(f,curr,"更改");
@@ -47,6 +51,8 @@ import * as pe from "path-extra"
 import * as fse from "fs-extra"
 import changesite from './changesite';
 import { EventEmitter } from "events";
+import { changed } from "./hooks";
+import { pathMap } from './lib/utils';
 /**
  * 监控指定site，如果有改动就自动复制到nowSite（实际上一开始是先删除再建立再复制为保证完整性） 
  * @param sitename 网站名字

@@ -11,6 +11,9 @@ const fse = require("fs-extra");
  * 功能如下：
  * * 自动生成context并调用nowSite的hooks.js文件
  * * 自动让hook函数在其本目录下运行
+ * 目前设定 由changesite程序调用changedSite钩子(watting test)
+ *          由generator程序在refresh为true时，重新生成后调用refresh(watting test)
+ *          由watch程序监视到改动时调用generated钩子(watting test)
  */
 /**
  * 获取上下文信息对象
@@ -41,10 +44,8 @@ const getNowSiteHooks = utils_1.cached(() => {
  */
 /**
  * 切换网站完成后调用
- * @param oldsitename 之前要切换走的site
- * @param sitename 新load的网站名
  */
-async function* changedSite(oldsitename, sitename) {
+async function* changedSite() {
     //调用之前site的beforeUnload钩子
     //调用新site的loaded钩子
     const ctx = await getContext();
@@ -66,14 +67,14 @@ exports.changedSite = changedSite;
  * 重新生成所有内容时调用
  *
  */
-async function refresh() {
+async function afterRefresh() {
     const ctx = await getContext();
     const obj = getNowSiteHooks();
     await utils_1.runInDir("./nowSite", () => {
         obj.generated(ctx);
     });
 }
-exports.refresh = refresh;
+exports.afterRefresh = afterRefresh;
 /**
  * 声明某个文章更改 可以是增删改
  * 程序自动合成判断类型
@@ -107,7 +108,7 @@ async function changed(articlepath, destpath) {
 exports.changed = changed;
 if (require.main == module) {
     (async () => {
-        let obj = changedSite("default", "default");
+        let obj = changedSite();
         await obj.next();
         console.log("执行完毕");
         await obj.next();

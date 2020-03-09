@@ -76,6 +76,7 @@ const fs = require("fs-extra");
 const transform_1 = require("./transform");
 const ld = require("lodash");
 const del = require("del");
+const hooks_1 = require("./hooks");
 /**
  *
  * @param articlemeta 元信息
@@ -234,15 +235,23 @@ async function generate(configname = "default", verbose = false, refresh = false
             await generate(); //如果元数据不存在则生成并自动记录到files.json
         next();
     });
-    walker.on("end", async () => {
-        //写入files.json
-        //如果已经存在就先删除
-        if (await fs.pathExists(filesjsonpath)) {
-            await del(filesjsonpath);
-        }
-        //确定是这里导致的已存在的files.json消失
-        await fs.writeFile(filesjsonpath, JSON.stringify(files, null, "\t"));
-        console.log("生成完毕");
+    //等待写入完成，并调用钩子
+    return new Promise((resolve, reject) => {
+        walker.on("end", async () => {
+            //写入files.json
+            //如果已经存在就先删除
+            if (await fs.pathExists(filesjsonpath)) {
+                await del(filesjsonpath);
+            }
+            //确定是这里导致的已存在的files.json消失
+            await fs.writeFile(filesjsonpath, JSON.stringify(files, null, "\t"));
+            console.log("生成完毕");
+            //调用钩子
+            if (refresh) {
+                await hooks_1.afterRefresh();
+            }
+            resolve();
+        });
     });
 }
 if (require.main == module) {

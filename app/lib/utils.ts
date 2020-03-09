@@ -97,6 +97,18 @@ export function getUrlFromPath(fpath:string,baseurl:string="/"){
     return url;
 }
 
+/**
+ * 对path进行同构映射
+ * @param srcpath 源地址，比如文件地址
+ * @param base 源地址的base目录，可以是任何一级
+ * @param newbase 用于替换的新base
+ */
+export function pathMap(srcpath:string,base:string,newbase:string){
+    const rel=path.relative(base,srcpath);
+    const npath=path.resolve(newbase,rel);
+    return npath;
+}
+
 
 ///高阶函数区域
 

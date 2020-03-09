@@ -30,6 +30,10 @@ async function watchArticles(configname = "default") {
         console.clear();
         console.log(`${msgtype}:${f}`);
         await generateFiles(configname);
+        //生成文章完毕 调用文章修改钩子
+        //合成destpath
+        const dest = utils_1.pathMap(f, "./articles", "./content");
+        await hooks_1.changed(f, dest);
     };
     mon.on("changed", async (f, curr, prev) => {
         await refresh(f, curr, "更改");
@@ -45,6 +49,8 @@ exports.default = watchArticles;
 const path = require("path");
 const fse = require("fs-extra");
 const changesite_1 = require("./changesite");
+const hooks_1 = require("./hooks");
+const utils_1 = require("./lib/utils");
 /**
  * 监控指定site，如果有改动就自动复制到nowSite（实际上一开始是先删除再建立再复制为保证完整性）
  * @param sitename 网站名字

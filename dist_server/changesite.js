@@ -13,6 +13,10 @@ const del = require("del");
 const fs_extra_1 = require("fs-extra");
 const path = require("path");
 async function changesite(sitename) {
+    //事件相关
+    const changesiteHook = hooks_1.changedSite();
+    //执行此前的before
+    await changesiteHook.next();
     let spath = path.resolve("./sites", sitename);
     let dpath = "./nowSite";
     // console.log(spath,dpath)
@@ -25,11 +29,17 @@ async function changesite(sitename) {
             cover: true
         }, (err) => {
             err && (console.log("切换失败:", err), j(err));
-            err || (console.log("切换完成"), r());
+            err || (async () => {
+                console.log("切换完成");
+                //调用loaded钩子
+                await changesiteHook.next();
+                r();
+            })();
         });
     });
 }
 const fs = require("fs-extra");
+const hooks_1 = require("./hooks");
 //按照配置的来复制
 if (require.main == module) {
     let config = fs.readJsonSync("./config/default.json");

@@ -96,6 +96,18 @@ function getUrlFromPath(fpath, baseurl = "/") {
     return url;
 }
 exports.getUrlFromPath = getUrlFromPath;
+/**
+ * 对path进行同构映射
+ * @param srcpath 源地址，比如文件地址
+ * @param base 源地址的base目录，可以是任何一级
+ * @param newbase 用于替换的新base
+ */
+function pathMap(srcpath, base, newbase) {
+    const rel = path.relative(base, srcpath);
+    const npath = path.resolve(newbase, rel);
+    return npath;
+}
+exports.pathMap = pathMap;
 ///高阶函数区域
 const equal = require("fast-deep-equal");
 const ld = require("lodash");
