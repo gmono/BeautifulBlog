@@ -1,5 +1,5 @@
 import IContextInfo from './Interface/IContextInfo';
-import { readConfig, readGlobalConfig, cached, runInDir } from './lib/utils';
+import { readConfig, readGlobalConfig, cached, runInDir, changeExt } from './lib/utils';
 import ISiteHooks from './Interface/ISiteHooks';
 import { BehaviorSubject } from 'rxjs';
 import * as fse from 'fs-extra';
@@ -35,7 +35,7 @@ const getContext=cached(async (configname?:string)=>
 const getNowSiteHooks=cached(():ISiteHooks=>{
     //加载nowsite的hooks.js文件并得到其导出的ISiteHooks接口对象
     //统一使用export={} 方式导出
-    let obj=require("../nowSite/hooks") as ISiteHooks;
+    let obj=require("../nowSite/hooks.js") as ISiteHooks;
     return obj;
 });
 
@@ -53,14 +53,25 @@ const getNowSiteHooks=cached(():ISiteHooks=>{
 
 /**
  * 切换网站完成后调用
+ * @param oldsitename 之前要切换走的site
  * @param sitename 新load的网站名
  */
-export async function changedSite(sitename:string){
-    //在其本目录调用loaded钩子
+export async function *changedSite(oldsitename:string,sitename:string){
+
+    //调用之前site的beforeUnload钩子
+    //调用新site的loaded钩子
     const ctx=await getContext();
     const obj=getNowSiteHooks();
-    runInDir("./nowSite",()=>{
-        obj.loaded(ctx);
+    await runInDir("./nowSite",()=>{
+        obj.beforeUnload(ctx);
+    });
+    //等待执行切换site操作 执行以一个await next执行上面的部分
+    //执行第二个await next执行下面的部分
+    yield;
+    //切换site操作结束
+    const newobj=getNowSiteHooks();
+    await runInDir("./nowSite",()=>{
+        newobj.loaded(ctx);
     })
 }
  /**
@@ -70,7 +81,7 @@ export async function changedSite(sitename:string){
 export async function refresh(){
     const ctx=await getContext();
     const obj=getNowSiteHooks();
-    runInDir("./nowSite",()=>{
+    await runInDir("./nowSite",()=>{
         obj.generated(ctx);
     })
 }
@@ -87,8 +98,29 @@ export async function changed(articlepath:string,destpath:string){
     //destpath件信息中 修改时间与创建时间一致 为创建，destpath不存在 为删除
     //如果destpath的信息中 修改时间与创建时间不一致为修改
     //destpath取元数据文件和html为观察对象
-    const info=await fse.stat(`${path.resolve(destpath)}.json`);
-    runInDir("./nowSite",()=>{
-        //obj.articleChanged(ctx)
+    
+    //元数据文件地址
+    const f=changeExt(destpath,".json");
+    //参数类型定义
+    type param=Parameters<typeof obj.articleChanged>[1];
+    let tp:param=null;
+    if(!(await fse.pathExists(f))) tp="remove";
+    else{
+        const info=await fse.stat(f);
+        if(info.ctimeMs==info.mtimeMs) tp="add";
+        else tp="change";
+    }
+    await runInDir("./nowSite",()=>{
+        //dest为不带后缀名的地址
+        obj.articleChanged(ctx,tp,changeExt(destpath,""));
     })
+}
+
+if(require.main==module){
+    (async ()=>{
+        let obj=changedSite("default","default");
+        await obj.next();
+        console.log("执行完毕");
+        await obj.next();
+    })();
 }

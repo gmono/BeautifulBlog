@@ -1,11 +1,10 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 //钩子系统 会被server端程序调用 当
 var Hooks = /** @class */ (function () {
     function Hooks() {
     }
-    Hooks.prototype.unloaded = function (context) {
-        throw new Error("Method not implemented.");
+    Hooks.prototype.beforeUnload = function (context) {
+        console.log(context);
     };
     Hooks.prototype.install = function (context, installName) {
         throw new Error("Method not implemented.");
@@ -24,4 +23,4 @@ var Hooks = /** @class */ (function () {
     };
     return Hooks;
 }());
-exports.default = new Hooks();
+module.exports = new Hooks();

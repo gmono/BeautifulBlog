@@ -13,7 +13,7 @@ export default interface ISiteHooks{
     //此事件并不会在new命令执行时触发，而是在watch或sync监视到改动并同步到content后触发
     articleChanged(context:IContextInfo,type:"change"|"add"|"remove",dest:string);
     //切换到其他site前调用
-    unloaded(context:IContextInfo);
+    beforeUnload(context:IContextInfo);
 
     //以下为备用的插件式安装和卸载site到sites目录时调用
     install(context:IContextInfo,installName:string);

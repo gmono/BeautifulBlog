@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("./lib/utils");
 const fse = require("fs-extra");
-const path = require("path");
 /**
  * site事件钩子调用代理
  * 所有程序通过给此程序通知事件，借由此程序调用对应site的事件钩子
@@ -30,7 +29,7 @@ const getContext = utils_1.cached(async (configname) => {
 const getNowSiteHooks = utils_1.cached(() => {
     //加载nowsite的hooks.js文件并得到其导出的ISiteHooks接口对象
     //统一使用export={} 方式导出
-    let obj = require("../nowSite/hooks");
+    let obj = require("../nowSite/hooks.js");
     return obj;
 });
 //代理函数部分
@@ -42,14 +41,24 @@ const getNowSiteHooks = utils_1.cached(() => {
  */
 /**
  * 切换网站完成后调用
+ * @param oldsitename 之前要切换走的site
  * @param sitename 新load的网站名
  */
-async function changedSite(sitename) {
-    //在其本目录调用loaded钩子
+async function* changedSite(oldsitename, sitename) {
+    //调用之前site的beforeUnload钩子
+    //调用新site的loaded钩子
     const ctx = await getContext();
     const obj = getNowSiteHooks();
-    utils_1.runInDir("./nowSite", () => {
-        obj.loaded(ctx);
+    await utils_1.runInDir("./nowSite", () => {
+        obj.beforeUnload(ctx);
+    });
+    //等待执行切换site操作 执行以一个await next执行上面的部分
+    //执行第二个await next执行下面的部分
+    yield;
+    //切换site操作结束
+    const newobj = getNowSiteHooks();
+    await utils_1.runInDir("./nowSite", () => {
+        newobj.loaded(ctx);
     });
 }
 exports.changedSite = changedSite;
@@ -60,7 +69,7 @@ exports.changedSite = changedSite;
 async function refresh() {
     const ctx = await getContext();
     const obj = getNowSiteHooks();
-    utils_1.runInDir("./nowSite", () => {
+    await utils_1.runInDir("./nowSite", () => {
         obj.generated(ctx);
     });
 }
@@ -78,10 +87,30 @@ async function changed(articlepath, destpath) {
     //destpath件信息中 修改时间与创建时间一致 为创建，destpath不存在 为删除
     //如果destpath的信息中 修改时间与创建时间不一致为修改
     //destpath取元数据文件和html为观察对象
-    const info = await fse.stat(`${path.resolve(destpath)}.json`);
-    utils_1.runInDir("./nowSite", () => {
-        //obj.articleChanged(ctx)
+    //元数据文件地址
+    const f = utils_1.changeExt(destpath, ".json");
+    let tp = null;
+    if (!(await fse.pathExists(f)))
+        tp = "remove";
+    else {
+        const info = await fse.stat(f);
+        if (info.ctimeMs == info.mtimeMs)
+            tp = "add";
+        else
+            tp = "change";
+    }
+    await utils_1.runInDir("./nowSite", () => {
+        //dest为不带后缀名的地址
+        obj.articleChanged(ctx, tp, utils_1.changeExt(destpath, ""));
     });
 }
 exports.changed = changed;
+if (require.main == module) {
+    (async () => {
+        let obj = changedSite("default", "default");
+        await obj.next();
+        console.log("执行完毕");
+        await obj.next();
+    })();
+}
 //# sourceMappingURL=hooks.js.map

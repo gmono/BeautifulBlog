@@ -3,8 +3,8 @@ import IContextInfo from '../../app/Interface/IContextInfo';
 //钩子系统 会被server端程序调用 当
 
 class Hooks implements ISiteHooks{
-    unloaded(context: IContextInfo) {
-        throw new Error("Method not implemented.");
+    beforeUnload(context: IContextInfo) {
+        console.log(context);
     }
     install(context: IContextInfo, installName: string) {
         throw new Error("Method not implemented.");
@@ -27,4 +27,4 @@ class Hooks implements ISiteHooks{
 
 }
 
-export default new Hooks();
+export =new Hooks();
