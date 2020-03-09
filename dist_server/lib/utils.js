@@ -96,4 +96,45 @@ function getUrlFromPath(fpath, baseurl = "/") {
     return url;
 }
 exports.getUrlFromPath = getUrlFromPath;
+///高阶函数区域
+const equal = require("fast-deep-equal");
+const ld = require("lodash");
+/**
+ * 包装函数，在参数与上次相同时返回上一次结果不调用函数
+ * 注意为了提高性能，本函数并不对result进行deepClone缓存，返回值不可修改否则将破坏一致性
+ * @param args 参数
+ */
+function cached(func) {
+    let hascalled = false;
+    let oldresult = null;
+    let oldargs = null;
+    return (...args) => {
+        if (!hascalled || oldargs !== args || !equal(args, oldargs)) {
+            oldresult = func(...args);
+            oldargs = ld.cloneDeep(args);
+            return oldresult;
+        }
+    };
+}
+exports.cached = cached;
+/**
+ * 包装函数，让同一参数只调用一次函数
+ * 注意由于技术所限本函数不会像cached一样进行deepClone和deepEqual比较
+ * 注意为了提高性能，本函数并不对result进行deepClone缓存，返回值不可修改否则将破坏一致性
+ * @param func 要包装的函数
+ */
+function mapCached(func) {
+    let args_resultMap = new Map();
+    return (...args) => {
+        if (args_resultMap.has(args)) {
+            return args_resultMap.get(args);
+        }
+        else {
+            let res = func(...args);
+            args_resultMap.set(args, res);
+            return res;
+        }
+    };
+}
+exports.mapCached = mapCached;
 //# sourceMappingURL=utils.js.map

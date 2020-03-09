@@ -1,33 +1,44 @@
 import IContextInfo from './Interface/IContextInfo';
-import { readConfig, readGlobalConfig } from './lib/utils';
+import { readConfig, readGlobalConfig, cached, runInDir } from './lib/utils';
 import ISiteHooks from './Interface/ISiteHooks';
+import { BehaviorSubject } from 'rxjs';
+import * as fse from 'fs-extra';
+import * as path from 'path';
 /**
  * site事件钩子调用代理
  * 所有程序通过给此程序通知事件，借由此程序调用对应site的事件钩子
  * 此程序明确定义所有的事件类型和事件钩子类型 数据类型等
  * 
  * 本程序主要作用为对外提供事件触发机制
- * 自动生成context并调用nowSite的hooks.js文件
+ * 功能如下：
+ * * 自动生成context并调用nowSite的hooks.js文件
+ * * 自动让hook函数在其本目录下运行
  */
 
 
-
-async function getContext(configname:string)
+/**
+ * 获取上下文信息对象
+ * @param configname 当前使用的配置文件名，主要用于提供config参数
+ */
+const getContext=cached(async (configname?:string)=>
 {
     let ret=<IContextInfo>{
         node_version:process.version,
         version:"0.6-alpha",
-        config:await readConfig(configname),
+        config:configname==null?null:await readConfig(configname),
         globalConfig:await readGlobalConfig()
     }
     return ret;
-}
-function getNowSiteHooks():ISiteHooks{
+})
+
+//site hooks对象加载函数
+const getNowSiteHooks=cached(():ISiteHooks=>{
     //加载nowsite的hooks.js文件并得到其导出的ISiteHooks接口对象
     //统一使用export={} 方式导出
     let obj=require("../nowSite/hooks") as ISiteHooks;
     return obj;
-}
+});
+
 
 
 //代理函数部分
@@ -45,13 +56,23 @@ function getNowSiteHooks():ISiteHooks{
  * @param sitename 新load的网站名
  */
 export async function changedSite(sitename:string){
-    
+    //在其本目录调用loaded钩子
+    const ctx=await getContext();
+    const obj=getNowSiteHooks();
+    runInDir("./nowSite",()=>{
+        obj.loaded(ctx);
+    })
 }
  /**
+  * 重新生成所有内容时调用
   * 
   */
 export async function refresh(){
-
+    const ctx=await getContext();
+    const obj=getNowSiteHooks();
+    runInDir("./nowSite",()=>{
+        obj.generated(ctx);
+    })
 }
 /**
  * 声明某个文章更改 可以是增删改
@@ -60,5 +81,14 @@ export async function refresh(){
  * @param destpath 生成目的地址（不带后缀名）
  */
 export async function changed(articlepath:string,destpath:string){
-
+    const ctx=await getContext();
+    const obj=getNowSiteHooks();
+    //这里通过一些方法判断更改类型
+    //destpath件信息中 修改时间与创建时间一致 为创建，destpath不存在 为删除
+    //如果destpath的信息中 修改时间与创建时间不一致为修改
+    //destpath取元数据文件和html为观察对象
+    const info=await fse.stat(`${path.resolve(destpath)}.json`);
+    runInDir("./nowSite",()=>{
+        //obj.articleChanged(ctx)
+    })
 }

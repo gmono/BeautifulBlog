@@ -30,7 +30,7 @@
     "test": "node ./dist_server/testLib.js",
     "initBlog": "node ./dist_server/init.js",
     "pkgall": "pkg -t win,linux package.json -o ./bin/blog-release",
-    "pkg":"pkg package.json -o ./blog"
+    "pkg": "pkg package.json -o ./blog"
   },
   "author": "gmono",
   "license": "MIT",
@@ -63,6 +63,7 @@
     "del": "^5.1.0",
     "delay": "^4.3.0",
     "execa": "^4.0.0",
+    "fast-deep-equal": "^3.1.1",
     "front-matter": "^3.0.2",
     "fs-extra": "^8.1.0",
     "highlight": "^0.2.4",

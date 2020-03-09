@@ -4,15 +4,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Hooks = /** @class */ (function () {
     function Hooks() {
     }
-    Hooks.prototype.init = function (context) {
-    };
-    Hooks.prototype.OnSiteChanged = function () {
+    Hooks.prototype.unloaded = function (context) {
         throw new Error("Method not implemented.");
     };
-    Hooks.prototype.OnAllGenerated = function () {
+    Hooks.prototype.install = function (context, installName) {
         throw new Error("Method not implemented.");
     };
-    Hooks.prototype.OnArticleChange = function (type, changelist) {
+    Hooks.prototype.uninstall = function (context, installName) {
+        throw new Error("Method not implemented.");
+    };
+    Hooks.prototype.loaded = function (context) {
+        console.log(context);
+    };
+    Hooks.prototype.generated = function (context) {
+        console.log(context);
+    };
+    Hooks.prototype.articleChanged = function (context, type, dest) {
         throw new Error("Method not implemented.");
     };
     return Hooks;

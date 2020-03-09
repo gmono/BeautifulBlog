@@ -316,7 +316,7 @@ let Page=(<ScrollWidthContainer>
         marginBottom:"1rem",
         padding:"2rem",
         position:"sticky"
-    }}>我的博客</h1> 
+    }}>我的博客</h1>
     <h3 style={{fontStyle:"italic",position:"sticky"}}></h3>
     <hr style={{marginBottom:"30px"}}></hr>
     <ArticleList filesPath="../content/files.json" />

@@ -6,8 +6,8 @@ import { IGlobalConfig } from './IGlobalConfig';
 export default interface IContextInfo{
     version:string;
     node_version:string;
-    //当前使用的配置文件
-    config:IConfig;
+    //当前使用的配置文件 在site装载 卸载 安装时没有此项
+    config?:IConfig;
     //全局配置文件
     globalConfig:IGlobalConfig;
 }

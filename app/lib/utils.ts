@@ -3,6 +3,7 @@ import { IConfig } from '../Interface/IConfig';
 import path = require("path");
 import * as walk from "walk"
 import { IGlobalConfig } from '../Interface/IGlobalConfig';
+import { deepEqual } from 'assert';
 
 export function readConfig(name:string){
     return fse.readJson(path.resolve(__dirname,`../../config/${name}.json`)) as Promise<IConfig>;
@@ -95,3 +96,51 @@ export function getUrlFromPath(fpath:string,baseurl:string="/"){
     url=path.posix.resolve(baseurl,url).trim();
     return url;
 }
+
+
+///高阶函数区域
+
+import * as equal from "fast-deep-equal"
+import * as ld from 'lodash';
+/**
+ * 包装函数，在参数与上次相同时返回上一次结果不调用函数
+ * 注意为了提高性能，本函数并不对result进行deepClone缓存，返回值不可修改否则将破坏一致性
+ * @param args 参数
+ */
+export function cached<T extends any[],R>(func:(...args:T)=>R):(...args:T)=>Readonly<R>{
+    let hascalled=false;
+    let oldresult=null;
+    let oldargs=null;
+    return (...args:T)=>{
+        if(!hascalled||oldargs!==args||!equal(args,oldargs))
+        {
+            oldresult=func(...args);
+            oldargs=ld.cloneDeep(args);
+            return oldresult;
+        }
+
+    }
+
+}
+
+/**
+ * 包装函数，让同一参数只调用一次函数
+ * 注意由于技术所限本函数不会像cached一样进行deepClone和deepEqual比较
+ * 注意为了提高性能，本函数并不对result进行deepClone缓存，返回值不可修改否则将破坏一致性
+ * @param func 要包装的函数
+ */
+export function mapCached<T extends any[],R>(func:(...args:T)=>R):(...args:T)=>Readonly<R>{
+    let args_resultMap=new Map<T,R>();
+    return (...args:T)=>{
+        if(args_resultMap.has(args)){
+            return args_resultMap.get(args);
+        }
+        else{
+            let res=func(...args);
+            args_resultMap.set(args,res);
+            return res;
+        }
+    }
+}
+
+
