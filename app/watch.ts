@@ -45,6 +45,7 @@ export default async function watchArticles(configname:string="default"){
     mon.on("removed",async (f:string,stat)=>{
         await refresh(f,stat,"删除");
     })
+
 }
 import * as path from "path"
 import * as pe from "path-extra"
