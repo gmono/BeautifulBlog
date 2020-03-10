@@ -274,6 +274,7 @@ class XScrollList extends React.Component<{children:any[]}>{
  * 等宽容器，其会将自己的height设置为与scrollWidth相同 进而使其内容物都可以有同样的宽度
  */
 class ScrollWidthContainer extends React.Component<{children:any[]}>{
+
     constructor(props){
         super(props);
     }
@@ -309,6 +310,53 @@ class ScrollWidthContainer extends React.Component<{children:any[]}>{
     }
 }
 
+type SummaryItemProps={title:string,summary:string,onClick:()=>any};
+class SummaryItem extends React.PureComponent<SummaryItemProps>{
+    constructor(props:SummaryItemProps){
+        super(props);
+    }
+    
+
+    render(){
+        return (<div style={{
+            padding:"8px"
+        }} onClick={this.props.onClick}>
+            <div id="title" style={{
+                fontSize:"1.5rem",
+                fontWeight:"bold",
+                marginBottom:"0.2rem",
+            }}>{this.props.title}</div>
+            <div id="summary" style={{
+                fontSize:"0.8em",
+                fontStyle:"italic",
+                color:"gray"
+            }}>{this.props.summary}</div>
+        </div>)
+    }
+}
+
+type SummaryListProps={filesInfo:IFiles,onClick:(key:string)=>any}
+class SummaryList extends React.PureComponent<SummaryListProps>{
+    constructor(props:SummaryListProps){
+        super(props);
+    }
+    getList(){
+        let itemlsit=[];
+        let lst=this.props.filesInfo.fileList;
+        for(let key in lst){
+            let item=lst[key];
+            itemlsit.push(<SummaryItem title={item.title} summary="" onClick={()=>{
+                //对外弹出事件
+                this.props.onClick(key);
+            }}></SummaryItem>)
+        }
+    }
+    render(){
+        return (<div>
+            {this.getList()}
+        </div>)
+    }
+}
 //暂时不适用上面的容器 性能问题 直接设置fixed
 let Page=(<ScrollWidthContainer>
     <h1 style={{

@@ -339,6 +339,53 @@ var ScrollWidthContainer = /** @class */ (function (_super) {
     };
     return ScrollWidthContainer;
 }(React.Component));
+var SummaryItem = /** @class */ (function (_super) {
+    __extends(SummaryItem, _super);
+    function SummaryItem(props) {
+        return _super.call(this, props) || this;
+    }
+    SummaryItem.prototype.render = function () {
+        return (React.createElement("div", { style: {
+                padding: "8px"
+            }, onClick: this.props.onClick },
+            React.createElement("div", { id: "title", style: {
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    marginBottom: "0.2rem",
+                } }, this.props.title),
+            React.createElement("div", { id: "summary", style: {
+                    fontSize: "0.8em",
+                    fontStyle: "italic",
+                    color: "gray"
+                } }, this.props.summary)));
+    };
+    return SummaryItem;
+}(React.PureComponent));
+var SummaryList = /** @class */ (function (_super) {
+    __extends(SummaryList, _super);
+    function SummaryList(props) {
+        return _super.call(this, props) || this;
+    }
+    SummaryList.prototype.getList = function () {
+        var _this = this;
+        var itemlsit = [];
+        var lst = this.props.filesInfo.fileList;
+        var _loop_1 = function (key) {
+            var item = lst[key];
+            itemlsit.push(React.createElement(SummaryItem, { title: item.title, summary: "", onClick: function () {
+                    //对外弹出事件
+                    _this.props.onClick(key);
+                } }));
+        };
+        for (var key in lst) {
+            _loop_1(key);
+        }
+    };
+    SummaryList.prototype.render = function () {
+        return (React.createElement("div", null, this.getList()));
+    };
+    return SummaryList;
+}(React.PureComponent));
 //暂时不适用上面的容器 性能问题 直接设置fixed
 var Page = (React.createElement(ScrollWidthContainer, null,
     React.createElement("h1", { style: {
