@@ -159,50 +159,22 @@ class ArticleItem extends React.Component<ArticleInfo,ArticleItemState>{
 }
 
 
-interface ArticleListProp{
-    //files.json 路径
-    filesPath:string;
-}
-class ArticleList extends React.Component<ArticleListProp,{
-    metalist:string[]
-}>
+
+class ArticleList extends React.Component<{metalist:string[]}>
 {
     constructor(props){
         super(props);
         
-        this.state={
-            metalist:[]
-        }
 
     }
-    async reload()
-    {
-        let r=await fetch(this.props.filesPath);
-        let f=await r.json() as IFiles;
-        let s=f.fileList;
-        let ss=[]
-        for(let k in s){
-            ss.push(k)
-        }
-        this.setState({
-            metalist:ss
-        });
-        //这里考虑加上加载完毕事件
-        //整体考虑使用mobx管理
-    }
-    componentDidMount(){
-        this.reload();
-    }
-    componentDidUpdate(prevprop,prevstate){
-        if(prevprop.filesPath!=this.props.filesPath){
-            this.reload();
-        }
-    }
+
     render()
     {
         return (
-            <XScrollList >
-                {this.state.metalist.map((v)=>{
+            <div style={{
+                whiteSpace:"nowrap"
+            }}>
+                {this.props.metalist.map((v)=>{
                     return <div key={v} style={{
                         display:"inline-block",
                         width:"80vw",
@@ -213,67 +185,19 @@ class ArticleList extends React.Component<ArticleListProp,{
                         }}/>
                     </div>
                 })}
-            </XScrollList>
-        )
-    }
-}
-
-
-class XScrollList extends React.Component<{children:any[]}>{
-    constructor(props){
-        super(props)
-    }
-
-    whell(e:WheelEvent){
-        if(e.target instanceof HTMLElement){
-            if(e.target == ReactDOM.findDOMNode(this.refs.mouse)){
-                e.preventDefault();
-                let ele=ReactDOM.findDOMNode(this.refs.top) as HTMLDivElement;
-                //默认150
-                let delta=e.deltaMode==1? e.deltaY*50:e.deltaMode==0? e.deltaY:150;
-                window.scroll(window.scrollX+e.deltaY,0);
-            }
-        }
-    }
-    componentDidMount(){
-        let ele=ReactDOM.findDOMNode(this.refs.mouse);
-        if(ele instanceof HTMLElement){
-            ele.addEventListener("wheel",this.whell.bind(this),{
-                capture:true,
-                passive:false
-            });
-        }
-    }
-    render(){
-        return (
-            <div ref="top" style={{
-                whiteSpace:"nowrap",
-                
-            }}>
-                <div ref="mouse" style={{
-                    position:"fixed",
-                    right:"0",
-                    bottom:"0",
-                    height:"200px",
-                    width:"200px",
-                    backgroundColor:"gray",
-                    display:"flex",
-                    justifyContent:"center",
-                    alignItems:"center"
-                    
-                }}><h2 style={{
-                    pointerEvents:"none"
-                }}>横向滚动区</h2></div>
-                {this.props.children}
             </div>
         )
     }
 }
 
+
+
+
 /**
  * 等宽容器，其会将自己的height设置为与scrollWidth相同 进而使其内容物都可以有同样的宽度
  */
-class ScrollWidthContainer extends React.Component<{children:any[]}>{
+class ScrollWidthContainer extends React.Component<{style?:React.CSSProperties,children:any[]}>{
+
     constructor(props){
         super(props);
     }
@@ -294,32 +218,167 @@ class ScrollWidthContainer extends React.Component<{children:any[]}>{
         // this.reset();
     }
     render(){
-        return (<div ref="top" style={{
-            backgroundImage:"url(./back.jpg)",
-            backgroundPosition:"center",
-            backgroundSize:"cover",
-            backgroundAttachment:"fixed",
-            backgroundBlendMode:"color-burn",
-            backgroundOrigin:"border-box",
-            backgroundRepeat:"no-repeat",
-            minHeight:"100vh"
-        }}>
+        return (<div ref="top" style={this.props.style? this.props.style:{}}>
             {this.props.children}
         </div>)
     }
 }
 
+type SummaryItemProps={title:string,summary:string,onClick:()=>any};
+class SummaryItem extends React.PureComponent<SummaryItemProps>{
+    constructor(props:SummaryItemProps){
+        super(props);
+    }
+    
+
+    render(){
+        return (<div style={{
+            padding:"8px"
+        }} onClick={this.props.onClick}>
+            <div id="title" style={{
+                fontSize:"1.5rem",
+                fontWeight:"bold",
+                marginBottom:"0.2rem",
+            }}>{this.props.title}</div>
+            <div id="summary" style={{
+                fontSize:"0.8em",
+                fontStyle:"italic",
+                color:"gray"
+            }}>{this.props.summary}</div>
+        </div>)
+    }
+}
+
+//summary列表部分
+type SummaryListProps={filesInfo:IFiles,onClick:(key:string)=>any}
+class SummaryList extends React.PureComponent<SummaryListProps>{
+    constructor(props:SummaryListProps){
+        super(props);
+    }
+    getList(){
+        let itemlsit:React.ReactNode[]=[];
+        let lst=this.props.filesInfo.fileList;
+        for(let key in lst){
+            let item=lst[key];
+            itemlsit.push(<SummaryItem key={item.article_path} title={item.title} summary="" onClick={()=>{
+                //对外弹出事件
+                this.props.onClick(key);
+            }}></SummaryItem>)
+        }
+        return itemlsit;
+    }
+    render(){
+        return (<div style={{
+            padding:"5px",
+            boxShadow:"0 0 5px 1px black",
+            background:"rgba(255, 255, 255, 0.781)",
+
+        }}>
+            {this.getList()}
+        </div>)
+    }
+}
+
+//主容器部分
+type MainContainerStates={
+    data:IFiles;
+}
+type MainContainerProps={
+    catalogPath:string;
+}
+class MainContainer extends React.Component<MainContainerProps,MainContainerStates>{
+    constructor(props:MainContainerProps){
+        super(props);
+        //初始信息为空
+        this.state={
+            data:{
+                useConfig:"",
+                fileList:{}
+            }
+        }
+    }
+
+    async getCatalog()
+    {
+        let r=await fetch(this.props.catalogPath);
+        let f=await r.json() as IFiles;
+        
+        //设置内部数据
+        this.setState({
+            data:f
+        });
+        //这里考虑加上加载完毕事件
+        //整体考虑使用mobx管理
+    }
+    getMetaList(){
+        //从中提取出文件列表和文章元数据url列表
+        let s=this.state.data.fileList;
+        let ss:string[]=[]
+        for(let k in s){
+            ss.push(k)
+        }
+        return ss;
+    }
+    componentDidMount(){
+        this.getCatalog();
+    }
+    componentDidUpdate(prevprop,prevstate){
+        if(prevprop.catalogPath!=this.props.catalogPath){
+            this.getCatalog();
+        }
+    }
+    listClick(key:string){
+
+    }
+    render(){
+        //侧边栏加内容区
+        //左边为summarylist
+        //content内容待定
+        //暂时全部用自动适配子元素宽度的容器代替div
+        return (<ScrollWidthContainer style={{
+            display:"flex",
+        }}>
+            <div ref="left" style={{
+                flex:"1"
+            }}>
+                <SummaryList  filesInfo={this.state.data} onClick={this.listClick.bind(this)} />
+            </div>
+            <ScrollWidthContainer ref="content" style={{
+                flex:"5"
+            }}>
+                <ArticleList metalist={this.getMetaList()} />
+                {/* <div></div> */}
+            </ScrollWidthContainer>
+        </ScrollWidthContainer>)
+    }
+}
 //暂时不适用上面的容器 性能问题 直接设置fixed
-let Page=(<ScrollWidthContainer>
-    <h1 style={{
+let Page=(<ScrollWidthContainer style={{
+    backgroundImage:"url(./back.jpg)",
+    backgroundPosition:"center",
+    backgroundSize:"cover",
+    backgroundAttachment:"fixed",
+    backgroundBlendMode:"color-burn",
+    backgroundOrigin:"border-box",
+    backgroundRepeat:"no-repeat",
+    minHeight:"100vh"
+}}>
+    <div style={{
         margin:"0",
         marginBottom:"1rem",
         padding:"2rem",
-        position:"sticky"
-    }}>我的博客</h1>
-    <h3 style={{fontStyle:"italic",position:"sticky"}}></h3>
+        position:"sticky",
+        display:"inline-block",
+        left:"0",
+        top:"0"
+    }}>
+        <h1>我的博客</h1>
+        <h3>点击标题展开</h3>
+        </div>
+    
     <hr style={{marginBottom:"30px"}}></hr>
-    <ArticleList filesPath="../content/files.json" />
-</ScrollWidthContainer>);
+    <MainContainer catalogPath="../content/files.json">
+    </MainContainer>
+    </ScrollWidthContainer>);
 
 ReactDOM.render(Page,document.querySelector("#page"));

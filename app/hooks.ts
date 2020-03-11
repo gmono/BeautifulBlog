@@ -38,8 +38,13 @@ const getContext=cached(async (configname?:string)=>
 const getNowSiteHooks=cached(():ISiteHooks=>{
     //加载nowsite的hooks.js文件并得到其导出的ISiteHooks接口对象
     //统一使用export={} 方式导出
-    let obj=require("../nowSite/hooks.js") as ISiteHooks;
-    return obj;
+    try{
+        let obj=require("../nowSite/hooks.js") as ISiteHooks;
+        return obj;
+    }
+    catch(e){
+        return null;
+    }
 });
 
 
@@ -58,13 +63,13 @@ const getNowSiteHooks=cached(():ISiteHooks=>{
  * 切换网站完成后调用
  */
 export async function *changedSite(){
-
+    await fse.ensureDir("./nowSite");
     //调用之前site的beforeUnload钩子
     //调用新site的loaded钩子
     const ctx=await getContext();
     const obj=getNowSiteHooks();
     await runInDir("./nowSite",()=>{
-        obj.beforeUnload(ctx);
+        obj&&obj.beforeUnload(ctx);
     });
     //等待执行切换site操作 执行以一个await next执行上面的部分
     //执行第二个await next执行下面的部分
@@ -72,7 +77,7 @@ export async function *changedSite(){
     //切换site操作结束
     const newobj=getNowSiteHooks();
     await runInDir("./nowSite",()=>{
-        newobj.loaded(ctx);
+        newobj&&newobj.loaded(ctx);
     })
 }
  /**
@@ -80,10 +85,11 @@ export async function *changedSite(){
   * 
   */
 export async function afterRefresh(){
+    await fse.ensureDir("./nowSite");
     const ctx=await getContext();
     const obj=getNowSiteHooks();
     await runInDir("./nowSite",()=>{
-        obj.generated(ctx);
+        obj&&obj.generated(ctx);
     })
 }
 /**
@@ -93,6 +99,7 @@ export async function afterRefresh(){
  * @param destpath 生成目的地址（不带后缀名）
  */
 export async function changed(articlepath:string,destpath:string){
+    await fse.ensureDir("./nowSite");
     const ctx=await getContext();
     const obj=getNowSiteHooks();
     //这里通过一些方法判断更改类型
@@ -113,7 +120,7 @@ export async function changed(articlepath:string,destpath:string){
     }
     await runInDir("./nowSite",()=>{
         //dest为不带后缀名的地址
-        obj.articleChanged(ctx,tp,changeExt(destpath,""));
+        obj&&obj.articleChanged(ctx,tp,changeExt(destpath,""));
     })
 }
 

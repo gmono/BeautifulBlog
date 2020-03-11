@@ -32,8 +32,13 @@ const getContext = utils_1.cached(async (configname) => {
 const getNowSiteHooks = utils_1.cached(() => {
     //加载nowsite的hooks.js文件并得到其导出的ISiteHooks接口对象
     //统一使用export={} 方式导出
-    let obj = require("../nowSite/hooks.js");
-    return obj;
+    try {
+        let obj = require("../nowSite/hooks.js");
+        return obj;
+    }
+    catch (e) {
+        return null;
+    }
 });
 //代理函数部分
 //代理函数主要完成：
@@ -46,12 +51,13 @@ const getNowSiteHooks = utils_1.cached(() => {
  * 切换网站完成后调用
  */
 async function* changedSite() {
+    await fse.ensureDir("./nowSite");
     //调用之前site的beforeUnload钩子
     //调用新site的loaded钩子
     const ctx = await getContext();
     const obj = getNowSiteHooks();
     await utils_1.runInDir("./nowSite", () => {
-        obj.beforeUnload(ctx);
+        obj && obj.beforeUnload(ctx);
     });
     //等待执行切换site操作 执行以一个await next执行上面的部分
     //执行第二个await next执行下面的部分
@@ -59,7 +65,7 @@ async function* changedSite() {
     //切换site操作结束
     const newobj = getNowSiteHooks();
     await utils_1.runInDir("./nowSite", () => {
-        newobj.loaded(ctx);
+        newobj && newobj.loaded(ctx);
     });
 }
 exports.changedSite = changedSite;
@@ -68,10 +74,11 @@ exports.changedSite = changedSite;
  *
  */
 async function afterRefresh() {
+    await fse.ensureDir("./nowSite");
     const ctx = await getContext();
     const obj = getNowSiteHooks();
     await utils_1.runInDir("./nowSite", () => {
-        obj.generated(ctx);
+        obj && obj.generated(ctx);
     });
 }
 exports.afterRefresh = afterRefresh;
@@ -82,6 +89,7 @@ exports.afterRefresh = afterRefresh;
  * @param destpath 生成目的地址（不带后缀名）
  */
 async function changed(articlepath, destpath) {
+    await fse.ensureDir("./nowSite");
     const ctx = await getContext();
     const obj = getNowSiteHooks();
     //这里通过一些方法判断更改类型
@@ -102,7 +110,7 @@ async function changed(articlepath, destpath) {
     }
     await utils_1.runInDir("./nowSite", () => {
         //dest为不带后缀名的地址
-        obj.articleChanged(ctx, tp, utils_1.changeExt(destpath, ""));
+        obj && obj.articleChanged(ctx, tp, utils_1.changeExt(destpath, ""));
     });
 }
 exports.changed = changed;

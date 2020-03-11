@@ -200,46 +200,12 @@ var ArticleItem = /** @class */ (function (_super) {
 var ArticleList = /** @class */ (function (_super) {
     __extends(ArticleList, _super);
     function ArticleList(props) {
-        var _this = _super.call(this, props) || this;
-        _this.state = {
-            metalist: []
-        };
-        return _this;
+        return _super.call(this, props) || this;
     }
-    ArticleList.prototype.reload = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var r, f, s, ss, k;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, fetch(this.props.filesPath)];
-                    case 1:
-                        r = _a.sent();
-                        return [4 /*yield*/, r.json()];
-                    case 2:
-                        f = _a.sent();
-                        s = f.fileList;
-                        ss = [];
-                        for (k in s) {
-                            ss.push(k);
-                        }
-                        this.setState({
-                            metalist: ss
-                        });
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    ArticleList.prototype.componentDidMount = function () {
-        this.reload();
-    };
-    ArticleList.prototype.componentDidUpdate = function (prevprop, prevstate) {
-        if (prevprop.filesPath != this.props.filesPath) {
-            this.reload();
-        }
-    };
     ArticleList.prototype.render = function () {
-        return (React.createElement(XScrollList, null, this.state.metalist.map(function (v) {
+        return (React.createElement("div", { style: {
+                whiteSpace: "nowrap"
+            } }, this.props.metalist.map(function (v) {
             return React.createElement("div", { key: v, style: {
                     display: "inline-block",
                     width: "80vw",
@@ -255,53 +221,6 @@ var ArticleList = /** @class */ (function (_super) {
         })));
     };
     return ArticleList;
-}(React.Component));
-var XScrollList = /** @class */ (function (_super) {
-    __extends(XScrollList, _super);
-    function XScrollList(props) {
-        return _super.call(this, props) || this;
-    }
-    XScrollList.prototype.whell = function (e) {
-        if (e.target instanceof HTMLElement) {
-            if (e.target == ReactDOM.findDOMNode(this.refs.mouse)) {
-                e.preventDefault();
-                var ele = ReactDOM.findDOMNode(this.refs.top);
-                //默认150
-                var delta = e.deltaMode == 1 ? e.deltaY * 50 : e.deltaMode == 0 ? e.deltaY : 150;
-                window.scroll(window.scrollX + e.deltaY, 0);
-            }
-        }
-    };
-    XScrollList.prototype.componentDidMount = function () {
-        var ele = ReactDOM.findDOMNode(this.refs.mouse);
-        if (ele instanceof HTMLElement) {
-            ele.addEventListener("wheel", this.whell.bind(this), {
-                capture: true,
-                passive: false
-            });
-        }
-    };
-    XScrollList.prototype.render = function () {
-        return (React.createElement("div", { ref: "top", style: {
-                whiteSpace: "nowrap",
-            } },
-            React.createElement("div", { ref: "mouse", style: {
-                    position: "fixed",
-                    right: "0",
-                    bottom: "0",
-                    height: "200px",
-                    width: "200px",
-                    backgroundColor: "gray",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center"
-                } },
-                React.createElement("h2", { style: {
-                        pointerEvents: "none"
-                    } }, "\u6A2A\u5411\u6EDA\u52A8\u533A")),
-            this.props.children));
-    };
-    return XScrollList;
 }(React.Component));
 /**
  * 等宽容器，其会将自己的height设置为与scrollWidth相同 进而使其内容物都可以有同样的宽度
@@ -326,28 +245,155 @@ var ScrollWidthContainer = /** @class */ (function (_super) {
         // this.reset();
     };
     ScrollWidthContainer.prototype.render = function () {
-        return (React.createElement("div", { ref: "top", style: {
-                backgroundImage: "url(./back.jpg)",
-                backgroundPosition: "center",
-                backgroundSize: "cover",
-                backgroundAttachment: "fixed",
-                backgroundBlendMode: "color-burn",
-                backgroundOrigin: "border-box",
-                backgroundRepeat: "no-repeat",
-                minHeight: "100vh"
-            } }, this.props.children));
+        return (React.createElement("div", { ref: "top", style: this.props.style ? this.props.style : {} }, this.props.children));
     };
     return ScrollWidthContainer;
 }(React.Component));
+var SummaryItem = /** @class */ (function (_super) {
+    __extends(SummaryItem, _super);
+    function SummaryItem(props) {
+        return _super.call(this, props) || this;
+    }
+    SummaryItem.prototype.render = function () {
+        return (React.createElement("div", { style: {
+                padding: "8px"
+            }, onClick: this.props.onClick },
+            React.createElement("div", { id: "title", style: {
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    marginBottom: "0.2rem",
+                } }, this.props.title),
+            React.createElement("div", { id: "summary", style: {
+                    fontSize: "0.8em",
+                    fontStyle: "italic",
+                    color: "gray"
+                } }, this.props.summary)));
+    };
+    return SummaryItem;
+}(React.PureComponent));
+var SummaryList = /** @class */ (function (_super) {
+    __extends(SummaryList, _super);
+    function SummaryList(props) {
+        return _super.call(this, props) || this;
+    }
+    SummaryList.prototype.getList = function () {
+        var _this = this;
+        var itemlsit = [];
+        var lst = this.props.filesInfo.fileList;
+        var _loop_1 = function (key) {
+            var item = lst[key];
+            itemlsit.push(React.createElement(SummaryItem, { key: item.article_path, title: item.title, summary: "", onClick: function () {
+                    //对外弹出事件
+                    _this.props.onClick(key);
+                } }));
+        };
+        for (var key in lst) {
+            _loop_1(key);
+        }
+        return itemlsit;
+    };
+    SummaryList.prototype.render = function () {
+        return (React.createElement("div", { style: {
+                padding: "5px",
+                boxShadow: "0 0 5px 1px black",
+                background: "rgba(255, 255, 255, 0.781)",
+            } }, this.getList()));
+    };
+    return SummaryList;
+}(React.PureComponent));
+var MainContainer = /** @class */ (function (_super) {
+    __extends(MainContainer, _super);
+    function MainContainer(props) {
+        var _this = _super.call(this, props) || this;
+        //初始信息为空
+        _this.state = {
+            data: {
+                useConfig: "",
+                fileList: {}
+            }
+        };
+        return _this;
+    }
+    MainContainer.prototype.getCatalog = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var r, f;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, fetch(this.props.catalogPath)];
+                    case 1:
+                        r = _a.sent();
+                        return [4 /*yield*/, r.json()];
+                    case 2:
+                        f = _a.sent();
+                        //设置内部数据
+                        this.setState({
+                            data: f
+                        });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    MainContainer.prototype.getMetaList = function () {
+        //从中提取出文件列表和文章元数据url列表
+        var s = this.state.data.fileList;
+        var ss = [];
+        for (var k in s) {
+            ss.push(k);
+        }
+        return ss;
+    };
+    MainContainer.prototype.componentDidMount = function () {
+        this.getCatalog();
+    };
+    MainContainer.prototype.componentDidUpdate = function (prevprop, prevstate) {
+        if (prevprop.catalogPath != this.props.catalogPath) {
+            this.getCatalog();
+        }
+    };
+    MainContainer.prototype.listClick = function (key) {
+    };
+    MainContainer.prototype.render = function () {
+        //侧边栏加内容区
+        //左边为summarylist
+        //content内容待定
+        //暂时全部用自动适配子元素宽度的容器代替div
+        return (React.createElement(ScrollWidthContainer, { style: {
+                display: "flex",
+            } },
+            React.createElement("div", { ref: "left", style: {
+                    flex: "1"
+                } },
+                React.createElement(SummaryList, { filesInfo: this.state.data, onClick: this.listClick.bind(this) })),
+            React.createElement(ScrollWidthContainer, { ref: "content", style: {
+                    flex: "5"
+                } },
+                React.createElement(ArticleList, { metalist: this.getMetaList() }))));
+    };
+    return MainContainer;
+}(React.Component));
 //暂时不适用上面的容器 性能问题 直接设置fixed
-var Page = (React.createElement(ScrollWidthContainer, null,
-    React.createElement("h1", { style: {
+var Page = (React.createElement(ScrollWidthContainer, { style: {
+        backgroundImage: "url(./back.jpg)",
+        backgroundPosition: "center",
+        backgroundSize: "cover",
+        backgroundAttachment: "fixed",
+        backgroundBlendMode: "color-burn",
+        backgroundOrigin: "border-box",
+        backgroundRepeat: "no-repeat",
+        minHeight: "100vh"
+    } },
+    React.createElement("div", { style: {
             margin: "0",
             marginBottom: "1rem",
             padding: "2rem",
-            position: "sticky"
-        } }, "\u6211\u7684\u535A\u5BA2"),
-    React.createElement("h3", { style: { fontStyle: "italic", position: "sticky" } }),
+            position: "sticky",
+            display: "inline-block",
+            left: "0",
+            top: "0"
+        } },
+        React.createElement("h1", null, "\u6211\u7684\u535A\u5BA2"),
+        React.createElement("h3", null, "\u70B9\u51FB\u6807\u9898\u5C55\u5F00")),
     React.createElement("hr", { style: { marginBottom: "30px" } }),
-    React.createElement(ArticleList, { filesPath: "../content/files.json" })));
+    React.createElement(MainContainer, { catalogPath: "../content/files.json" })));
 ReactDOM.render(Page, document.querySelector("#page"));
