@@ -52,11 +52,13 @@ class Item extends React.Component<ItemInfo,{
             height:`${this.state.contentHeight}px`};
         return (<div style={{
             whiteSpace:"normal"
+            
         }}  className="item">
             {/*这是标题*/}
             <div style={{
                 fontFamily:"微软雅黑",
-                fontSize:"xx-large"
+                fontSize:"xx-large",
+                cursor:"pointer"
             }} onClick={this.props.OnTitleClick}>{this.props.info.title}</div>
             <hr></hr>
             <div style={{
@@ -225,20 +227,30 @@ class ScrollWidthContainer extends React.Component<{style?:React.CSSProperties,c
 }
 
 type SummaryItemProps={title:string,summary:string,onClick:()=>any};
-class SummaryItem extends React.PureComponent<SummaryItemProps>{
+class SummaryItem extends React.PureComponent<SummaryItemProps,{mouseHover:boolean}>{
     constructor(props:SummaryItemProps){
         super(props);
+        this.state={mouseHover:false}
     }
     
 
     render(){
-        return (<div style={{
+        //生成css
+        let css={
             padding:"8px",
             cursor:"pointer",
-            boxShadow:"0 0 2px 0 gray"
-        }} onClick={this.props.onClick}>
+            boxShadow:"0 0 1px 0 gray",
+            marginTop:"8px",
+            fontFamily:"微软雅黑"
+        } as React.CSSProperties;
+        if(this.state.mouseHover){
+            css.boxShadow="0 0 5px 0 gray"
+        }
+        return (<div style={css} onClick={this.props.onClick} 
+        onMouseEnter={()=>this.setState({mouseHover:true})}
+        onMouseLeave={()=>this.setState({mouseHover:false})}>
             <div id="title" style={{
-                fontSize:"1.5rem",
+                fontSize:"1.1rem",
                 fontWeight:"bold",
                 marginBottom:"0.2rem",
             }}>{this.props.title}</div>
@@ -271,7 +283,7 @@ class SummaryList extends React.PureComponent<SummaryListProps>{
     }
     render(){
         return (<div style={{
-            padding:"5px",
+            padding:"12px",
             boxShadow:"0 0 5px 1px black",
             background:"rgba(255, 255, 255, 0.781)",
 
@@ -332,7 +344,10 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
     listClick(key:string){
         alert(key);
         //这里进行content 的scroll操作
-
+        let ele=ReactDOM.findDOMNode(this.refs.content);
+        if(ele instanceof Element){
+            //这里要滚动到某个元素位置
+        }
     }
     render(){
         //侧边栏加内容区
@@ -372,10 +387,10 @@ let Page=(<ScrollWidthContainer style={{
         margin:"0",
         marginBottom:"1rem",
         padding:"2rem",
-        position:"sticky",
-        display:"inline-block",
-        left:"0",
-        top:"0"
+        // position:"sticky",
+        // display:"inline-block",
+        // left:"0",
+        // top:"0"
     }}>
         <h1>我的博客</h1>
         <h3>点击标题展开</h3>

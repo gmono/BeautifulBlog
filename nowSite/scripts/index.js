@@ -91,7 +91,8 @@ var Item = /** @class */ (function (_super) {
             }, className: "item" },
             React.createElement("div", { style: {
                     fontFamily: "微软雅黑",
-                    fontSize: "xx-large"
+                    fontSize: "xx-large",
+                    cursor: "pointer"
                 }, onClick: this.props.OnTitleClick }, this.props.info.title),
             React.createElement("hr", null),
             React.createElement("div", { style: {
@@ -205,7 +206,7 @@ var ArticleList = /** @class */ (function (_super) {
     ArticleList.prototype.render = function () {
         return (React.createElement("div", { style: {
                 whiteSpace: "nowrap"
-            } }, this.props.metalist.map(function (v) {
+            } }, this.props.metalist.map(function (v, idx) {
             return React.createElement("div", { key: v, style: {
                     display: "inline-block",
                     width: "80vw",
@@ -252,16 +253,26 @@ var ScrollWidthContainer = /** @class */ (function (_super) {
 var SummaryItem = /** @class */ (function (_super) {
     __extends(SummaryItem, _super);
     function SummaryItem(props) {
-        return _super.call(this, props) || this;
+        var _this = _super.call(this, props) || this;
+        _this.state = { mouseHover: false };
+        return _this;
     }
     SummaryItem.prototype.render = function () {
-        return (React.createElement("div", { style: {
-                padding: "8px",
-                cursor: "pointer",
-                boxShadow: "0 0 2px 0 gray"
-            }, onClick: this.props.onClick },
+        var _this = this;
+        //生成css
+        var css = {
+            padding: "8px",
+            cursor: "pointer",
+            boxShadow: "0 0 1px 0 gray",
+            marginTop: "8px",
+            fontFamily: "微软雅黑"
+        };
+        if (this.state.mouseHover) {
+            css.boxShadow = "0 0 5px 0 gray";
+        }
+        return (React.createElement("div", { style: css, onClick: this.props.onClick, onMouseEnter: function () { return _this.setState({ mouseHover: true }); }, onMouseLeave: function () { return _this.setState({ mouseHover: false }); } },
             React.createElement("div", { id: "title", style: {
-                    fontSize: "1.5rem",
+                    fontSize: "1.1rem",
                     fontWeight: "bold",
                     marginBottom: "0.2rem",
                 } }, this.props.title),
@@ -296,7 +307,7 @@ var SummaryList = /** @class */ (function (_super) {
     };
     SummaryList.prototype.render = function () {
         return (React.createElement("div", { style: {
-                padding: "5px",
+                padding: "12px",
                 boxShadow: "0 0 5px 1px black",
                 background: "rgba(255, 255, 255, 0.781)",
             } }, this.getList()));
@@ -355,6 +366,11 @@ var MainContainer = /** @class */ (function (_super) {
     };
     MainContainer.prototype.listClick = function (key) {
         alert(key);
+        //这里进行content 的scroll操作
+        var ele = ReactDOM.findDOMNode(this.refs.content);
+        if (ele instanceof Element) {
+            ele.scrollIntoView();
+        }
     };
     MainContainer.prototype.render = function () {
         //侧边栏加内容区
@@ -370,7 +386,8 @@ var MainContainer = /** @class */ (function (_super) {
                 React.createElement(SummaryList, { filesInfo: this.state.data, onClick: this.listClick.bind(this) })),
             React.createElement("div", { ref: "content", style: {
                     flex: "5",
-                    overflow: "scroll"
+                    overflowX: "hidden",
+                    overflowY: "visible"
                 } },
                 React.createElement(ArticleList, { metalist: this.getMetaList() }))));
     };
@@ -391,10 +408,6 @@ var Page = (React.createElement(ScrollWidthContainer, { style: {
             margin: "0",
             marginBottom: "1rem",
             padding: "2rem",
-            position: "sticky",
-            display: "inline-block",
-            left: "0",
-            top: "0"
         } },
         React.createElement("h1", null, "\u6211\u7684\u535A\u5BA2"),
         React.createElement("h3", null, "\u70B9\u51FB\u6807\u9898\u5C55\u5F00")),
