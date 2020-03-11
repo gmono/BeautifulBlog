@@ -233,7 +233,9 @@ class SummaryItem extends React.PureComponent<SummaryItemProps>{
 
     render(){
         return (<div style={{
-            padding:"8px"
+            padding:"8px",
+            cursor:"pointer",
+            boxShadow:"0 0 2px 0 gray"
         }} onClick={this.props.onClick}>
             <div id="title" style={{
                 fontSize:"1.5rem",
@@ -328,6 +330,8 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
         }
     }
     listClick(key:string){
+        alert(key);
+        //这里进行content 的scroll操作
 
     }
     render(){
@@ -343,12 +347,13 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
             }}>
                 <SummaryList  filesInfo={this.state.data} onClick={this.listClick.bind(this)} />
             </div>
-            <ScrollWidthContainer ref="content" style={{
-                flex:"5"
+            <div ref="content" style={{
+                flex:"5",
+                overflow:"scroll"
             }}>
                 <ArticleList metalist={this.getMetaList()} />
                 {/* <div></div> */}
-            </ScrollWidthContainer>
+            </div>
         </ScrollWidthContainer>)
     }
 }

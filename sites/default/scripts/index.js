@@ -256,7 +256,9 @@ var SummaryItem = /** @class */ (function (_super) {
     }
     SummaryItem.prototype.render = function () {
         return (React.createElement("div", { style: {
-                padding: "8px"
+                padding: "8px",
+                cursor: "pointer",
+                boxShadow: "0 0 2px 0 gray"
             }, onClick: this.props.onClick },
             React.createElement("div", { id: "title", style: {
                     fontSize: "1.5rem",
@@ -352,6 +354,8 @@ var MainContainer = /** @class */ (function (_super) {
         }
     };
     MainContainer.prototype.listClick = function (key) {
+        alert(key);
+        //这里进行content 的scroll操作
     };
     MainContainer.prototype.render = function () {
         //侧边栏加内容区
@@ -365,8 +369,9 @@ var MainContainer = /** @class */ (function (_super) {
                     flex: "1"
                 } },
                 React.createElement(SummaryList, { filesInfo: this.state.data, onClick: this.listClick.bind(this) })),
-            React.createElement(ScrollWidthContainer, { ref: "content", style: {
-                    flex: "5"
+            React.createElement("div", { ref: "content", style: {
+                    flex: "5",
+                    overflow: "scroll"
                 } },
                 React.createElement(ArticleList, { metalist: this.getMetaList() }))));
     };
