@@ -122,7 +122,8 @@ class ArticleItem extends React.Component<ArticleInfo,ArticleItemState>{
             await this.loadArticle();
         }
     }
-    summarySwitch(){
+    //对外公开的方法
+    public summarySwitch(){
         this.setState({
             isExpanded:!(this.state.isExpanded)
         });
@@ -152,7 +153,7 @@ class ArticleItem extends React.Component<ArticleInfo,ArticleItemState>{
         else{
             return (
             <Item info={this.state.info} summary={this.state.html}
-            OnTitleClick={this.summarySwitch.bind(this)} 
+            OnTitleClick={this.enterArticle.bind(this)} 
             OnSummaryClick={()=>{}}
             isExpanded={this.state.isExpanded}
             />)
@@ -169,13 +170,14 @@ class ArticleList extends React.Component<{metalist:string[]}>
         
 
     }
+
     render()
     {
         return (
             <div style={{
                 whiteSpace:"nowrap"
             }}>
-                {this.props.metalist.map((v,idx)=>{
+                {this.props.metalist.map((v)=>{
                     return <div key={v} style={{
                         display:"inline-block",
                         width:"80vw",
@@ -283,7 +285,7 @@ class SummaryList extends React.PureComponent<SummaryListProps>{
     render(){
         return (<div style={{
             padding:"12px",
-            boxShadow:"0 0 5px 1px black",
+            boxShadow:"0 0 5px 1px #0000003b",
             background:"rgba(255, 255, 255, 0.781)",
 
         }}>
@@ -295,6 +297,8 @@ class SummaryList extends React.PureComponent<SummaryListProps>{
 //主容器部分
 type MainContainerStates={
     data:IFiles;
+    nowArticleMetaPath:string;
+    metalist:string[];
 }
 type MainContainerProps={
     catalogPath:string;
@@ -307,7 +311,9 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
             data:{
                 useConfig:"",
                 fileList:{}
-            }
+            },
+            metalist:[],
+            nowArticleMetaPath:null
         }
     }
 
@@ -316,9 +322,12 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
         let r=await fetch(this.props.catalogPath);
         let f=await r.json() as IFiles;
         
+        let lst=this.getMetaList();
         //设置内部数据
         this.setState({
-            data:f
+            data:f,
+            metalist:lst,
+            nowArticleMetaPath:lst[0]
         });
         //这里考虑加上加载完毕事件
         //整体考虑使用mobx管理
@@ -341,12 +350,21 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
         }
     }
     listClick(key:string){
-        alert(key);
-        //这里进行content 的scroll操作
-        let ele=ReactDOM.findDOMNode(this.refs.content);
-        if(ele instanceof Element){
-            ele.scrollIntoView();
+        this.setState({
+            nowArticleMetaPath:key
+        });
+        let switchSummary=()=>{
+            let item=this.refs.item as ArticleItem;
+            item.summarySwitch();
         }
+        switchSummary();
+        switchSummary();
+
+    }
+    enter(){
+        //这里调用其函数展开item
+        let item=this.refs.item as ArticleItem;
+        item.summarySwitch();
     }
     render(){
         //侧边栏加内容区
@@ -363,11 +381,9 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
             </div>
             <div ref="content" style={{
                 flex:"5",
-                overflowX:"hidden",
-                overflowY:"visible"
+                overflow:"scroll"
             }}>
-                <ArticleList metalist={this.getMetaList()} />
-                {/* <div></div> */}
+                <ArticleItem ref="item" metapath={this.state.nowArticleMetaPath} OnEnter={this.enter.bind(this)} />>
             </div>
         </ScrollWidthContainer>)
     }

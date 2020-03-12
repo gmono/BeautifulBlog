@@ -169,6 +169,7 @@ var ArticleItem = /** @class */ (function (_super) {
             });
         });
     };
+    //对外公开的方法
     ArticleItem.prototype.summarySwitch = function () {
         this.setState({
             isExpanded: !(this.state.isExpanded)
@@ -193,7 +194,7 @@ var ArticleItem = /** @class */ (function (_super) {
                 }, summary: "\u52A0\u8F7D\u4E2D......", OnTitleClick: function () { }, OnSummaryClick: function () { }, isExpanded: this.state.isExpanded }));
         }
         else {
-            return (React.createElement(Item, { info: this.state.info, summary: this.state.html, OnTitleClick: this.summarySwitch.bind(this), OnSummaryClick: function () { }, isExpanded: this.state.isExpanded }));
+            return (React.createElement(Item, { info: this.state.info, summary: this.state.html, OnTitleClick: this.enterArticle.bind(this), OnSummaryClick: function () { }, isExpanded: this.state.isExpanded }));
         }
     };
     return ArticleItem;
@@ -206,7 +207,7 @@ var ArticleList = /** @class */ (function (_super) {
     ArticleList.prototype.render = function () {
         return (React.createElement("div", { style: {
                 whiteSpace: "nowrap"
-            } }, this.props.metalist.map(function (v, idx) {
+            } }, this.props.metalist.map(function (v) {
             return React.createElement("div", { key: v, style: {
                     display: "inline-block",
                     width: "80vw",
@@ -308,7 +309,7 @@ var SummaryList = /** @class */ (function (_super) {
     SummaryList.prototype.render = function () {
         return (React.createElement("div", { style: {
                 padding: "12px",
-                boxShadow: "0 0 5px 1px black",
+                boxShadow: "0 0 5px 1px #0000003b",
                 background: "rgba(255, 255, 255, 0.781)",
             } }, this.getList()));
     };
@@ -323,13 +324,15 @@ var MainContainer = /** @class */ (function (_super) {
             data: {
                 useConfig: "",
                 fileList: {}
-            }
+            },
+            metalist: [],
+            nowArticleMetaPath: null
         };
         return _this;
     }
     MainContainer.prototype.getCatalog = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var r, f;
+            var r, f, lst;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, fetch(this.props.catalogPath)];
@@ -338,9 +341,12 @@ var MainContainer = /** @class */ (function (_super) {
                         return [4 /*yield*/, r.json()];
                     case 2:
                         f = _a.sent();
+                        lst = this.getMetaList();
                         //设置内部数据
                         this.setState({
-                            data: f
+                            data: f,
+                            metalist: lst,
+                            nowArticleMetaPath: lst[0]
                         });
                         return [2 /*return*/];
                 }
@@ -365,12 +371,21 @@ var MainContainer = /** @class */ (function (_super) {
         }
     };
     MainContainer.prototype.listClick = function (key) {
-        alert(key);
-        //这里进行content 的scroll操作
-        var ele = ReactDOM.findDOMNode(this.refs.content);
-        if (ele instanceof Element) {
-            ele.scrollIntoView();
-        }
+        var _this = this;
+        this.setState({
+            nowArticleMetaPath: key
+        });
+        var switchSummary = function () {
+            var item = _this.refs.item;
+            item.summarySwitch();
+        };
+        switchSummary();
+        switchSummary();
+    };
+    MainContainer.prototype.enter = function () {
+        //这里调用其函数展开item
+        var item = this.refs.item;
+        item.summarySwitch();
     };
     MainContainer.prototype.render = function () {
         //侧边栏加内容区
@@ -386,10 +401,10 @@ var MainContainer = /** @class */ (function (_super) {
                 React.createElement(SummaryList, { filesInfo: this.state.data, onClick: this.listClick.bind(this) })),
             React.createElement("div", { ref: "content", style: {
                     flex: "5",
-                    overflowX: "hidden",
-                    overflowY: "visible"
+                    overflow: "scroll"
                 } },
-                React.createElement(ArticleList, { metalist: this.getMetaList() }))));
+                React.createElement(ArticleItem, { ref: "item", metapath: this.state.nowArticleMetaPath, OnEnter: this.enter.bind(this) }),
+                ">")));
     };
     return MainContainer;
 }(React.Component));
