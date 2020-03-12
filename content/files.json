@@ -11,41 +11,6 @@
 			"article_path": "./articles/ceshi.pdf",
 			"filesDir_url": "/BeautifulBlog/content/ceshi.dir"
 		},
-		"/BeautifulBlog/content/helloaaa.json": {
-			"title": "helloaaa",
-			"article_path": "./articles/helloaaa.md",
-			"filesDir_url": "/BeautifulBlog/content/helloaaa.dir"
-		},
-		"/BeautifulBlog/content/helloaaaa.json": {
-			"title": "helloaaaa",
-			"article_path": "./articles/helloaaaa.md",
-			"filesDir_url": "/BeautifulBlog/content/helloaaaa.dir"
-		},
-		"/BeautifulBlog/content/ts.json": {
-			"title": "ceshi\r",
-			"article_path": "./articles/ts.txt",
-			"filesDir_url": "/BeautifulBlog/content/ts.dir"
-		},
-		"/BeautifulBlog/content/tttt.json": {
-			"title": "tttt",
-			"article_path": "./articles/tttt.md",
-			"filesDir_url": "/BeautifulBlog/content/tttt.dir"
-		},
-		"/BeautifulBlog/content/测试.json": {
-			"title": "标题\r",
-			"article_path": "./articles/测试.txt",
-			"filesDir_url": "/BeautifulBlog/content/测试.dir"
-		},
-		"/BeautifulBlog/content/testss/hhh.json": {
-			"title": "hhh",
-			"article_path": "./articles/testss/hhh.md",
-			"filesDir_url": "/BeautifulBlog/content/testss/hhh.dir"
-		},
-		"/BeautifulBlog/content/testdl/testmd.json": {
-			"title": "关于博客asdfasdfasd",
-			"article_path": "./articles/testdl/testmd.md",
-			"filesDir_url": "/BeautifulBlog/content/testdl/testmd.dir"
-		},
 		"/BeautifulBlog/content/tech/设计一个新的静态博客系统.json": {
 			"title": "设计一个新的静态博客系统",
 			"article_path": "./articles/tech/设计一个新的静态博客系统.md",
@@ -100,16 +65,6 @@
 			"title": "测试一下这个目录",
 			"article_path": "./articles/life/测试这个目录.md",
 			"filesDir_url": "/BeautifulBlog/content/life/测试这个目录.dir"
-		},
-		"/BeautifulBlog/content/helo/ceshiaaa.json": {
-			"title": "ceshiaaa",
-			"article_path": "./articles/helo/ceshiaaa.md",
-			"filesDir_url": "/BeautifulBlog/content/helo/ceshiaaa.dir"
-		},
-		"/BeautifulBlog/content/ceshiccc/hello.json": {
-			"title": "标题\r",
-			"article_path": "./articles/ceshiccc/hello.txt",
-			"filesDir_url": "/BeautifulBlog/content/ceshiccc/hello.dir"
 		}
 	}
 }

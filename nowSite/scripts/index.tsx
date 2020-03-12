@@ -8,6 +8,26 @@ import { IFiles } from '../../../app/Interface/IFiles';
 // var React:any;
 // var ReactDOM:any;
 
+//时间格式化
+function formatDate(fmt:string,date:Date)   
+{ //author: meizz   
+  var o = {   
+    "M+" : date.getMonth()+1,                 //月份   
+    "d+" : date.getDate(),                    //日   
+    "h+" : date.getHours(),                   //小时   
+    "m+" : date.getMinutes(),                 //分   
+    "s+" : date.getSeconds(),                 //秒   
+    "q+" : Math.floor((date.getMonth()+3)/3), //季度   
+    "S"  : date.getMilliseconds()             //毫秒   
+  };   
+  if(/(y+)/.test(fmt))   
+    fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length));   
+  for(var k in o)   
+    if(new RegExp("("+ k +")").test(fmt))   
+  fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));   
+  return fmt;   
+}
+
 interface ItemInfo{
     info:IContentMeta;
     summary:string;
@@ -32,12 +52,12 @@ class Item extends React.Component<ItemInfo,{
         })
     }
     componentDidUpdate(prevprop,prevstate){
+        //当属性或状态变化时重新获取content的高度
         let h=(ReactDOM.findDOMNode(this.refs.content) as HTMLElement).clientHeight;
-        if(prevprop.isExpanded!=this.props.isExpanded){
+        if(this.state.contentHeight!=h)
             this.setState({
                 contentHeight:h
             })
-        }
     }
     render()
     {
@@ -46,13 +66,15 @@ class Item extends React.Component<ItemInfo,{
             overflow:"hidden",
             transition:"all ease-out 1s"
         };
+        //展开状态下的高度 
         let expstyle={
             overflow:"hidden",
             transition:"all ease-in 1s",
             height:`${this.state.contentHeight}px`};
+        
+        let date=this.props.info.date? new Date(this.props.info.date):new Date();
         return (<div style={{
             whiteSpace:"normal"
-            
         }}  className="item">
             {/*这是标题*/}
             <div style={{
@@ -64,7 +86,7 @@ class Item extends React.Component<ItemInfo,{
             <div style={{
                 color:"blue",
                 fontSize:"0.7em"
-            }}>{this.props.info.date?.toString()}</div>
+            }}>{formatDate("yyyy-MM-dd hh:mm:ss",date)}</div>
     
             <div style={this.props.isExpanded? expstyle:uexpstyle} onClick={this.props.OnSummaryClick}>
                 <div ref="content"  dangerouslySetInnerHTML={{__html:this.props.summary}}></div>
@@ -343,6 +365,9 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
     }
     componentDidMount(){
         this.getCatalog();
+        //这里直接设置为恒展开
+        let item=this.refs.item as ArticleItem;
+        item.summarySwitch();
     }
     componentDidUpdate(prevprop,prevstate){
         if(prevprop.catalogPath!=this.props.catalogPath){
@@ -353,18 +378,17 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
         this.setState({
             nowArticleMetaPath:key
         });
-        let switchSummary=()=>{
-            let item=this.refs.item as ArticleItem;
-            item.summarySwitch();
+        //自动跳转到content开头
+        let item=ReactDOM.findDOMNode(this.refs.item);
+        if(item instanceof Element){
+            item.scrollIntoView();
         }
-        switchSummary();
-        switchSummary();
 
     }
     enter(){
         //这里调用其函数展开item
-        let item=this.refs.item as ArticleItem;
-        item.summarySwitch();
+        // let item=this.refs.item as ArticleItem;
+        // item.summarySwitch();
     }
     render(){
         //侧边栏加内容区

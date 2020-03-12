@@ -51,6 +51,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var ReactDOM = require("react-dom");
+// var React:any;
+// var ReactDOM:any;
+//时间格式化
+function formatDate(fmt, date) {
+    var o = {
+        "M+": date.getMonth() + 1,
+        "d+": date.getDate(),
+        "h+": date.getHours(),
+        "m+": date.getMinutes(),
+        "s+": date.getSeconds(),
+        "q+": Math.floor((date.getMonth() + 3) / 3),
+        "S": date.getMilliseconds() //毫秒   
+    };
+    if (/(y+)/.test(fmt))
+        fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt))
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
 var Item = /** @class */ (function (_super) {
     __extends(Item, _super);
     function Item(props) {
@@ -67,25 +87,26 @@ var Item = /** @class */ (function (_super) {
         });
     };
     Item.prototype.componentDidUpdate = function (prevprop, prevstate) {
+        //当属性或状态变化时重新获取content的高度
         var h = ReactDOM.findDOMNode(this.refs.content).clientHeight;
-        if (prevprop.isExpanded != this.props.isExpanded) {
+        if (this.state.contentHeight != h)
             this.setState({
                 contentHeight: h
             });
-        }
     };
     Item.prototype.render = function () {
-        var _a;
         var uexpstyle = {
             height: "100px",
             overflow: "hidden",
             transition: "all ease-out 1s"
         };
+        //展开状态下的高度 
         var expstyle = {
             overflow: "hidden",
             transition: "all ease-in 1s",
             height: this.state.contentHeight + "px"
         };
+        var date = this.props.info.date ? new Date(this.props.info.date) : new Date();
         return (React.createElement("div", { style: {
                 whiteSpace: "normal"
             }, className: "item" },
@@ -98,7 +119,7 @@ var Item = /** @class */ (function (_super) {
             React.createElement("div", { style: {
                     color: "blue",
                     fontSize: "0.7em"
-                } }, (_a = this.props.info.date) === null || _a === void 0 ? void 0 : _a.toString()),
+                } }, formatDate("yyyy-MM-dd hh:mm:ss", date)),
             React.createElement("div", { style: this.props.isExpanded ? expstyle : uexpstyle, onClick: this.props.OnSummaryClick },
                 React.createElement("div", { ref: "content", dangerouslySetInnerHTML: { __html: this.props.summary } }))));
     };
@@ -364,6 +385,9 @@ var MainContainer = /** @class */ (function (_super) {
     };
     MainContainer.prototype.componentDidMount = function () {
         this.getCatalog();
+        //这里直接设置为恒展开
+        var item = this.refs.item;
+        item.summarySwitch();
     };
     MainContainer.prototype.componentDidUpdate = function (prevprop, prevstate) {
         if (prevprop.catalogPath != this.props.catalogPath) {
@@ -374,11 +398,16 @@ var MainContainer = /** @class */ (function (_super) {
         this.setState({
             nowArticleMetaPath: key
         });
+        //自动跳转到content开头
+        var item = ReactDOM.findDOMNode(this.refs.item);
+        if (item instanceof Element) {
+            item.scrollIntoView();
+        }
     };
     MainContainer.prototype.enter = function () {
         //这里调用其函数展开item
-        var item = this.refs.item;
-        item.summarySwitch();
+        // let item=this.refs.item as ArticleItem;
+        // item.summarySwitch();
     };
     MainContainer.prototype.render = function () {
         //侧边栏加内容区
