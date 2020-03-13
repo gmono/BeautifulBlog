@@ -58,6 +58,10 @@ const getNowSiteHooks=cached(():ISiteHooks=>{
  */
 
 
+ //通用异常钩子
+ function getErrorCBK(name:string){
+     return (e)=>console.log(`${name}hooks中发生异常 ${e.message? e.message:""}`)
+ }
 
 /**
  * 切换网站完成后调用
@@ -70,7 +74,7 @@ export async function *changedSite(){
     const obj=getNowSiteHooks();
     await runInDir("./nowSite",()=>{
         obj&&obj.beforeUnload(ctx);
-    });
+    },getErrorCBK("切换网站"));
     //等待执行切换site操作 执行以一个await next执行上面的部分
     //执行第二个await next执行下面的部分
     yield;
@@ -78,7 +82,7 @@ export async function *changedSite(){
     const newobj=getNowSiteHooks();
     await runInDir("./nowSite",()=>{
         newobj&&newobj.loaded(ctx);
-    })
+    },getErrorCBK("切换网站"));
 }
  /**
   * 重新生成所有内容时调用
@@ -90,7 +94,7 @@ export async function afterRefresh(){
     const obj=getNowSiteHooks();
     await runInDir("./nowSite",()=>{
         obj&&obj.generated(ctx);
-    })
+    },getErrorCBK("文章刷新"))
 }
 /**
  * 声明某个文章更改 可以是增删改
@@ -121,7 +125,7 @@ export async function changed(articlepath:string,destpath:string){
     await runInDir("./nowSite",()=>{
         //dest为不带后缀名的地址
         obj&&obj.articleChanged(ctx,tp,changeExt(destpath,""));
-    })
+    },getErrorCBK("文章更改"))
 }
 
 if(require.main==module){

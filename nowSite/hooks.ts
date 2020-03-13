@@ -7,10 +7,10 @@ class Hooks implements ISiteHooks{
         console.log("unloading");
     }
     install(context: IContextInfo, installName: string) {
-        
+        throw new Error("Method not implemented.");
     }
     uninstall(context: IContextInfo, installName: string) {
-        
+        throw new Error("Method not implemented.");
     }
     loaded(context: IContextInfo) {
         console.log("loaded");
@@ -19,7 +19,7 @@ class Hooks implements ISiteHooks{
         console.log("generated");
     }
     articleChanged(context: IContextInfo, type: "change" | "add" | "remove", dest: string) {
-        
+        throw new Error("Method not implemented.");
     }
 
 

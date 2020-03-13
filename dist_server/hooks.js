@@ -47,6 +47,10 @@ const getNowSiteHooks = utils_1.cached(() => {
  * 自动获取context
  * 加载nowSite的hookds对象并调用对应事件
  */
+//通用异常钩子
+function getErrorCBK(name) {
+    return (e) => console.log(`${name}hooks中发生异常 ${e.message ? e.message : ""}`);
+}
 /**
  * 切换网站完成后调用
  */
@@ -58,7 +62,7 @@ async function* changedSite() {
     const obj = getNowSiteHooks();
     await utils_1.runInDir("./nowSite", () => {
         obj && obj.beforeUnload(ctx);
-    });
+    }, getErrorCBK("切换网站"));
     //等待执行切换site操作 执行以一个await next执行上面的部分
     //执行第二个await next执行下面的部分
     yield;
@@ -66,7 +70,7 @@ async function* changedSite() {
     const newobj = getNowSiteHooks();
     await utils_1.runInDir("./nowSite", () => {
         newobj && newobj.loaded(ctx);
-    });
+    }, getErrorCBK("切换网站"));
 }
 exports.changedSite = changedSite;
 /**
@@ -79,7 +83,7 @@ async function afterRefresh() {
     const obj = getNowSiteHooks();
     await utils_1.runInDir("./nowSite", () => {
         obj && obj.generated(ctx);
-    });
+    }, getErrorCBK("文章刷新"));
 }
 exports.afterRefresh = afterRefresh;
 /**
@@ -111,7 +115,7 @@ async function changed(articlepath, destpath) {
     await utils_1.runInDir("./nowSite", () => {
         //dest为不带后缀名的地址
         obj && obj.articleChanged(ctx, tp, utils_1.changeExt(destpath, ""));
-    });
+    }, getErrorCBK("文章更改"));
 }
 exports.changed = changed;
 if (require.main == module) {

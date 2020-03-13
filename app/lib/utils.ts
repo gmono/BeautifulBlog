@@ -13,10 +13,15 @@ export function readGlobalConfig(){
     return fse.readJSON(path.resolve(__dirname,"../../global.json")) as Promise<IGlobalConfig>;
 }
 
-export async function runInDir(dirpath:string,func:Function){
+export async function runInDir(dirpath:string,func:Function,errorcbk?:(e:any)=>void){
     const s=process.cwd()
     process.chdir(dirpath);
-    await func();
+    try{
+        await func();
+    }
+    catch(e){
+        errorcbk(e);
+    }
     process.chdir(s);
 }
 
