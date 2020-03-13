@@ -1,5 +1,6 @@
 "use strict";
 //钩子系统 会被server端程序调用 当
+///aaa
 var Hooks = /** @class */ (function () {
     function Hooks() {
     }

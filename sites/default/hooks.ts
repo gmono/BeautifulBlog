@@ -1,7 +1,7 @@
 import ISiteHooks from '../../app/Interface/ISiteHooks';
 import IContextInfo from '../../app/Interface/IContextInfo';
 //钩子系统 会被server端程序调用 当
-
+///aaa
 class Hooks implements ISiteHooks{
     beforeUnload(context: IContextInfo) {
         console.log("unloading");
