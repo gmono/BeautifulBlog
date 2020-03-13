@@ -57,12 +57,19 @@ const utils_1 = require("./lib/utils");
  */
 async function watchSite(sitename) {
     let spath = path.resolve("./sites", sitename);
-    if (!(await fse.pathExists(spath)))
+    //如果不存在则返回
+    if (!(await fse.pathExists(spath))) {
+        console.log(`网站${sitename}不存在`);
         return;
+    }
+    //先进行一次changesite
+    console.log("正在初始化网站...");
+    await changesite_1.default(sitename);
     let mon = await createMonitor(spath);
     let update = async (f) => {
         //更新网站
         //这里直接使用changesite 后期考虑优化
+        console.log("正在同步网站更改");
         await changesite_1.default(sitename);
         console.log("网站同步完成!");
         exports.OnSiteSynced.next();

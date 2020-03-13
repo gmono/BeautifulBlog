@@ -83,11 +83,12 @@ pro.command("dev [configname] [usesync] [serverport]")
             });
             c.stdout.on("data",(str:Buffer)=>{
                 console.log("[同步程序] ",str.toString());
-            })
+            });
         }
     })
 
 import * as ph from "path"
+import * as execa from 'execa';
 //new命令与create程序对应
 pro.command("new <type> <path> <name> ")
     .description("创建文章或子类 type: a 文章 c 子类 ")
