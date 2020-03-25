@@ -5,6 +5,7 @@ import IContextInfo from './IContextInfo';
 
 
 export default interface ISiteHooks{
+    init(basepath:string,context:IContextInfo);
     //执行changesit装载此site后触发，只有loaded的site才会被触发其他事件
     loaded(context:IContextInfo);
     //文章重新生成 

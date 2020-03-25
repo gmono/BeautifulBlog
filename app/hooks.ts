@@ -1,9 +1,7 @@
 import IContextInfo from './Interface/IContextInfo';
-import { readConfig, readGlobalConfig, cached, runInDir, changeExt } from './lib/utils';
+import { readConfig, readGlobalConfig, cached, changeExt, runWithError } from './lib/utils';
 import ISiteHooks from './Interface/ISiteHooks';
-import { BehaviorSubject } from 'rxjs';
 import * as fse from 'fs-extra';
-import * as path from 'path';
 /**
  * site事件钩子调用代理
  * 所有程序通过给此程序通知事件，借由此程序调用对应site的事件钩子
@@ -72,7 +70,7 @@ export async function *changedSite(){
     //调用新site的loaded钩子
     const ctx=await getContext();
     const obj=getNowSiteHooks();
-    await runInDir("./nowSite",()=>{
+    await runWithError(()=>{
         obj&&obj.beforeUnload(ctx);
     },getErrorCBK("切换网站"));
     //等待执行切换site操作 执行以一个await next执行上面的部分
@@ -80,7 +78,7 @@ export async function *changedSite(){
     yield;
     //切换site操作结束
     const newobj=getNowSiteHooks();
-    await runInDir("./nowSite",()=>{
+    await runWithError(()=>{
         newobj&&newobj.loaded(ctx);
     },getErrorCBK("切换网站"));
 }
@@ -92,7 +90,7 @@ export async function afterRefresh(){
     await fse.ensureDir("./nowSite");
     const ctx=await getContext();
     const obj=getNowSiteHooks();
-    await runInDir("./nowSite",()=>{
+    await runWithError(()=>{
         obj&&obj.generated(ctx);
     },getErrorCBK("文章刷新"))
 }
@@ -102,7 +100,7 @@ export async function afterRefresh(){
  * @param articlepath 更改的文章
  * @param destpath 生成目的地址（不带后缀名）
  */
-export async function changed(articlepath:string,destpath:string){
+export async function changed(destpath:string){
     await fse.ensureDir("./nowSite");
     const ctx=await getContext();
     const obj=getNowSiteHooks();
@@ -122,7 +120,8 @@ export async function changed(articlepath:string,destpath:string){
         if(info.ctimeMs==info.mtimeMs) tp="add";
         else tp="change";
     }
-    await runInDir("./nowSite",()=>{
+
+    await runWithError(()=>{
         //dest为不带后缀名的地址
         obj&&obj.articleChanged(ctx,tp,changeExt(destpath,""));
     },getErrorCBK("文章更改"))

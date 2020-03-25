@@ -13,16 +13,28 @@ export function readGlobalConfig(){
     return fse.readJSON(path.resolve(__dirname,"../../global.json")) as Promise<IGlobalConfig>;
 }
 
-export async function runInDir(dirpath:string,func:Function,errorcbk?:(e:any)=>void){
+export async function runInDir<T extends Parameters<typeof runWithError>>(dirpath:string,...args:T){
+    // assert(args.length>=2,"参数错误");
     const s=process.cwd()
     process.chdir(dirpath);
+    await (runWithError as Function)(...args);
+    process.chdir(s);
+}
+export async function runWithError<T extends any[]>(func:(...args:T)=>any,errorcbk:(e:any)=>void,args?:T)
+{
     try{
-        await func();
+        //无参调用与有参调用
+        if(args==null)
+        {
+            let fun=func as Function;
+            await fun();
+        }
+        else func(...args);
+        
     }
     catch(e){
         errorcbk(e);
     }
-    process.chdir(s);
 }
 
 /**
@@ -119,6 +131,7 @@ export function pathMap(srcpath:string,base:string,newbase:string){
 
 import * as equal from "fast-deep-equal"
 import * as ld from 'lodash';
+import { assert } from 'console';
 /**
  * 包装函数，在参数与上次相同时返回上一次结果不调用函数
  * 注意为了提高性能，本函数并不对result进行deepClone缓存，返回值不可修改否则将破坏一致性

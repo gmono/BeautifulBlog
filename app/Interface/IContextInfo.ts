@@ -4,6 +4,8 @@ import { IGlobalConfig } from './IGlobalConfig';
 
 
 export default interface IContextInfo{
+    //blog路径
+    blogPath:string;
     version:string;
     node_version:string;
     //当前使用的配置文件 在site装载 卸载 安装时没有此项
