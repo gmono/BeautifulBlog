@@ -59,7 +59,7 @@ async function initGit(dirpath) {
         await utils_1.innerCopy(path.resolve(__dirname, "../static/template_gitignore.txt"), "./.gitignore");
         await execa("git add .", { stdio: "inherit" });
         await execa(`git commit -m "创建博客" `, { stdio: "inherit" });
-    });
+    }, null);
     console.log("创建完毕");
 }
 exports.initGit = initGit;
@@ -155,13 +155,6 @@ async function push() {
     }
 }
 exports.push = push;
-function hasUndefined(obj, names) {
-    for (let k of names) {
-        if (obj[k] == undefined)
-            return true;
-    }
-    return false;
-}
 /**
  * 用户接口 添加仓库 提示输入名字和url
  */
@@ -175,7 +168,7 @@ async function add() {
             name: "url",
             message: "请输入Remote仓库地址(GIT地址):"
         }]);
-    if (hasUndefined(response, ["name", "url"]))
+    if (utils_1.hasUndefined(response, ["name", "url"]))
         return;
     //判断是否为https链接 如果是则要求输入用户名密码
     let url = response.url.trim();
@@ -190,7 +183,7 @@ async function add() {
                 name: "password",
                 message: "请输入密码:"
             }]);
-        if (hasUndefined(response, ["username", "password"]))
+        if (utils_1.hasUndefined(response, ["username", "password"]))
             return;
         //转义@符号
         let username = userinfo.username.replace(/@/g, "%40");
@@ -218,7 +211,7 @@ async function remove(repos = null) {
             message: "请输入要删除的仓库",
             choices: reposes
         });
-        if (hasUndefined(res, ["removes"]))
+        if (utils_1.hasUndefined(res, ["removes"]))
             return;
         repos = res.removes;
     }

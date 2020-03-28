@@ -23,7 +23,7 @@ import generate from './generator';
 import changesite from './changesite';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import { readConfig,runInDir, innerCopy } from './lib/utils';
+import { readConfig,runInDir, innerCopy, hasUndefined } from './lib/utils';
 import prompts = require("prompts");
 
 ///基本功能函数部分
@@ -83,7 +83,7 @@ export async function initGit(dirpath:string){
         await innerCopy(path.resolve(__dirname,"../static/template_gitignore.txt"),"./.gitignore");
         await execa("git add .",{stdio:"inherit"});
         await execa(`git commit -m "创建博客" `,{stdio:"inherit"});
-    });
+    },null);
     console.log("创建完毕")
 }
 
@@ -181,14 +181,7 @@ export async function push(){
 
 }
 
-function hasUndefined(obj:object,names:PropertyKey[]){
-    for(let k of names){
-        if(obj[k]==undefined)
-            return true;
-    }
-    return false;
 
-}
 
 /**
  * 用户接口 添加仓库 提示输入名字和url

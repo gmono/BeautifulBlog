@@ -19,7 +19,7 @@ class Hooks implements ISiteHooks{
         // throw new Error("Method not implemented.");
     }
     loaded(context: IContextInfo) {
-        // console.log("loaded");
+        console.log("this is default theme");
     }    
     generated(context: IContextInfo) {
         // console.log("generated");

@@ -3,27 +3,56 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fse = require("fs-extra");
 const path = require("path");
 const walk = require("walk");
+//确保对象指定的key中没有undefined
+function objHasValue(obj, names, val) {
+    for (let k of names) {
+        if (obj[k] === val)
+            return true;
+    }
+    return false;
+}
+exports.objHasValue = objHasValue;
+function hasUndefined(...args) {
+    return objHasValue(args[0], args[1], undefined);
+}
+exports.hasUndefined = hasUndefined;
 function readConfig(name) {
     return fse.readJson(path.resolve(__dirname, `../../config/${name}.json`));
 }
 exports.readConfig = readConfig;
 function readGlobalConfig() {
-    //读取全局配置文件
-    return fse.readJSON(path.resolve(__dirname, "../../global.json"));
+    //读取全局配置文件 从blog根目录
+    return fse.readJSON("./global.json");
 }
 exports.readGlobalConfig = readGlobalConfig;
-async function runInDir(dirpath, func, errorcbk) {
+function writeToGlobalConfig(obj) {
+    return fse.writeJSONSync("./global.json", obj);
+}
+exports.writeToGlobalConfig = writeToGlobalConfig;
+async function runInDir(dirpath, ...args) {
+    // assert(args.length>=2,"参数错误");
     const s = process.cwd();
     process.chdir(dirpath);
-    try {
-        await func();
-    }
-    catch (e) {
-        errorcbk(e);
-    }
+    await runWithError(...args);
     process.chdir(s);
 }
 exports.runInDir = runInDir;
+async function runWithError(func, errorcbk, args) {
+    try {
+        //无参调用与有参调用
+        if (args == null) {
+            let fun = func;
+            await fun();
+        }
+        else
+            func(...args);
+    }
+    catch (e) {
+        if (errorcbk)
+            errorcbk(e);
+    }
+}
+exports.runWithError = runWithError;
 /**
  * 修改一个路径的扩展名并返回(原文件名无扩展名也可使用)
  * @param fpath 文件路径

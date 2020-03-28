@@ -4,13 +4,28 @@ import path = require("path");
 import * as walk from "walk"
 import { IGlobalConfig } from '../Interface/IGlobalConfig';
 import { deepEqual } from 'assert';
+//确保对象指定的key中没有undefined
+export function objHasValue(obj:object,names:PropertyKey[],val:any){
+    for(let k of names){
+        if(obj[k]===val)
+            return true;
+    }
+    return false;
+} 
+export function hasUndefined<T extends Parameters<typeof objHasValue>>(...args:[T[0],T[1]]){
+    return objHasValue(args[0],args[1],undefined);
+}
 
 export function readConfig(name:string){
     return fse.readJson(path.resolve(__dirname,`../../config/${name}.json`)) as Promise<IConfig>;
 }
 export function readGlobalConfig(){
-    //读取全局配置文件
-    return fse.readJSON(path.resolve(__dirname,"../../global.json")) as Promise<IGlobalConfig>;
+    //读取全局配置文件 从blog根目录
+    return fse.readJSON("./global.json") as Promise<IGlobalConfig>;
+}
+export function writeToGlobalConfig(obj:IGlobalConfig)
+{
+    return fse.writeJSONSync("./global.json",obj);
 }
 
 export async function runInDir<T extends Parameters<typeof runWithError>>(dirpath:string,...args:T){
@@ -20,7 +35,8 @@ export async function runInDir<T extends Parameters<typeof runWithError>>(dirpat
     await (runWithError as Function)(...args);
     process.chdir(s);
 }
-export async function runWithError<T extends any[]>(func:(...args:T)=>any,errorcbk:(e:any)=>void,args?:T)
+
+export async function runWithError<T extends any[]>(func:(...args:T)=>any,errorcbk?:(e:any)=>void,args?:T)
 {
     try{
         //无参调用与有参调用
@@ -33,7 +49,7 @@ export async function runWithError<T extends any[]>(func:(...args:T)=>any,errorc
         
     }
     catch(e){
-        errorcbk(e);
+        if(errorcbk) errorcbk(e);
     }
 }
 

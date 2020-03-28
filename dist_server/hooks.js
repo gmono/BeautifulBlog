@@ -60,7 +60,7 @@ async function* changedSite() {
     //调用新site的loaded钩子
     const ctx = await getContext();
     const obj = getNowSiteHooks();
-    await utils_1.runInDir("./nowSite", () => {
+    await utils_1.runWithError(() => {
         obj && obj.beforeUnload(ctx);
     }, getErrorCBK("切换网站"));
     //等待执行切换site操作 执行以一个await next执行上面的部分
@@ -68,7 +68,7 @@ async function* changedSite() {
     yield;
     //切换site操作结束
     const newobj = getNowSiteHooks();
-    await utils_1.runInDir("./nowSite", () => {
+    await utils_1.runWithError(() => {
         newobj && newobj.loaded(ctx);
     }, getErrorCBK("切换网站"));
 }
@@ -81,7 +81,7 @@ async function afterRefresh() {
     await fse.ensureDir("./nowSite");
     const ctx = await getContext();
     const obj = getNowSiteHooks();
-    await utils_1.runInDir("./nowSite", () => {
+    await utils_1.runWithError(() => {
         obj && obj.generated(ctx);
     }, getErrorCBK("文章刷新"));
 }
@@ -92,7 +92,7 @@ exports.afterRefresh = afterRefresh;
  * @param articlepath 更改的文章
  * @param destpath 生成目的地址（不带后缀名）
  */
-async function changed(articlepath, destpath) {
+async function changed(destpath) {
     await fse.ensureDir("./nowSite");
     const ctx = await getContext();
     const obj = getNowSiteHooks();
@@ -112,7 +112,7 @@ async function changed(articlepath, destpath) {
         else
             tp = "change";
     }
-    await utils_1.runInDir("./nowSite", () => {
+    await utils_1.runWithError(() => {
         //dest为不带后缀名的地址
         obj && obj.articleChanged(ctx, tp, utils_1.changeExt(destpath, ""));
     }, getErrorCBK("文章更改"));

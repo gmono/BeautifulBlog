@@ -61,7 +61,8 @@ async function createBlog(dirpath, autocreate = true, autoreplace = false) {
         utils_2.innerCopy(`${__dirname}/../sites/default`, `${dirpath}/sites/default`),
         utils_2.innerCopy(`${__dirname}/../config/default.json`, `${dirpath}/config/default.json`),
         utils_2.innerCopy(`${__dirname}/../assets`, `${dirpath}/assets`),
-        utils_2.innerCopy(`${__dirname}/../index.html`, `${dirpath}/index.html`)
+        utils_2.innerCopy(`${__dirname}/../index.html`, `${dirpath}/index.html`),
+        utils_2.innerCopy(`${__dirname}/../global.json`, `${dirpath}/global.json`)
     ]);
     console.log("文件复制完毕");
     console.log("切换到默认site");

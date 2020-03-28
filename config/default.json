@@ -8,6 +8,6 @@
         "shell","powershell",
         "sql","markdown"
     ],
-    "site":"default",
+    "site":"mysite",
     "editor":"code"
 }
