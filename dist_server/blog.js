@@ -78,6 +78,7 @@ pro.command("dev [configname] [usesync] [serverport]")
     }
 });
 const ph = require("path");
+const config_1 = require("./config");
 //new命令与create程序对应
 pro.command("new <type> <path> <name> ")
     .description("创建文章或子类 type: a 文章 c 子类 ")
@@ -110,9 +111,9 @@ pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|rem
         },
         push() {
             if (p1 != null)
-                manager_1.push(p1);
+                manager_1.pushToRepos(p1);
             else
-                manager_1.push();
+                manager_1.pushUp();
         },
         add() {
             manager_1.add();
@@ -123,6 +124,24 @@ pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|rem
     };
     cmds[cmd]();
 });
+pro.command("config <cmd> <target> [target2]").description("管理配置文件").action((async (cmd, target, target2) => {
+    let cmds = {
+        add(target, target2, ...args) {
+            return config_1.createConfig(target2, target);
+        },
+        del(target, ...args) {
+            return config_1.deleteConfig(target);
+        },
+        use(target, ...args) {
+            return config_1.useConfig(target);
+        }
+    };
+    if (cmd in cmds == false) {
+        console.log("命令错误");
+        return;
+    }
+    await cmds[cmd](...[target, target2]);
+}));
 pro.command("help").description("输出帮助").action(() => pro.outputHelp());
 pro.parseAsync(process.argv);
 // console.log("hhhh");

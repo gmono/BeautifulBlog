@@ -150,10 +150,9 @@ export async function listRemote(){
 }
     
 /**
- * 用户接口，提交到某个仓库   
- * @param name 仓库名，如果不提供则提交到所有仓库
+ * 用户接口，提交到某个仓库   自动询问
  */
-export async function push(){
+export async function pushUp(){
     //获取所有仓库
     const allrepos=await getRemoteList();
     //转换为选项

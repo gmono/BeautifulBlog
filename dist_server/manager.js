@@ -123,10 +123,9 @@ async function listRemote() {
 }
 exports.listRemote = listRemote;
 /**
- * 用户接口，提交到某个仓库
- * @param name 仓库名，如果不提供则提交到所有仓库
+ * 用户接口，提交到某个仓库   自动询问
  */
-async function push() {
+async function pushUp() {
     //获取所有仓库
     const allrepos = await getRemoteList();
     //转换为选项
@@ -154,7 +153,7 @@ async function push() {
         await pushToRepos(res.select);
     }
 }
-exports.push = push;
+exports.pushUp = pushUp;
 /**
  * 用户接口 添加仓库 提示输入名字和url
  */

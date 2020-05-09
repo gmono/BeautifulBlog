@@ -26,9 +26,16 @@ function readGlobalConfig() {
 }
 exports.readGlobalConfig = readGlobalConfig;
 function writeToGlobalConfig(obj) {
-    return fse.writeJSONSync("./global.json", obj);
+    return fse.writeJSON("./global.json", obj, { spaces: 4 });
 }
 exports.writeToGlobalConfig = writeToGlobalConfig;
+//添加函数 用于支持“修改json文件"
+async function changeJson(jsonpath, cbk) {
+    let obj = await fse.readJson(jsonpath);
+    let res = await cbk(obj);
+    await fse.writeJson(jsonpath, res);
+}
+exports.changeJson = changeJson;
 async function runInDir(dirpath, ...args) {
     // assert(args.length>=2,"参数错误");
     const s = process.cwd();

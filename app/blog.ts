@@ -17,7 +17,7 @@ import { createArticle, createClass } from "./create";
 import { exec, fork } from "child_process";
 import watchArticles from "./watch";
 import { createBlog } from "./init";
-import { listRemote,  push, add, remove } from "./manager";
+import { listRemote,  pushUp, add, remove, pushToRepos } from "./manager";
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename:string,dest?:string)=>{
@@ -89,6 +89,7 @@ pro.command("dev [configname] [usesync] [serverport]")
 
 import * as ph from "path"
 import * as execa from 'execa';
+import { createConfig, deleteConfig, useConfig } from "./config";
 //new命令与create程序对应
 pro.command("new <type> <path> <name> ")
     .description("创建文章或子类 type: a 文章 c 子类 ")
@@ -122,8 +123,8 @@ pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|rem
             },
             push(){
                 if(p1!=null)
-                    push(p1);
-                else push();
+                    pushToRepos(p1);
+                else pushUp();
             },
             add(){
                 add()
@@ -134,6 +135,22 @@ pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|rem
         }
         cmds[cmd]();
     })
+
+pro.command("config <cmd> <target> [target2]").description("管理配置文件").action((async (cmd:string,target:string,target2:string)=>{
+    let cmds={
+        add(target:string,target2:string,...args){
+            return createConfig(target2,target)
+        },
+        del(target:string,...args){
+            return deleteConfig(target)
+        },
+        use(target:string,...args){
+            return useConfig(target);
+        }
+    }
+    if(cmd in cmds==false) {console.log("命令错误");return;}
+    await cmds[cmd](...[target,target2]);
+}))
 pro.command("help").description("输出帮助").action(()=>pro.outputHelp());
 
 pro.parseAsync(process.argv);
