@@ -25,7 +25,13 @@ export function readGlobalConfig(){
 }
 export function writeToGlobalConfig(obj:IGlobalConfig)
 {
-    return fse.writeJSONSync("./global.json",obj);
+    return fse.writeJSON("./global.json",obj);
+}
+//添加函数 用于支持“修改json文件"
+export async function changeJson<T>(jsonpath:string,cbk:(obj:T)=>Promise<T>){
+    let obj=await fse.readJson(jsonpath);
+    let res=await cbk(obj);
+    await fse.writeJson(jsonpath,res);
 }
 
 export async function runInDir<T extends Parameters<typeof runWithError>>(dirpath:string,...args:T){
