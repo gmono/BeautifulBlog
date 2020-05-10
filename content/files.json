@@ -1,16 +1,6 @@
 {
-	"useConfig": "default",
+	"useConfig": "origin",
 	"fileList": {
-		"/BeautifulBlog/content/about.json": {
-			"title": "关于博客",
-			"article_path": "./articles/about.md",
-			"filesDir_url": "/BeautifulBlog/content/about.dir"
-		},
-		"/BeautifulBlog/content/ceshi.json": {
-			"title": "ceshi",
-			"article_path": "./articles/ceshi.pdf",
-			"filesDir_url": "/BeautifulBlog/content/ceshi.dir"
-		},
 		"/BeautifulBlog/content/tech/设计一个新的静态博客系统.json": {
 			"title": "设计一个新的静态博客系统",
 			"article_path": "./articles/tech/设计一个新的静态博客系统.md",
