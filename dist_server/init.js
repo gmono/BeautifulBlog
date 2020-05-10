@@ -36,7 +36,8 @@ async function createBlog(dirpath, autocreate = true, autoreplace = false) {
             fs_extra_1.mkdir(`${dirpath}/nowSite`),
             fs_extra_1.mkdir(`${dirpath}/config`),
             fs_extra_1.mkdir(`${dirpath}/sites`),
-            fs_extra_1.mkdir(`${dirpath}/assets`)
+            fs_extra_1.mkdir(`${dirpath}/assets`),
+            fs_extra_1.mkdir(`${dirpath}/transforms`)
         ]);
     };
     //当前直接程序创建
@@ -57,12 +58,14 @@ async function createBlog(dirpath, autocreate = true, autoreplace = false) {
         }
     }
     console.log("目录创建完毕");
+    //复制transforms目录 从虚拟源码路径中到blog目录中
     await Promise.all([
         utils_2.innerCopy(`${__dirname}/../sites/default`, `${dirpath}/sites/default`),
         utils_2.innerCopy(`${__dirname}/../config/default.json`, `${dirpath}/config/default.json`),
         utils_2.innerCopy(`${__dirname}/../assets`, `${dirpath}/assets`),
         utils_2.innerCopy(`${__dirname}/../index.html`, `${dirpath}/index.html`),
-        utils_2.innerCopy(`${__dirname}/../global.json`, `${dirpath}/global.json`)
+        utils_2.innerCopy(`${__dirname}/../global.json`, `${dirpath}/global.json`),
+        utils_2.innerCopy(`${__dirname}/transforms`, `${dirpath}/transforms`)
     ]);
     console.log("文件复制完毕");
     console.log("切换到默认site");

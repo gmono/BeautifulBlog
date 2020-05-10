@@ -18,6 +18,9 @@ import { exec, fork } from "child_process";
 import watchArticles from "./watch";
 import { createBlog } from "./init";
 import { listRemote,  pushUp, add, remove, pushToRepos } from "./manager";
+import { readGlobalConfig } from "./lib/utils";
+//读取 全局配置文件
+const globalconfig=readGlobalConfig();
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename:string,dest?:string)=>{
@@ -28,9 +31,11 @@ pro.command("transform <filename> [dest]")
     });
 
 
-pro.command("generate [configname] [refresh] [verbose]")
+pro.command("generate [refresh] [verbose]")
     .description("执行生成器程序(verbose 可选择v和verbose 不填默认不显示生成详情)")
-    .action(async (config?:string,refresh:"y"|"n"="n",verbose?:string)=>{
+    .action(async (refresh:"y"|"n"="n",verbose?:string)=>{
+        //使用全局配置
+        const config=(await globalconfig).configName;
         let v=verbose=="v"||verbose=="verbose";
         let r=refresh=="y";
         await generate(config,v,r);
@@ -44,15 +49,17 @@ pro.command("changesite [sitename]")
     });
 
 //并不等同于watch程序（watch程序中有监视articles目录和sites目录的函数）
-pro.command("watch [configname]")
+pro.command("watch")
     .description("监视文件改动并实时生成")
-    .action(async (configname?:string)=>{
+    .action(async ()=>{
+        const config=(await globalconfig).configName;
         console.log("正在监视文章改动......");
-        await watchArticles(configname);
+        await watchArticles(config);
     });
-pro.command("sync  [configname] [port]")
+pro.command("sync [port]")
 .description("启动开发服务器(指定端口与配置文件）")
-.action(async (configname="default",port:string=null)=>{
+.action(async (port:string=null)=>{
+    const configname=(await globalconfig).configName;
     if(port==null) await sync(null,configname);
     else{
         let p=parseInt(port);
@@ -60,19 +67,21 @@ pro.command("sync  [configname] [port]")
     }
 });
 
-pro.command("refresh [configname]")
+pro.command("refresh")
     .description("刷新，切换网站并重新生成内容，相当于changesite与generate的组合")
-    .action(async (configname="default")=>{
-        await sitegen(configname);
+    .action(async ()=>{
+        const config=(await globalconfig).configName;
+        await sitegen(config);
     });
 
 /**
  * 其中usesync 为n时 configname只用于选取要监视的网站(编译并自动复制到nowSite) usesync为y时，configname还用于给
  * sync程序指定配置文件（用于生成内容）
  */
-pro.command("dev [configname] [usesync] [serverport]")
+pro.command("dev [usesync] [serverport]")
     .description("启动开发用自动编译器（开发时专用),usesync=y|n （y等同于自动执行sync命令）")
-    .action(async (configname:string="default",useserver:"y"|"n"="y",serverport="8080")=>{
+    .action(async (useserver:"y"|"n"="y",serverport="8080")=>{
+        const configname=(await globalconfig).configName;
         await dev(configname);
         //考虑在此处启动开发服务器实现自动同步site和自动生成content 以提供完整的开发体验
         if(useserver=="y"){
@@ -90,6 +99,7 @@ pro.command("dev [configname] [usesync] [serverport]")
 import * as ph from "path"
 import * as execa from 'execa';
 import { createConfig, deleteConfig, useConfig } from "./config";
+
 //new命令与create程序对应
 pro.command("new <type> <path> <name> ")
     .description("创建文章或子类 type: a 文章 c 子类 ")
