@@ -75,7 +75,7 @@ export function changeExt(fpath:string,ext:string=""){
 
 //工具函数区域
 /**
- * 复制，通过write(read(file)) 功能继承自fse.copy
+ * 复制，主要是可以从虚拟路径复制，不依赖系统复制命令,通过write(read(file)) 功能继承自fse.copy
  * @param src 源地址
  * @param dest 目的地址
  */

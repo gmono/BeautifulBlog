@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createBlog = void 0;
 const fs_extra_1 = require("fs-extra");
 /**
  * 主要用于在一个目录中创建基本的博客目录结构

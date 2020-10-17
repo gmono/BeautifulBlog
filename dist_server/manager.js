@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.remove = exports.add = exports.pushUp = exports.listRemote = exports.changeUserAndPass = exports.removeRepos = exports.addRepos = exports.pushToRepos = exports.initGit = exports.getRemoteList = exports.getRemote = exports.getNames = void 0;
 const execa = require("execa");
 const generator_1 = require("./generator");
 const path = require("path");

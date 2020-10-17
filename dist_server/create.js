@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createTagByClass = exports.createVersionByClasses = exports.createClassByClasses = exports.createArticleByClasses = exports.createTag = exports.createVersion = exports.createClass = exports.createArticle = void 0;
 const fse = require("fs-extra");
 const path = require("path");
 const execa = require("execa");

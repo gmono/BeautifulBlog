@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.mapCached = exports.cached = exports.pathMap = exports.getUrlFromPath = exports.innerCopy = exports.changeExt = exports.runWithError = exports.runInDir = exports.changeJson = exports.writeToGlobalConfig = exports.readGlobalConfig = exports.readConfig = exports.hasUndefined = exports.objHasValue = void 0;
 const fse = require("fs-extra");
 const path = require("path");
 const walk = require("walk");
@@ -76,7 +77,7 @@ function changeExt(fpath, ext = "") {
 exports.changeExt = changeExt;
 //工具函数区域
 /**
- * 复制，通过write(read(file)) 功能继承自fse.copy
+ * 复制，主要是可以从虚拟路径复制，不依赖系统复制命令,通过write(read(file)) 功能继承自fse.copy
  * @param src 源地址
  * @param dest 目的地址
  */

@@ -1,9 +1,9 @@
 {
   "name": "blogsystem",
-  "version": "0.0.1",
+  "version": "0.6.1-alpha",
   "description": "博客系统，可自定义整个网站",
   "main": "generate.js",
-  "bin": "./dist_server/blog.js",
+  "bin": {"blog":"node ./dist_server/blog.js"},
   "pkg": {
     "scripts": [
       "./node_modules/prismjs/components/*.js",

@@ -1,6 +1,7 @@
 "use strict";
 //开发服务器 用于实时预览 未完成
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.watchSite = exports.OnSiteSynced = exports.OnArticleGenerated = void 0;
 const watch = require("watch");
 async function createMonitor(root) {
     return new Promise((resolve, reject) => {

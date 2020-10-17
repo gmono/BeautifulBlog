@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.transformFile = exports.getFilesDir = exports.getFileFromDest = exports.readMetaFromArticle = exports.getAllowFileExts = exports.ensureTransformTable = void 0;
 const fs = require("fs");
 const toml = require("toml");
 let readAsync = async (fpath) => {
