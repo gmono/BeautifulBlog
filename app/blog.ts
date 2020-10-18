@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * 总和程序 通过commander构建   
  */
