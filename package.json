@@ -1,9 +1,11 @@
 {
   "name": "blogsystem",
-  "version": "0.6.1-alpha3",
+  "version": "0.6.1-alpha4",
   "description": "博客系统，可自定义整个网站",
   "main": "blog.ts",
-  "bin": {"blog":"./blog.bat"},
+  "bin": {
+    "blog": "node ./dist_server/blog.js"
+  },
   "pkg": {
     "scripts": [
       "./node_modules/prismjs/components/*.js",
@@ -95,7 +97,13 @@
     "nightmare": "^3.0.2",
     "simple-git": "^1.131.0",
     "webpack": "^4.41.5"
-  },"keywords": [
-    "blog","blogsystem","static-blog","static-site","website","theme"
+  },
+  "keywords": [
+    "blog",
+    "blogsystem",
+    "static-blog",
+    "static-site",
+    "website",
+    "theme"
   ]
 }
