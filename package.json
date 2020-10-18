@@ -1,10 +1,11 @@
 {
   "name": "blogsystem",
-  "version": "0.6.1-alpha6",
+  "version": "0.6.1-alpha7",
   "description": "博客系统，可自定义整个网站",
   "main": "blog.ts",
+  "preferGlobal": true,
   "bin": {
-    "blog": "./dist_server/blog"
+    "blog": "./blog"
   },
   "pkg": {
     "scripts": [
