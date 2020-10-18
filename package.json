@@ -1,9 +1,9 @@
 {
   "name": "blogsystem",
-  "version": "0.6.1-alpha",
+  "version": "0.6.1-alpha3",
   "description": "博客系统，可自定义整个网站",
-  "main": "generate.js",
-  "bin": {"blog":"node ./dist_server/blog.js"},
+  "main": "blog.ts",
+  "bin": {"blog":"./blog.bat"},
   "pkg": {
     "scripts": [
       "./node_modules/prismjs/components/*.js",
@@ -17,6 +17,10 @@
       "./index.html",
       "./global.json"
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gmono/BeautifulBlog"
   },
   "scripts": {
     "gen": " node ./dist_server/generator.js",
@@ -91,5 +95,7 @@
     "nightmare": "^3.0.2",
     "simple-git": "^1.131.0",
     "webpack": "^4.41.5"
-  }
+  },"keywords": [
+    "blog","blogsystem","static-blog","static-site","website","theme"
+  ]
 }
