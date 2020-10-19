@@ -154,6 +154,7 @@ exports.pathMap = pathMap;
 const equal = require("fast-deep-equal");
 const ld = require("lodash");
 /**
+ * ! 必须保证参数和结果的对应关系 也即必须是纯函数或者确保不会出现不同才能使用此函数
  * 包装函数，在参数与上次相同时返回上一次结果不调用函数
  * 注意为了提高性能，本函数并不对result进行deepClone缓存，返回值不可修改否则将破坏一致性
  * @param args 参数

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.changed = exports.afterRefresh = exports.changedSite = void 0;
 const utils_1 = require("./lib/utils");
 const fse = require("fs-extra");
+const path = require("path");
 /**
  * site事件钩子调用代理
  * 所有程序通过给此程序通知事件，借由此程序调用对应site的事件钩子
@@ -30,17 +31,19 @@ const getContext = utils_1.cached(async (configname) => {
     return ret;
 });
 //site hooks对象加载函数
-const getNowSiteHooks = utils_1.cached(() => {
+const getNowSiteHooks = () => {
     //加载nowsite的hooks.js文件并得到其导出的ISiteHooks接口对象
     //统一使用export={} 方式导出
+    //require的相对路径问题
     try {
-        let obj = require("../nowSite/hooks.js");
+        // console.log(path.resolve("./nowSite/hooks.js"))
+        let obj = require(path.resolve("./nowSite/hooks.js"));
         return obj;
     }
     catch (e) {
         return null;
     }
-});
+};
 //代理函数部分
 //代理函数主要完成：
 /**
@@ -60,17 +63,18 @@ async function* changedSite() {
     //调用之前site的beforeUnload钩子
     //调用新site的loaded钩子
     const ctx = await getContext();
-    const obj = getNowSiteHooks();
     await utils_1.runWithError(() => {
-        obj && obj.beforeUnload(ctx);
+        const obj = getNowSiteHooks();
+        obj?.beforeUnload(ctx);
     }, getErrorCBK("切换网站"));
     //等待执行切换site操作 执行以一个await next执行上面的部分
     //执行第二个await next执行下面的部分
     yield;
     //切换site操作结束
-    const newobj = getNowSiteHooks();
     await utils_1.runWithError(() => {
-        newobj && newobj.loaded(ctx);
+        const newobj = getNowSiteHooks();
+        // console.log(newobj)
+        newobj?.loaded(ctx);
     }, getErrorCBK("切换网站"));
 }
 exports.changedSite = changedSite;

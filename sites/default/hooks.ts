@@ -10,22 +10,23 @@ class Hooks implements ISiteHooks{
     }
     
     beforeUnload(context: IContextInfo) {
-        console.log("unloading");
+        console.log("正在切换出默认主题");
     }
     install(context: IContextInfo, installName: string) {
         // throw new Error("Method not implemented.");
+        console.log("安装，默认主题？");
     }
     uninstall(context: IContextInfo, installName: string) {
-        // throw new Error("Method not implemented.");
+        console.log("卸载：默认主题");
     }
     loaded(context: IContextInfo) {
-        console.log("this is default theme");
+        console.log("默认主题，瞎几把写的，将就着用吧.");
     }    
     generated(context: IContextInfo) {
-        // console.log("generated");
+        console.log(`生成文章了，已经，这里可以写一些代码，比如把文章自动加随即配图然后放到主页${context.version}`);
     }
     articleChanged(context: IContextInfo, type: "change" | "add" | "remove", dest: string) {
-        // throw new Error("Method not implemented.");
+        console.log("文章更改，这时候网站应该立刻响应，如果没事就算了 当然");
     }
 
 

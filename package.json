@@ -18,7 +18,8 @@
       "./config/*.json",
       "./assets/**/*",
       "./index.html",
-      "./global.json"
+      "./global.json",
+      "./articles/about.md"
     ]
   },
   "repository": {

@@ -122,7 +122,8 @@ const filesjsonpath="./content/files.json";
  */
 async function generate(configname:string="default",verbose=false,refresh=false)
 {
-    await ensurePath("./content");
+    await fs.ensureDir("./content")
+    // await ensurePath("");
     //refresh的含义是
     //1 即使存在content元数据依然执行generate 2. 即使配置文件一致依然初始化files
     if(refresh) {

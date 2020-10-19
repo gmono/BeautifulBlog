@@ -73,7 +73,6 @@ function getUrlFile(root, filestat, base_url) {
  * getUrlFile:相对于base_url的路径（可直接做为网站链接）
  */
 const fs = require("fs-extra");
-const ensurePath = require("@wrote/ensure-path");
 const transform_1 = require("./transform");
 const ld = require("lodash");
 const del = require("del");
@@ -106,7 +105,8 @@ const filesjsonpath = "./content/files.json";
  * @param refresh 是否执行全部重新生成（当前未完成）
  */
 async function generate(configname = "default", verbose = false, refresh = false) {
-    await ensurePath("./content");
+    await fs.ensureDir("./content");
+    // await ensurePath("");
     //refresh的含义是
     //1 即使存在content元数据依然执行generate 2. 即使配置文件一致依然初始化files
     if (refresh) {

@@ -2,6 +2,7 @@ import IContextInfo from './Interface/IContextInfo';
 import { readConfig, readGlobalConfig, cached, changeExt, runWithError } from './lib/utils';
 import ISiteHooks from './Interface/ISiteHooks';
 import * as fse from 'fs-extra';
+import * as path from 'path';
 /**
  * site事件钩子调用代理
  * 所有程序通过给此程序通知事件，借由此程序调用对应site的事件钩子
@@ -33,17 +34,19 @@ const getContext=cached(async (configname?:string)=>
 })
 
 //site hooks对象加载函数
-const getNowSiteHooks=cached(():ISiteHooks=>{
+const getNowSiteHooks=():ISiteHooks=>{
     //加载nowsite的hooks.js文件并得到其导出的ISiteHooks接口对象
     //统一使用export={} 方式导出
+    //require的相对路径问题
     try{
-        let obj=require("../nowSite/hooks.js") as ISiteHooks;
+        // console.log(path.resolve("./nowSite/hooks.js"))
+        let obj=require(path.resolve("./nowSite/hooks.js")) as ISiteHooks;
         return obj;
     }
     catch(e){
         return null;
     }
-});
+};
 
 
 
@@ -69,17 +72,21 @@ export async function *changedSite(){
     //调用之前site的beforeUnload钩子
     //调用新site的loaded钩子
     const ctx=await getContext();
-    const obj=getNowSiteHooks();
+    
     await runWithError(()=>{
-        obj&&obj.beforeUnload(ctx);
+        const obj=getNowSiteHooks();
+        obj?.beforeUnload(ctx);
     },getErrorCBK("切换网站"));
     //等待执行切换site操作 执行以一个await next执行上面的部分
     //执行第二个await next执行下面的部分
     yield;
     //切换site操作结束
-    const newobj=getNowSiteHooks();
+    
+    
     await runWithError(()=>{
-        newobj&&newobj.loaded(ctx);
+        const newobj=getNowSiteHooks();
+        // console.log(newobj)
+        newobj?.loaded(ctx);
     },getErrorCBK("切换网站"));
 }
  /**

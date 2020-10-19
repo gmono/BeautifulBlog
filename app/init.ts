@@ -40,7 +40,7 @@ export async function createBlog(dirpath:string,autocreate:boolean=true,autorepl
             mkdir(`${dirpath}/config`),
             mkdir(`${dirpath}/sites`),
             mkdir(`${dirpath}/assets`),
-            mkdir(`${dirpath}/transforms`)
+            // mkdir(`${dirpath}/transforms`)
         ]);
     }
     //当前直接程序创建
@@ -68,7 +68,8 @@ export async function createBlog(dirpath:string,autocreate:boolean=true,autorepl
         innerCopy(`${__dirname}/../assets`,`${dirpath}/assets`),
         innerCopy(`${__dirname}/../index.html`,`${dirpath}/index.html`),
         innerCopy(`${__dirname}/../global.json`,`${dirpath}/global.json`),
-        innerCopy(`${__dirname}/transforms`,`${dirpath}/transforms`)
+        // innerCopy(`${__dirname}/transforms`,`${dirpath}/transforms`),
+        innerCopy(`${__dirname}/../articles/about.md`,`${dirpath}/articles/about.md`)
     ]);
     console.log("文件复制完毕");
     console.log("切换到默认site");
