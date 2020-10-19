@@ -7,9 +7,7 @@
 import * as pro from "commander";
 import transform,{transformFile} from './transform';
 
-import * as path from "path-extra"
 
-import * as fs from "fs-extra"
 import generate from "./generator"
 import changesite from "./changesite";
 import sitegen from "./sitegen"
