@@ -1,6 +1,6 @@
 {
   "name": "blogsystem",
-  "version": "0.6.3-maintain1",
+  "version": "0.6.3-maintain2",
   "description": "博客系统，可自定义整个网站",
   "main": "./dist/app/blog.js",
   "preferGlobal": true,
