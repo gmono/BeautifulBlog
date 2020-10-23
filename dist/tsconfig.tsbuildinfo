@@ -1291,7 +1291,6 @@
       "importHelpers": true,
       "downlevelIteration": true,
       "incremental": true,
-      "composite": true,
       "moduleResolution": 2,
       "experimentalDecorators": true,
       "emitDecoratorMetadata": true,
