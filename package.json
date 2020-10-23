@@ -1,6 +1,6 @@
 {
   "name": "blogsystem",
-  "version": "0.6.3",
+  "version": "0.6.3-maintain1",
   "description": "博客系统，可自定义整个网站",
   "main": "blog.ts",
   "preferGlobal": true,
