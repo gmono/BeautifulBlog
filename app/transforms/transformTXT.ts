@@ -30,7 +30,7 @@ async function transformTXT(filepath: string, destpath: string, config: IConfig,
   };
   //读取
   let obj = await read(filepath);
-  let html = template(path.resolve(__dirname, "../../static/txt_template.html"), {
+  let html = template(path.resolve(__dirname, "../../../static/txt_template.html"), {
     content: obj.content
   }) as string;
   //返回
@@ -54,7 +54,7 @@ export=<TransformerExports>{
   },
   async templateContent(title,date){
     //返回模板
-    const str= template(path.resolve(__dirname,"../../static/transformer_files/md.md"),{
+    const str= template(path.resolve(__dirname,"../../../static/transformer_files/md.md"),{
       title:title,
       date:dateFormat(date,"yyyy-mm-dd hh:MM:ss"),
       simple:"模板内容"

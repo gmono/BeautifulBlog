@@ -109,7 +109,7 @@ function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,raw
     cmeta.modify_time=articlefile.mtime;
     return cmeta;
 }
-
+import * as process from "process"
 
 const filesjsonpath="./content/files.json";
 // console.log(ensurePath)
@@ -122,6 +122,7 @@ const filesjsonpath="./content/files.json";
  */
 async function generate(configname:string="default",verbose=false,refresh=false)
 {
+    console.log(process.cwd())
     await fs.ensureDir("./content")
     // await ensurePath("");
     //refresh的含义是

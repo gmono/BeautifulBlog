@@ -18,7 +18,7 @@ async function transformPDF(filepath: string, destpath: string, config: IConfig,
   const destpdf = getFileFromDest(destpath, "article.pdf");
   const pdfurl = getUrlFromPath(destpdf,config.base_url);
   //生成html
-  let html = template(path.resolve(__dirname, "../../static/pdf_template.html"), {
+  let html = template(path.resolve(__dirname, "../../../static/pdf_template.html"), {
     pdfurl: pdfurl
   });
   //生成元数据

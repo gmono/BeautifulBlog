@@ -4,3 +4,4 @@ bin
 sites/mysite
 文档
 nowSite
+**/*.map

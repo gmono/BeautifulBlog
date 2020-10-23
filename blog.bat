@@ -1,1 +1,0 @@
-node ./dist_server/blog.js %1 %2 %3 %4 %5 %6

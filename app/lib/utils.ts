@@ -17,7 +17,7 @@ export function hasUndefined<T extends Parameters<typeof objHasValue>>(...args:[
 }
 
 export function readConfig(name:string){
-    return fse.readJson(path.resolve(__dirname,`../../config/${name}.json`)) as Promise<IConfig>;
+    return fse.readJson(`./config/${name}.json`) as Promise<IConfig>;
 }
 export function readGlobalConfig(){
     //读取全局配置文件 从blog根目录

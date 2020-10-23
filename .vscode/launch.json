@@ -4,11 +4,12 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "type": "node",
             "request": "launch",
             "name": "hooksTest",
-            "program": "${workspaceFolder}/dist_server/hooks.js",
+            "program": "${workspaceFolder}/dist/app/hooks.js",
             "skipFiles": [
                 "<node_internals>/**"
             ]
@@ -19,7 +20,7 @@
             "type": "node",
             "request": "launch",
             "name": "sync",
-            "program": "${workspaceFolder}/dist_server/blog.js",
+            "program": "${workspaceFolder}/dist/app/blog.js",
             "args": ["sync","default","80"],
             "skipFiles": [
                 "<node_internals>/**"
@@ -30,7 +31,7 @@
             "type": "node",
             "request": "launch",
             "name": "init",
-            "program": "${workspaceFolder}/dist_server/blog.js",
+            "program": "${workspaceFolder}/dist/app/blog.js",
             "args": ["init","tst","y"],
             "skipFiles": [
                 "<node_internals>/**"
@@ -44,7 +45,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\dist_server\\blog.js",
+            "program": "${workspaceFolder}\\dist\\app\\blog.js",
             "args": ["generate"],
             "outFiles": [
                 "${workspaceFolder}/**/*.js"

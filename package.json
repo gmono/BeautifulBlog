@@ -2,7 +2,7 @@
   "name": "blogsystem",
   "version": "0.6.3-maintain1",
   "description": "博客系统，可自定义整个网站",
-  "main": "blog.ts",
+  "main": "./dist/app/blog.js",
   "preferGlobal": true,
   "bin": {
     "blog": "./blog"
@@ -10,7 +10,7 @@
   "pkg": {
     "scripts": [
       "./node_modules/prismjs/components/*.js",
-      "./dist_server/transforms/**/*.js"
+      "./dist/app/transforms/**/*.js"
     ],
     "assets": [
       "./static/**/*",
@@ -27,18 +27,18 @@
     "url": "https://github.com/gmono/BeautifulBlog"
   },
   "scripts": {
-    "gen": " node ./dist_server/generator.js",
-    "watch": "node ./dist_server/watch.js",
-    "trans": "node ./dist_server/transform.js",
-    "site": "node ./dist_server/changesite.js",
-    "refresh": "node ./dist_server/sitegen.js",
-    "server": "node ./dist_server/server.js",
-    "dev": "node ./dist_server/dev.js",
-    "blog": "node ./dist_server/blog.js",
-    "test": "node ./dist_server/testLib.js",
-    "initBlog": "node ./dist_server/init.js",
+    "gen": " node --trace-warnings ./dist/app/generator.js",
+    "watch": "node --trace-warnings ./dist/app/watch.js",
+    "trans": "node --trace-warnings ./dist/app/transform.js",
+    "site": "node --trace-warnings ./dist/app/changesite.js",
+    "refresh": "node --trace-warnings ./dist/app/sitegen.js",
+    "server": "node --trace-warnings ./dist/app/server.js",
+    "dev": "node --trace-warnings ./dist/app/dev.js",
+    "blog": "node --trace-warnings ./dist/app/blog.js",
+    "test": "node --trace-warnings ./dist/app/testLib.js",
+    "initBlog": "node --trace-warnings ./dist/app/init.js",
     "pkgall": "pkg -t win,linux package.json -o ./bin/blog-release",
-    "pkg": "pkg package.json -o ./blog"
+    "pkgwin": "pkg -t win package.json -o ./bin/blog-release"
   },
   "author": "gmono",
   "license": "MIT",
@@ -90,6 +90,7 @@
     "rxjs": "^6.5.4",
     "spinnies": "^0.5.1",
     "toml": "^3.0.0",
+    "tslib": "^2.0.3",
     "walk": "^2.3.14",
     "watch": "^1.0.2",
     "yaml": "^1.7.2"
