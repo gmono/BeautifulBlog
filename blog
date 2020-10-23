@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('./dist_server/blog.js')
+require('./dist/app/blog.js')
