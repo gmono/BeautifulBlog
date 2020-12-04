@@ -75,7 +75,7 @@
     "front-matter": "^3.0.2",
     "fs-extra": "^8.1.0",
     "highlight": "^0.2.4",
-    "highlight.js": "^9.17.1",
+    "highlight.js": "^10.4.1",
     "koa": "^2.11.0",
     "koa-router": "^8.0.7",
     "koa-static": "^5.0.0",
