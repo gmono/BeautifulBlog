@@ -23,7 +23,8 @@
     "assets/",
     "index.html",
     "global.json",
-    "README.md"
+    "README.md",
+    "README.en.md"
   ],
   "pkg": {
     "scripts": [
