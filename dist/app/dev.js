@@ -1,9 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = dev;
+const tslib_1 = require("tslib");
 const child_process_1 = require("child_process");
 const tscCompileOK = (outcontent) => outcontent.indexOf("Watching for file changes.") != -1;
-const ld = require("lodash");
-const fse = require("fs-extra");
+const ld = tslib_1.__importStar(require("lodash"));
+const fse = tslib_1.__importStar(require("fs-extra"));
 function hasError(outcontent) {
     return outcontent.indexOf("error TS") != -1;
 }
@@ -54,7 +56,7 @@ const tscCompileError = (outcontent) => {
     return result;
 };
 async function tscWatch(name, dirpath) {
-    let child = child_process_1.exec("tsc -w", {
+    let child = (0, child_process_1.exec)("tsc -w", {
         cwd: dirpath
     }, (error, stdout, stderr) => {
         if (error != null) {
@@ -97,7 +99,7 @@ async function tscWatch(name, dirpath) {
 }
 async function dev(configname = "default") {
     const allowvers = ["3.8.2", "2.6.4"];
-    const ver = child_process_1.execSync("tsc -v").toString();
+    const ver = (0, child_process_1.execSync)("tsc -v").toString();
     console.log("typescript 版本", ver);
     if (allowvers.filter(v => ver.indexOf(v) != -1).length == 0) {
         const desc = allowvers.reduce((prev, curr) => `${prev}\n${curr}`);
@@ -114,7 +116,6 @@ async function dev(configname = "default") {
     ]);
     console.log("输入ctrl+c结束所有监视任务");
 }
-exports.default = dev;
 if (require.main == module) {
     dev();
 }

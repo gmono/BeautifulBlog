@@ -2,7 +2,7 @@ import * as fse from 'fs-extra';
 import * as path from "path"
 import async from './watch';
 import { format } from 'util';
-import * as execa from 'execa';
+import { spawn } from 'child_process';
 import { IGlobalConfig } from './Interface/IGlobalConfig';
 /**
  * 专门处理各种创建操作
@@ -48,10 +48,12 @@ draft: true
     console.log(`创建文章完成，文章路径:${p}`)
     //如果editor有配置则调用编辑器打开文件
     
-    const gconfig=(await fse.readJson(path.resolve(__dirname,"../global.json"))) as IGlobalConfig;
+    const gconfig=(await fse.readJson(path.resolve(__dirname,"../../global.json"))) as IGlobalConfig;
     if(gconfig.editor!=null){
         //启动且并不等待返回
-        execa(gconfig.editor,[p])
+        const editor=spawn(gconfig.editor,[p],{detached:true,stdio:"ignore"});
+        editor.once("error",error=>console.warn(`无法启动编辑器 ${gconfig.editor}: ${error.message}`));
+        editor.unref();
     }
 }
 

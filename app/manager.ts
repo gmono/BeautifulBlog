@@ -17,7 +17,7 @@
 //其中name为git remote仓库名  url为git仓库，此处由于使用git url只做展示用
 type RemoteItem={name:string,url:string};
 import * as ld from "lodash"
-import * as execa from 'execa';
+import { runCommand } from './lib/runCommand';
 import { fork } from 'child_process';
 import generate from './generator';
 import changesite from './changesite';
@@ -32,7 +32,7 @@ import prompts = require("prompts");
 export async function getNames(){
     //执行git remote
     //all表示要手机process的所有输出
-    let res=await execa("git remote",{all:true});
+    let res=await runCommand("git",["remote"]);
     let output=res.all;
     return output.trim().split("\n").map(v=>v.trim());
 }
@@ -41,7 +41,7 @@ export async function getRemote(name:string):Promise<RemoteItem>{
     //执行 git remote 和 git remote get-url
     return {
         name:name,
-        url:(await execa(`git remote get-url ${name}`,{all:true})).all
+        url:(await runCommand("git",["remote","get-url",name])).all
     }
 }
 export async function getRemoteList():Promise<RemoteItem[]>{
@@ -76,13 +76,13 @@ export async function initGit(dirpath:string){
     //创建git仓库
     await runInDir(dirpath,async ()=>{
         // console.log(process.cwd())
-        await execa("git init",{
+        await runCommand("git",["init"],{
             stdio:"inherit",
         });
         //复制gitginore模板到blog目录的.gitignore文件
-        await innerCopy(path.resolve(__dirname,"../static/template_gitignore.txt"),"./.gitignore");
-        await execa("git add .",{stdio:"inherit"});
-        await execa(`git commit -m "创建博客" `,{stdio:"inherit"});
+        await innerCopy(path.resolve(__dirname,"../../static/template_gitignore.txt"),"./.gitignore");
+        await runCommand("git",["add","."],{stdio:"inherit"});
+        await runCommand("git",["commit","-m","创建博客"],{stdio:"inherit"});
     },null);
     console.log("创建完毕")
 }
@@ -99,11 +99,11 @@ export async function pushToRepos(name:string){
         // const config=await readConfig(name);
         // await changesite(config.site);
         //add 由于存在默认的.gitignore 会自动跳过添加articles sites config目录
-        await execa("git add .");
+        await runCommand("git",["add","."]);
         //合成提交消息
-        await execa(`git commit -m "${await getChangeInfoText()}"`);
+        await runCommand("git",["commit","-m",await getChangeInfoText()]);
         //此处只提供提交到master分支 假设已经设置了trach branch
-        await execa(`git push ${name} master`)
+        await runCommand("git",["push",name,"master"])
 }
 
 
@@ -117,16 +117,16 @@ export async function pushToRepos(name:string){
 export async function addRepos(reposname:string,giturl:string){
     //指定git指令添加仓库，并进行初次提交
     //目前的冲突解决策略是直接放弃显示失败，因此务必保持remote仓库为空
-    await execa(`git remote add ${reposname} ${giturl}`)
+    await runCommand("git",["remote","add",reposname,giturl])
     //初次提交 目前只支持master分支不支持自定义分支指定
-    await execa(`git push -u ${reposname} master`)
+    await runCommand("git",["push","-u",reposname,"master"])
 }
 /**
  * 代理移除仓库的功能
  * @param reposname 仓库名
  */
 export async function removeRepos(reposname:string){
-    await execa(`git remove ${reposname}`);
+    await runCommand("git",["remote","remove",reposname]);
 }
 
 

@@ -1,4 +1,4 @@
-declare type RemoteItem = {
+type RemoteItem = {
     name: string;
     url: string;
 };

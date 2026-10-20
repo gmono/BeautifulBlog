@@ -3,12 +3,10 @@
  */
 
 
-import * as koa from "koa"
-import * as kstatic from "koa-static"
-import * as krouter from "koa-router"
+import Koa = require("koa")
+import kstatic from "koa-static"
 
 
-import del = require("del");
 import generate from "./generator";
 
 
@@ -21,8 +19,9 @@ import * as fse from 'fs-extra';
 
 
 import { runFunction, IThreadContext, IMessage } from './lib/runInThread';
-import * as template from 'art-template';
+import template = require('art-template');
 import * as path from 'path';
+import { stripBaseUrl } from "./url";
 import { WriteStream } from "fs-extra";
 import { ReadStream } from "tty";
 import { IServerInfo } from './Interface/IServerInfo';
@@ -41,7 +40,7 @@ function getUpdatedMessage(date:Date){
 }
 
 
-function worker1(context:IThreadContext,configname:string){
+async function worker1(context:IThreadContext,configname:string){
     // let path=require("path")
     // console.log(path.resolve("."))
     //
@@ -53,9 +52,10 @@ function worker1(context:IThreadContext,configname:string){
     wh.OnArticleGenerated.subscribe(()=>{
         context.sendMessage(getUpdatedMessage(new Date()))
     })
-    watchArticles(configname);
+    await watchArticles(configname);
+    console.log("文章监视已就绪");
 }
-function worker2(context:IThreadContext,config:IConfig){
+async function worker2(context:IThreadContext,config:IConfig){
     type W=typeof import("./watch");
     let wh=context.localRequire<W>("./watch");
     let watchSite=wh.watchSite;
@@ -63,13 +63,13 @@ function worker2(context:IThreadContext,config:IConfig){
     wh.OnSiteSynced.subscribe(()=>{
         context.sendMessage(getUpdatedMessage(new Date()))
     })
-    watchSite(config.site);
+    await watchSite(config.site);
 }
 ;
 
 //获取内容Frame中间件 通过art-template模板文件
 function getContentFrame(framefile:string){
-    return async (ctx:koa.ParameterizedContext<koa.DefaultState, koa.DefaultContext>,next)=>{
+    return async (ctx:Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext>,next)=>{
         let ret=await next();
         if(ctx.type!="text/html") return ret;
         let body=ctx.body as ReadStream;
@@ -106,64 +106,56 @@ export default async function serve(port:number=null,configname="default"){
     let config=(await fse.readJSON(`./config/${configname}.json`)) as IConfig;
     //启动服务器
     if(port==null) port=1024+Math.floor((Math.random()*65535));
-    let startServer=(port:number)=>{
-        //启动服务器
-        const app=new koa();
-        app.use(async (ctx,next)=>{
-            //这里拦截查询服务器信息的请求
-            if(ctx.path=="/info"){
-                ctx.body=JSON.stringify(serverInfo);
-                return;
-            }else return next();
-        })
-        //html添加前缀中间件
-        let mid=getContentFrame(path.resolve(__dirname,"../static/head.html"));
-        app.use(mid);
-        //prefixify中间件
-        app.use(async (ctx,next)=>{
-            let p=ctx.path;
-            if(p.startsWith(config.base_url)){
+    const app=new Koa();
+    app.use(async (ctx,next)=>{
+        if(ctx.path==="/info"){
+            ctx.body=JSON.stringify(serverInfo);
+            return;
+        }
+        return next();
+    });
+    const mid=getContentFrame(path.resolve(__dirname,"../../static/head.html"));
+    app.use(mid);
+    app.use(async (ctx,next)=>{
+        const staticPath=stripBaseUrl(ctx.path,config.base_url);
+        if(staticPath===null){ctx.status=404;return;}
+        ctx.path=staticPath;
+        return next();
+    });
+    app.use(kstatic("."));
 
-                // if(p==config.base_url&&!p.endsWith("/")) (p+="/",ctx.redirect(p));
-                //去除
-                let ap=p.slice(config.base_url.length);
-                if(ap=="") ap="/";
-                
-                //使用去头后的调用next
-                ctx.path=ap;
-                return next();
-            }
-            //错误
-            ctx.redirect(config.base_url+"/");
-        })
-        app.use(kstatic("."))
-        // app.on("error",v=>console.log("hello"))
-        app.listen(port);
-    }
-    //主线程 启动服务器 这里错误捕捉不成功
-    try{
-        startServer(port);
-    }catch(e){
-        //此处重选端口并启动服务器
-        port=port+1+Math.random()*(65535-port);
-        port=Math.floor(port);
-        console.log("启动服务器失败，尝试重选端口");
-        startServer(port);
+    let server:ReturnType<typeof app.listen>;
+    for(let attempt=0;attempt<64;attempt++){
+        server=app.listen(port);
+        try{
+            await new Promise<void>((resolve,reject)=>{
+                server.once("listening",resolve);
+                server.once("error",reject);
+            });
+            break;
+        }catch(error){
+            server.close();
+            if(error.code!=="EADDRINUSE"||attempt===63) throw error;
+            port=port>=65535?1024:port+1;
+        }
     }
     console.log(`服务器启动，端口:${port},地址:http://localhost:${port}${config.base_url}`);
-    //删除原有content 全部重新生成
-    await del("./content");
+    // 强制重新处理文章，但保留旧发布结果，主题切换或处理失败时可继续提供旧内容。
     console.log("已启动全部重新生成");
-    await generate(configname)
+    await generate(configname, false, true)
     //开启监视线程
     let w1=runFunction(__dirname,{},{getUpdatedMessage},worker1,configname);
-    w1.MessagePump<UpdateMsg>("updated").subscribe((dt)=>{
+    w1.onMessage<UpdateMsg>("updated",(dt)=>{
         serverInfo.article_updateTime=dt;
     })
     let w2=runFunction(__dirname,{},{getUpdatedMessage},worker2,config);
-    w2.onMessage<UpdateMsg>("update",(dt)=>{
+    w2.onMessage<UpdateMsg>("updated",(dt)=>{
         serverInfo.site_updateTime=dt;
     })
+    w1.on("error",error=>console.error("文章监视线程错误:",error));
+    w2.on("error",error=>console.error("主题监视线程错误:",error));
+    w1.on("exit",code=>{if(code!==0) console.error(`文章监视线程退出，代码 ${code}`)});
+    w2.on("exit",code=>{if(code!==0) console.error(`主题监视线程退出，代码 ${code}`)});
 
 }
 

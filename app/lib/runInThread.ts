@@ -29,11 +29,12 @@ function transToExtraWorker(worker:thread.Worker){
     }
     ret.onceMessage=(type:string)=>{
         return new Promise<any>((resolve)=>{
-            worker.once("message",(msg:IMessage)=>{
-                if(msg.type==type){
-                    resolve(msg.data);
-                }
-            })
+            const onMessage=(msg:IMessage)=>{
+                if(msg.type!==type) return;
+                worker.off("message",onMessage);
+                resolve(msg.data);
+            };
+            worker.on("message",onMessage);
         })
     }
     ret.MessagePump=(type:string)=>{

@@ -4,7 +4,7 @@ export declare function objHasValue(obj: object, names: PropertyKey[], val: any)
 export declare function hasUndefined<T extends Parameters<typeof objHasValue>>(...args: [T[0], T[1]]): boolean;
 export declare function readConfig(name: string): Promise<IConfig>;
 export declare function readGlobalConfig(): Promise<IGlobalConfig>;
-export declare function writeToGlobalConfig(obj: IGlobalConfig): Promise<void>;
+export declare function writeToGlobalConfig(obj: IGlobalConfig): any;
 export declare function changeJson<T>(jsonpath: string, cbk: (obj: T) => Promise<T>): Promise<void>;
 export declare function runInDir<T extends Parameters<typeof runWithError>>(dirpath: string, ...args: T): Promise<void>;
 export declare function runWithError<T extends any[]>(func: (...args: T) => any, errorcbk?: (e: any) => void, args?: T): Promise<void>;

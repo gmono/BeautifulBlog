@@ -3,7 +3,7 @@ import { IGlobalConfig } from '../Interface/IGlobalConfig';
 import { TransformResult, ITransformer, TransformerExports } from '../Interface/IS_Transform';
 import { getFileFromDest, readMetaFromArticle } from '../transform';
 import * as fse from 'fs-extra';
-import * as template from 'art-template';
+import template = require('art-template');
 import { getUrlFromPath } from '../lib/utils';
 import path = require("path");
 /**

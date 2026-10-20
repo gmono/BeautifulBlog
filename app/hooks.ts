@@ -1,6 +1,6 @@
 import IContextInfo from './Interface/IContextInfo';
 import { readConfig, readGlobalConfig, cached, changeExt, runWithError } from './lib/utils';
-import ISiteHooks from './Interface/ISiteHooks';
+import ISiteHooks, { SiteArticleContext, SiteMetaInfo } from './Interface/ISiteHooks';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 /**
@@ -47,6 +47,27 @@ const getNowSiteHooks=():ISiteHooks=>{
         return null;
     }
 };
+
+export const getSiteHooks=(sitename?:string):ISiteHooks=>{
+    const hookpath=path.resolve(sitename?`./sites/${sitename}/hooks.js`:'./nowSite/hooks.js');
+    try {
+        delete require.cache[require.resolve(hookpath)];
+        return require(hookpath) as ISiteHooks;
+    } catch {
+        return null;
+    }
+};
+
+export async function getSiteArticleSupport(sitename:string):Promise<{metainfo:SiteMetaInfo, intercept?:ISiteHooks["interceptArticle"]}|null>{
+    const hooks=getSiteHooks(sitename);
+    if(!hooks?.metainfo?.articleExtensions?.length && !hooks?.interceptArticle) return null;
+    return {metainfo:hooks.metainfo??{},intercept:hooks.interceptArticle?.bind(hooks)};
+}
+
+export async function interceptSiteArticle(sitename:string,context:SiteArticleContext){
+    const hooks=getSiteHooks(sitename);
+    return hooks?.interceptArticle?.call(hooks,context);
+}
 
 
 
@@ -107,7 +128,7 @@ export async function afterRefresh(){
  * @param articlepath 更改的文章
  * @param destpath 生成目的地址（不带后缀名）
  */
-export async function changed(destpath:string){
+export async function changed(destpath:string, changeType?:"change"|"add"|"remove"){
     await fse.ensureDir("./nowSite");
     const ctx=await getContext();
     const obj=getNowSiteHooks();
@@ -119,10 +140,10 @@ export async function changed(destpath:string){
     //元数据文件地址
     const f=changeExt(destpath,".json");
     //参数类型定义
-    type param=Parameters<typeof obj.articleChanged>[1];
-    let tp:param=null;
-    if(!(await fse.pathExists(f))) tp="remove";
-    else{
+    type param=Parameters<ISiteHooks["articleChanged"]>[1];
+    let tp:param=changeType;
+    if(!tp && !(await fse.pathExists(f))) tp="remove";
+    else if(!tp){
         const info=await fse.stat(f);
         if(info.ctimeMs==info.mtimeMs) tp="add";
         else tp="change";

@@ -8,7 +8,7 @@ import { IConfig } from './Interface/IConfig';
 
  //删除nowSite目录复制spath指向的目录并命名为nowSite
  //删除复制目录树
- import * as _copy from "copy-dir";
+ import _copy from "copy-dir";
 
  //copy模块的类型
 type CopyMod=(from:string,to:string,option:{
@@ -20,8 +20,7 @@ type CopyMod=(from:string,to:string,option:{
 
 
 const copy=_copy as CopyMod;
- import * as del from "del"
-import  {mkdir}  from "fs-extra";
+import { mkdir, remove } from "fs-extra";
 import * as path from "path"
 async function changesite(sitename:string){
     
@@ -33,7 +32,7 @@ async function changesite(sitename:string){
     let spath=path.resolve("./sites",sitename);
     let dpath="./nowSite"
     // console.log(spath,dpath)
-    await del(dpath)
+    await remove(dpath)
     await mkdir(dpath)
     return new Promise<void>((r,j)=>{
         copy(spath,dpath,{

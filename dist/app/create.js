@@ -1,9 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createTagByClass = exports.createVersionByClasses = exports.createClassByClasses = exports.createArticleByClasses = exports.createTag = exports.createVersion = exports.createClass = exports.createArticle = void 0;
-const fse = require("fs-extra");
-const path = require("path");
-const execa = require("execa");
+exports.createTagByClass = exports.createVersionByClasses = exports.createClassByClasses = exports.createArticleByClasses = void 0;
+exports.createArticle = createArticle;
+exports.createClass = createClass;
+exports.createVersion = createVersion;
+exports.createTag = createTag;
+const tslib_1 = require("tslib");
+const fse = tslib_1.__importStar(require("fs-extra"));
+const path = tslib_1.__importStar(require("path"));
+const child_process_1 = require("child_process");
 let makeToClassBase = (func) => {
     return (classes, ...args) => {
         let p = path.resolve("./articles", ...classes);
@@ -25,12 +30,13 @@ draft: true
     await fse.ensureDir(path.parse(p).dir);
     await fse.writeFile(p, templateContent);
     console.log(`创建文章完成，文章路径:${p}`);
-    const gconfig = (await fse.readJson(path.resolve(__dirname, "../global.json")));
+    const gconfig = (await fse.readJson(path.resolve(__dirname, "../../global.json")));
     if (gconfig.editor != null) {
-        execa(gconfig.editor, [p]);
+        const editor = (0, child_process_1.spawn)(gconfig.editor, [p], { detached: true, stdio: "ignore" });
+        editor.once("error", error => console.warn(`无法启动编辑器 ${gconfig.editor}: ${error.message}`));
+        editor.unref();
     }
 }
-exports.createArticle = createArticle;
 async function createClass(basepath, name) {
     let p = path.resolve(basepath, name);
     if (await fse.pathExists(p)) {
@@ -39,15 +45,12 @@ async function createClass(basepath, name) {
     await fse.mkdir(p);
     console.log(`创建子类完成，子类文件夹路径:${p}`);
 }
-exports.createClass = createClass;
 async function createVersion(basepath, name) {
     throw new Error("尚未实现此功能");
 }
-exports.createVersion = createVersion;
 async function createTag(basepath, name) {
     throw new Error("尚未实现此功能");
 }
-exports.createTag = createTag;
 exports.createArticleByClasses = makeToClassBase(createArticle);
 exports.createClassByClasses = makeToClassBase(createClass);
 exports.createVersionByClasses = makeToClassBase(createVersion);

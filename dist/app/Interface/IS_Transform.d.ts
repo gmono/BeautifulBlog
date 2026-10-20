@@ -1,16 +1,15 @@
-/// <reference types="node" />
 import { IArticleMeta } from "./IArticleMeta";
 import { IConfig } from "./IConfig";
 import { IGlobalConfig } from "./IGlobalConfig";
 export interface TransformResult {
     html: string;
     meta: IArticleMeta;
-    raw: Buffer;
+    raw?: Uint8Array;
     files?: {
-        [idx: string]: Buffer;
+        [idx: string]: Uint8Array;
     };
 }
-export declare type TransformFunc = ((filepath: string, destpath: string, config: IConfig, globalconfig: IGlobalConfig, ...args: any[]) => Promise<TransformResult>);
+export type TransformFunc = ((filepath: string, destpath: string, config: IConfig, globalconfig: IGlobalConfig, ...args: any[]) => Promise<TransformResult>);
 export interface ITransformer {
     ext: string;
     transformer: TransformFunc;
@@ -18,7 +17,7 @@ export interface ITransformer {
         name: string;
         description: string;
     };
-    templateContent?(title: string, date: Date): Promise<Buffer>;
-    init(): Promise<void>;
+    templateContent?(title: string, date: Date): Promise<Uint8Array>;
+    init(): void | Promise<void>;
 }
-export declare type TransformerExports = ITransformer | ITransformer[];
+export type TransformerExports = ITransformer | ITransformer[];

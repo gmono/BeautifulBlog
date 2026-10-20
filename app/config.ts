@@ -1,7 +1,6 @@
 import { readGlobalConfig, writeToGlobalConfig, readConfig } from './lib/utils';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import * as del from 'del';
 /**
  * config程序 用于管理配置文件
  * 功能有
@@ -23,7 +22,7 @@ export async function createConfig(baseConfigname:string,newname:string){
     fse.writeJSON(`./config/${newname}.json`,await readConfig(baseConfigname));
 }
 export async function deleteConfig(configname:string){
-    await del(`./config/${configname}.json`)
+    await fse.remove(`./config/${configname}.json`)
 }
 /**
  * 切换配置文件

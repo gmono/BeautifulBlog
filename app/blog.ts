@@ -4,7 +4,8 @@
  * 总和程序 通过commander构建   
  */
 
-import * as pro from "commander";
+import { Command } from "commander";
+const pro = new Command();
 import transform,{transformFile} from './transform';
 
 
@@ -20,7 +21,7 @@ import { createBlog } from "./init";
 import { listRemote,  pushUp, add, remove, pushToRepos } from "./manager";
 import { readGlobalConfig } from "./lib/utils";
 //读取 全局配置文件
-const globalconfig=readGlobalConfig();
+const globalconfig=readGlobalConfig().catch(()=>({editor:"",configName:"default"}));
 pro.command("transform <filename> [dest]")
     .description("执行转换器程序")
     .action(async (filename:string,dest?:string)=>{
@@ -97,7 +98,6 @@ pro.command("dev [usesync] [serverport]")
     })
 
 import * as ph from "path"
-import * as execa from 'execa';
 import { createConfig, deleteConfig, useConfig } from "./config";
 
 //new命令与create程序对应
@@ -123,7 +123,7 @@ pro.command("init <dir> [autoCreateDir]")
     .description("初始化一个目录作为Blog,autoCreateDir指定是否自动创建目录(如果不存在)")
     .action(async (dirpath:string,autocreate:string="y")=>{
         let auto=autocreate=="y";
-        createBlog(dirpath,auto);
+        await createBlog(dirpath,auto);
     });
 pro.command("manage <cmd> [p1] [p2]").description("管理博客 cmd=list|add|remove|push,p1为name,p2为url")
     .action(async (cmd:string,p1:string,p2:string)=>{

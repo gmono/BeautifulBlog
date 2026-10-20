@@ -3,9 +3,9 @@ import { IGlobalConfig } from '../Interface/IGlobalConfig';
 import { TransformResult, ITransformer, TransformerExports } from '../Interface/IS_Transform';
 import { readMetaFromArticle } from '../transform';
 import * as fse from 'fs-extra';
-import * as template from "art-template";
+import template = require("art-template");
 import path = require("path");
-import dateFormat = require("dateformat");
+import dateFormat from "dateformat";
 async function transformTXT(filepath: string, destpath: string, config: IConfig, globalconfig: IGlobalConfig, ...args) {
   //转换txt文件到html txt如果没有yaml的元数据则把第一行当作标题其余元数据为null
   //txt文件的meta由同名yaml提供

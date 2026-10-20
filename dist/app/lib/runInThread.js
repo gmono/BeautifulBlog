@@ -1,9 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MakeMessageFactory = exports.MakeMessageType = exports.runFunction = void 0;
-const thread = require("worker_threads");
+exports.runFunction = runFunction;
+exports.MakeMessageType = MakeMessageType;
+exports.MakeMessageFactory = MakeMessageFactory;
+const tslib_1 = require("tslib");
+const thread = tslib_1.__importStar(require("worker_threads"));
 const rxjs_1 = require("rxjs");
-const ld = require("lodash");
+const ld = tslib_1.__importStar(require("lodash"));
 function transToExtraWorker(worker) {
     let ret = worker;
     ret.onMessage = (type, cbk) => {
@@ -15,11 +18,13 @@ function transToExtraWorker(worker) {
     };
     ret.onceMessage = (type) => {
         return new Promise((resolve) => {
-            worker.once("message", (msg) => {
-                if (msg.type == type) {
-                    resolve(msg.data);
-                }
-            });
+            const onMessage = (msg) => {
+                if (msg.type !== type)
+                    return;
+                worker.off("message", onMessage);
+                resolve(msg.data);
+            };
+            worker.on("message", onMessage);
         });
     };
     ret.MessagePump = (type) => {
@@ -62,21 +67,19 @@ function runFunction(modpath, namedObjects, libFuncs, func, ...args) {
             args } });
     return transToExtraWorker(worker);
 }
-exports.runFunction = runFunction;
 function MakeMessageType(type) {
     return class Message {
+        data;
+        type = type;
         constructor(data) {
             this.data = data;
-            this.type = type;
         }
     };
 }
-exports.MakeMessageType = MakeMessageType;
 function MakeMessageFactory(type) {
     return (data) => ({
         type: type,
         data: data
     });
 }
-exports.MakeMessageFactory = MakeMessageFactory;
 //# sourceMappingURL=runInThread.js.map

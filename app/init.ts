@@ -1,5 +1,4 @@
 import { mkdir } from "fs-extra";
-import * as execa from "execa"
 /**
  * 主要用于在一个目录中创建基本的博客目录结构
  * 功能：
@@ -9,7 +8,6 @@ import * as execa from "execa"
 import * as fse from "fs-extra"
 import * as path from 'path';
 import * as walk from 'walk';
-import * as del from 'del';
 // import { fork } from 'child_process';
 import changesite from './changesite';
 import { initGit } from "./manager";
@@ -50,7 +48,7 @@ export async function createBlog(dirpath:string,autocreate:boolean=true,autorepl
     }catch(e){
         if(autoreplace){
             console.log("创建子目录失败，删除重建中");
-            await del(dirpath);
+            await fse.remove(dirpath);
             await mkdir(dirpath);
             await createSubDir();
         }else{
@@ -63,13 +61,13 @@ export async function createBlog(dirpath:string,autocreate:boolean=true,autorepl
     console.log("目录创建完毕")
     //复制transforms目录 从虚拟源码路径中到blog目录中
     await Promise.all([
-        innerCopy(`${__dirname}/../sites/default`,`${dirpath}/sites/default`),
-        innerCopy(`${__dirname}/../config/default.json`,`${dirpath}/config/default.json`),
-        innerCopy(`${__dirname}/../assets`,`${dirpath}/assets`),
-        innerCopy(`${__dirname}/../index.html`,`${dirpath}/index.html`),
-        innerCopy(`${__dirname}/../global.json`,`${dirpath}/global.json`),
+        innerCopy(path.resolve(__dirname,"../../sites/default"),`${dirpath}/sites/default`),
+        innerCopy(path.resolve(__dirname,"../../config/default.json"),`${dirpath}/config/default.json`),
+        innerCopy(path.resolve(__dirname,"../../assets"),`${dirpath}/assets`),
+        innerCopy(path.resolve(__dirname,"../../index.html"),`${dirpath}/index.html`),
+        innerCopy(path.resolve(__dirname,"../../global.json"),`${dirpath}/global.json`),
         // innerCopy(`${__dirname}/transforms`,`${dirpath}/transforms`),
-        innerCopy(`${__dirname}/../articles/about.md`,`${dirpath}/articles/about.md`)
+        innerCopy(path.resolve(__dirname,"../../static/article_templates/about.md"),`${dirpath}/articles/about.md`)
     ]);
     console.log("文件复制完毕");
     console.log("切换到默认site");

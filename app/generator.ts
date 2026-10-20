@@ -80,17 +80,17 @@ function getUrlFile(root:string,filestat:walk.WalkStats,base_url:string){
 
 
 import * as fs from "fs-extra"
-import * as ensurePath from '@wrote/ensure-path'
 import { IArticleMeta } from './Interface/IArticleMeta';
 import { IContentMeta } from './Interface/IContentMeta';
 
-import * as format from "dateformat"
 import { IConfig } from "./Interface/IConfig";
 import { IFiles } from './Interface/IFiles';
-import { getAllowFileExts, getFilesDir,transformFile } from './transform';
+import { getAllowFileExts, getFilesDir,transformFile,writeTransformResult } from './transform';
 import * as ld from 'lodash';
-import del = require("del");
 import {afterRefresh} from "./hooks"
+import { getSiteArticleSupport } from './hooks';
+import { readGlobalConfig } from './lib/utils';
+import { pruneFileIndex } from "./file-index";
 /**
  * 
  * @param articlemeta 元信息
@@ -112,13 +112,11 @@ function getContentMeta(articlemeta:IArticleMeta,from_dir:string,html:string,raw
 import * as process from "process"
 
 const filesjsonpath="./content/files.json";
-// console.log(ensurePath)
-//ensurePath(string)->Promise
 /**
  * 从articles生成content  
  * @param configname 配置文件名
  * @param verbose 是否输出详细文件转换列表
- * @param refresh 是否执行全部重新生成（当前未完成）
+ * @param refresh 是否强制重新处理全部可识别文章；刷新采用非破坏式提交
  */
 async function generate(configname:string="default",verbose=false,refresh=false)
 {
@@ -132,50 +130,43 @@ async function generate(configname:string="default",verbose=false,refresh=false)
     }
     /////
     const config=(await fs.readJSON(`./config/${configname}.json`))as IConfig;
+    const globalConfig=await readGlobalConfig();
+    const siteSupport=await getSiteArticleSupport(config.site);
+    const siteInterceptor=siteSupport?.intercept;
     //获取允许的所有文件类型
-    const allowFileExts=await getAllowFileExts();
+    const defaultFileExts=await getAllowFileExts();
+    const siteFileExts=(siteSupport?.metainfo.articleExtensions??[]).map(ext=>ext.startsWith(".")?ext.toLowerCase():`.${ext.toLowerCase()}`);
+    const allowFileExts=new Set([...defaultFileExts,...siteFileExts]);
 
     //主函数
     let walker=walk.walk("./articles");
     //文件表 key:元数据路径  value:文章标题  key相对于content目录 后期考虑换为 相对于base_url的路径
     let files:IFiles={useConfig:configname,fileList:{}};
 
-    //此处不缩进表示双重条件
-    //不刷新才考虑加载此前的配置文件
-    if(!refresh) //前缀检查写法
+    // 刷新也必须以已有索引为基线。刷新表示强制重新处理，而不是清空发布结果。
     if(await fs.pathExists("./content/files.json")){
         //require基于模块路径
-        let t=(await fs.readJSON("./content/files.json"));
-        //如果上次生成使用的配置文件与这次不相等就维持初始化，等于全部重新生成 相等则把files初始化为上次内容
-        if(t.useConfig==configname){
-            //输出提示
-            console.log("配置文件一致，清洗并刷新记录数据中......")
-            files=t;
-        }
-        else{
-            //这里由于配置文件更改，files中没有记录，无法清理不存在文章
-            //可以考虑全部重新生成以不出现文件碎片
-            console.log("配置文件更改，刷新记录数据中...");
-        }
+        const t=(await fs.readJSON("./content/files.json")) as IFiles;
+        files={...t,useConfig:configname,fileList:{...t.fileList}};
+        console.log(t.useConfig==configname
+            ? "配置文件一致，清洗并刷新记录数据中......"
+            : "配置文件更改，保留已有发布结果并刷新记录数据中...");
     }
     ///读入已有的files列表，并清除其中不存在的文件
     //如果已经读入了上次的files则需要首先清除不存在的文件 然后生成缺失的和更改的文件
     //如果重新初始化则此处无用 fileList为空
-    let dtasks=[]
+    const staleRecords:{articlePath:string, contentPath:string}[]=[];
+    const existingArticlePaths=new Set<string>();
     for(let k in files.fileList){
-        //从files中清除此项，同时删除对应的json和html文件
-        //k为相对于网站的url
-        //读取元数据
         let apath=files.fileList[k].article_path;
-        if(await fs.pathExists(apath)) continue;
+        if(await fs.pathExists(apath)) {
+            existingArticlePaths.add(apath);
+            continue;
+        }
         let cpath=getContentPath(apath,"./content")
-        let hpath=changeExt(cpath,".html");
-        let jpath=changeExt(cpath,".json");
-        console.log("文章已删除：",hpath);
-        dtasks.push(del(hpath));
-        dtasks.push(del(jpath));
+        staleRecords.push({articlePath:apath,contentPath:cpath});
     }
-    await Promise.all(dtasks) //等待所有任务完成
+    if(staleRecords.length) console.log("检测到已删除文章，待本轮生成成功后清理其发布结果");
 
     
     //生成有记录文件表
@@ -185,16 +176,21 @@ async function generate(configname:string="default",verbose=false,refresh=false)
     //文件记录查询函数
     const isRecorded=(articlepath:string)=>recordedFiles.includes(path.resolve(articlepath));
     //转换每个文件
-    walker.on("file",async (base,name,next)=>{
+    let fileProcessingError:unknown;
+    walker.on("file",(base,name,next)=>{
+      void (async()=>{
+      try {
         //这里应该过滤后缀名（目前允许txt md 以后应该以transformer声明的为主)
         //由于此处原因导致generate漏文件，生成不全 原因不明
-        if(allowFileExts.indexOf(path.parse(name.name).ext.trim())==-1){
-            next()
+        const extension=path.parse(name.name).ext.trim().toLowerCase();
+        if(!allowFileExts.has(extension)){
             return;
             //跳过
         }
         //生成源文件与目的文件地址
-        let articlepath=getArticleFile(base,name);
+        let articlepath=getArticleFile(base,name).replace(/\\/g,"/");
+        // 当前扫描到的源文件属于本轮有效集合；成功或复用后都应保留在最终索引中。
+        existingArticlePaths.add(articlepath);
         let contentpath=getContentFile(base,name);
         //去除目的文件地址的后缀名
         contentpath=changeExt(contentpath,"");
@@ -204,7 +200,19 @@ async function generate(configname:string="default",verbose=false,refresh=false)
         //生成函数 生成并写入到文件
         let generate=async ()=>{   
             //开始转换
-            let {res,content_meta:meta}=await transformFile(articlepath,contentpath)
+            let res=siteInterceptor?await siteInterceptor({
+                sourcePath:path.resolve(articlepath),
+                destinationPath:path.resolve(contentpath),
+                extension,
+                config,
+                globalConfig
+            }):undefined;
+            let transformed=res?await writeTransformResult(articlepath,contentpath,res):null;
+            if(!transformed){
+                if(!defaultFileExts.includes(extension)) throw new Error(`主题声明了 ${extension}，但 interceptArticle 没有返回结果，且没有默认 transformer`);
+                transformed=await transformFile(articlepath,contentpath);
+            }
+            const {content_meta:meta}=transformed;
             //输出转换进度
             if(verbose)
                 console.log(`文章:${meta.title}\n转换${articlepath}到${contentpath}`)
@@ -257,16 +265,32 @@ async function generate(configname:string="default",verbose=false,refresh=false)
         else await generate();//如果元数据不存在则生成并自动记录到files.json
         
         
-        next();
+      } catch(error) {
+        fileProcessingError ??= error;
+      }
+      })().finally(()=>next());
     });
     //等待写入完成，并调用钩子
     return new Promise<void>((resolve,reject)=>{
         walker.on("end",async ()=>{
+            if(fileProcessingError){
+                reject(fileProcessingError);
+                return;
+            }
+            // 只有所有文章都成功后才清理已删除文章，避免主题切换失败破坏旧结果。
+            for(const stale of staleRecords){
+                const htmlPath=changeExt(stale.contentPath,".html");
+                const jsonPath=changeExt(stale.contentPath,".json");
+                const filesDir=getFilesDir(stale.contentPath);
+                console.log("文章已删除：",htmlPath);
+                await Promise.all([fs.remove(htmlPath),fs.remove(jsonPath),fs.remove(filesDir)]);
+            }
+            files=pruneFileIndex(files,existingArticlePaths);
             //写入files.json
             //如果已经存在就先删除
     
             if(await fs.pathExists(filesjsonpath)){
-                await del(filesjsonpath);
+                await fs.remove(filesjsonpath);
             }
             //确定是这里导致的已存在的files.json消失
             await fs.writeFile(filesjsonpath,JSON.stringify(files,null,"\t"));
@@ -276,6 +300,8 @@ async function generate(configname:string="default",verbose=false,refresh=false)
                 await afterRefresh();
             }
             resolve();
+        }).on("error",reject).on("errors",(_root,errors)=>{
+            reject(new AggregateError(errors.map(error=>error.error ?? error),"文章目录遍历失败"));
         })
     });
     

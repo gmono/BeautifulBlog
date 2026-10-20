@@ -1,17 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const _copy = require("copy-dir");
-const copy = _copy;
-const del = require("del");
+const tslib_1 = require("tslib");
+const copy_dir_1 = tslib_1.__importDefault(require("copy-dir"));
+const copy = copy_dir_1.default;
 const fs_extra_1 = require("fs-extra");
-const path = require("path");
+const path = tslib_1.__importStar(require("path"));
 async function changesite(sitename) {
-    const changesiteHook = hooks_1.changedSite();
+    const changesiteHook = (0, hooks_1.changedSite)();
     await changesiteHook.next();
     let spath = path.resolve("./sites", sitename);
     let dpath = "./nowSite";
-    await del(dpath);
-    await fs_extra_1.mkdir(dpath);
+    await (0, fs_extra_1.remove)(dpath);
+    await (0, fs_extra_1.mkdir)(dpath);
     return new Promise((r, j) => {
         copy(spath, dpath, {
             utimes: true,
@@ -27,7 +27,7 @@ async function changesite(sitename) {
         });
     });
 }
-const fs = require("fs-extra");
+const fs = tslib_1.__importStar(require("fs-extra"));
 const hooks_1 = require("./hooks");
 if (require.main == module) {
     let config = fs.readJsonSync("./config/default.json");

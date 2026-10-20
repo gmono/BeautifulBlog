@@ -1,11 +1,12 @@
 "use strict";
-const fm = require("front-matter");
-const cheerio = require("cheerio");
+const tslib_1 = require("tslib");
+const front_matter_1 = tslib_1.__importDefault(require("front-matter"));
+const cheerio = tslib_1.__importStar(require("cheerio"));
 const path = require("path");
-const loadLanguages = require("prismjs/components/");
-const fse = require("fs-extra");
+const loadLanguages = require('prismjs/components/');
+const fse = tslib_1.__importStar(require("fs-extra"));
 const Prism = require("prismjs");
-const mk = require("marked");
+const marked_1 = require("marked");
 const template = require("art-template");
 function htmlProcessing(html) {
     let $ = cheerio.load(html);
@@ -28,22 +29,17 @@ async function transformMD(filepath, destpath, config, globalconfig, ...args) {
         first = false;
     }
     let str = (await fse.readFile(filepath)).toString();
-    let res = fm(str);
-    mk.setOptions({
-        renderer: new mk.Renderer(),
-        highlight: (code, lang, cbk) => {
-            const ret = Prism.highlight(code, Prism.languages[lang], lang);
-            return ret;
-        },
-        pedantic: false,
-        gfm: true,
-        breaks: false,
-        sanitize: false,
-        smartLists: true,
-        smartypants: false,
-        xhtml: false
-    });
-    let content = mk(res.body);
+    let res = (0, front_matter_1.default)(str);
+    marked_1.marked.setOptions({ gfm: true, breaks: false });
+    marked_1.marked.use({ renderer: { code({ text: code, lang }) {
+                const language = lang?.split(/\s+/)[0];
+                const grammar = language && Prism.languages[language];
+                const highlighted = grammar
+                    ? Prism.highlight(code, grammar, language)
+                    : code.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[char]));
+                return `<pre><code${language ? ` class="language-${language}"` : ""}>${highlighted}</code></pre>`;
+            } } });
+    let content = await marked_1.marked.parse(res.body);
     let html = template(fse.realpathSync(path.resolve(__dirname, "../../../static/article_template.html")), {
         content: content,
         cssurl: `${baseurl}/assets/prism.css`

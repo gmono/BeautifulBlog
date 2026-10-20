@@ -165,7 +165,8 @@ async function getContentMeta(res:TransformResult,articlePath:string){
   //去掉最前面的 ./articles
   //这里考虑去掉form_dir 此属性只在generator中有意义
   let cmeta=JSON.parse(JSON.stringify(res.meta)) as IContentMeta;
-  cmeta.article_length=res.raw.length;
+  const raw=res.raw??await fse.readFile(articlePath);
+  cmeta.article_length=raw.length;
   cmeta.content_length=res.html.length;
   //提取原始文章文件信息
   //修改时间
@@ -216,9 +217,8 @@ export function getFilesDir(destpath:string){
  * @param srcfile 源文件名
  * @param destfilename 目的文件名（不包括扩展名）
  */
-export async function transformFile(srcfile:string,destfilename:string):Promise<TransformFileResult>{
+export async function writeTransformResult(srcfile:string,destfilename:string,res:TransformResult):Promise<TransformFileResult>{
   await fse.ensureDir(path.parse(destfilename).dir);
-  let res=await transform(srcfile,destfilename);
   //保存基本内容
   let htmlpath=changeExt(destfilename,".html");
   let jsonpath=changeExt(destfilename,".json");
@@ -250,6 +250,11 @@ export async function transformFile(srcfile:string,destfilename:string):Promise<
   return {
     res,content_meta:contentMeta
   }
+}
+
+export async function transformFile(srcfile:string,destfilename:string):Promise<TransformFileResult>{
+  let res=await transform(srcfile,destfilename);
+  return writeTransformResult(srcfile,destfilename,res);
 }
 
 

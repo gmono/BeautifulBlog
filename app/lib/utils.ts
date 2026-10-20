@@ -151,7 +151,7 @@ export function pathMap(srcpath:string,base:string,newbase:string){
 
 ///高阶函数区域
 
-import * as equal from "fast-deep-equal"
+import equal from "fast-deep-equal"
 import * as ld from 'lodash';
 import { assert } from 'console';
 /**

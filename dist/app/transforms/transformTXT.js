@@ -1,13 +1,14 @@
 "use strict";
+const tslib_1 = require("tslib");
 const transform_1 = require("../transform");
-const fse = require("fs-extra");
+const fse = tslib_1.__importStar(require("fs-extra"));
 const template = require("art-template");
 const path = require("path");
-const dateFormat = require("dateformat");
+const dateformat_1 = tslib_1.__importDefault(require("dateformat"));
 async function transformTXT(filepath, destpath, config, globalconfig, ...args) {
     let txt = (await fse.readFile(filepath)).toString();
     let read = async (filepath) => {
-        let meta = await transform_1.readMetaFromArticle(filepath);
+        let meta = await (0, transform_1.readMetaFromArticle)(filepath);
         if (meta == null) {
             meta = {
                 title: txt.split("\n")[0],
@@ -44,7 +45,7 @@ module.exports = {
     async templateContent(title, date) {
         const str = template(path.resolve(__dirname, "../../../static/transformer_files/md.md"), {
             title: title,
-            date: dateFormat(date, "yyyy-mm-dd hh:MM:ss"),
+            date: (0, dateformat_1.default)(date, "yyyy-mm-dd hh:MM:ss"),
             simple: "模板内容"
         });
         return Buffer.from(str);

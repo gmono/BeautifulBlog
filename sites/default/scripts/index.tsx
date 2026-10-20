@@ -1,44 +1,45 @@
-//接口导入 
+//接口导入
 import { IContentMeta } from '../../../app/Interface/IContentMeta';
 
-import * as React from "react"
-import * as ReactDOM from "react-dom"
+import React from "react"
+import { createRoot } from "react-dom/client"
 import { IFiles } from '../../../app/Interface/IFiles';
 
 // var React:any;
 // var ReactDOM:any;
 
 //时间格式化
-function formatDate(fmt:string,date:Date)   
-{ //author: meizz   
-  var o = {   
-    "M+" : date.getMonth()+1,                 //月份   
-    "d+" : date.getDate(),                    //日   
-    "h+" : date.getHours(),                   //小时   
-    "m+" : date.getMinutes(),                 //分   
-    "s+" : date.getSeconds(),                 //秒   
-    "q+" : Math.floor((date.getMonth()+3)/3), //季度   
-    "S"  : date.getMilliseconds()             //毫秒   
-  };   
-  if(/(y+)/.test(fmt))   
-    fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length));   
-  for(var k in o)   
-    if(new RegExp("("+ k +")").test(fmt))   
-  fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));   
-  return fmt;   
+function formatDate(fmt:string,date:Date)
+{ //author: meizz
+  var o = {
+    "M+" : date.getMonth()+1,                 //月份
+    "d+" : date.getDate(),                    //日
+    "h+" : date.getHours(),                   //小时
+    "m+" : date.getMinutes(),                 //分
+    "s+" : date.getSeconds(),                 //秒
+    "q+" : Math.floor((date.getMonth()+3)/3), //季度
+    "S"  : date.getMilliseconds()             //毫秒
+  };
+  if(/(y+)/.test(fmt))
+    fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length));
+  for(var k in o)
+    if(new RegExp("("+ k +")").test(fmt))
+  fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+  return fmt;
 }
 
 interface ItemInfo{
     info:IContentMeta;
     summary:string;
-    OnTitleClick:(()=>void);
-    OnSummaryClick:(()=>void);
+    onTitleClick:(()=>void);
+    onSummaryClick:(()=>void);
     isExpanded:boolean
 }
 class Item extends React.Component<ItemInfo,{
     contentHeight:number
 }>
 {
+    private contentRef=React.createRef<HTMLDivElement>();
     constructor(props:ItemInfo){
         super(props);
         this.state={
@@ -46,14 +47,14 @@ class Item extends React.Component<ItemInfo,{
         };
     }
     componentDidMount(){
-        console.log((ReactDOM.findDOMNode(this.refs.content) as HTMLElement).clientHeight)
+        console.log(this.contentRef.current?.clientHeight ?? 0)
         this.setState({
-            contentHeight:(ReactDOM.findDOMNode(this.refs.content) as HTMLElement).clientHeight
+            contentHeight:this.contentRef.current?.clientHeight ?? 0
         })
     }
     componentDidUpdate(prevprop,prevstate){
         //当属性或状态变化时重新获取content的高度
-        let h=(ReactDOM.findDOMNode(this.refs.content) as HTMLElement).clientHeight;
+        let h=this.contentRef.current?.clientHeight ?? 0;
         if(this.state.contentHeight!=h)
             this.setState({
                 contentHeight:h
@@ -66,12 +67,12 @@ class Item extends React.Component<ItemInfo,{
             overflow:"hidden",
             transition:"all ease-out 1s"
         };
-        //展开状态下的高度 
+        //展开状态下的高度
         let expstyle={
             overflow:"hidden",
             transition:"all ease-in 1s",
             height:`${this.state.contentHeight}px`};
-        
+
         let date=this.props.info.date? new Date(this.props.info.date):new Date();
         return (<div style={{
             whiteSpace:"normal"
@@ -81,20 +82,20 @@ class Item extends React.Component<ItemInfo,{
                 fontFamily:"微软雅黑",
                 fontSize:"xx-large",
                 cursor:"pointer"
-            }} onClick={this.props.OnTitleClick}>{this.props.info.title}</div>
+            }} onClick={this.props.onTitleClick}>{this.props.info.title}</div>
             <hr></hr>
             <div style={{
                 color:"blue",
                 fontSize:"0.7em"
             }}>{formatDate("yyyy-MM-dd hh:mm:ss",date)}</div>
-    
-            <div style={this.props.isExpanded? expstyle:uexpstyle} onClick={this.props.OnSummaryClick}>
-                <div ref="content"  dangerouslySetInnerHTML={{__html:this.props.summary}}></div>
+
+            <div style={this.props.isExpanded? expstyle:uexpstyle} onClick={this.props.onSummaryClick}>
+                <div ref={this.contentRef} dangerouslySetInnerHTML={{__html:this.props.summary}}></div>
             {/* <span style={{
                 color:"pink",
                 fontSize:"0.8em",
                 fontWeight:"bold"
-            }} onClick={props.OnSummaryClick}>{props.isExpanded? "收起":"展开"}</span> */}
+            }} onClick={props.onSummaryClick}>{props.isExpanded? "收起":"展开"}</span> */}
             </div>
         </div>)
     }
@@ -105,7 +106,7 @@ interface ArticleInfo
 {
     metapath:string;
     //进入事件 提供元数据 内容 元数据地址 内容地址
-    OnEnter:(metainfo:IContentMeta,html:string,metapath:string,contentpath:string)=>void;
+    onEnter:(metainfo:IContentMeta,html:string,metapath:string,contentpath:string)=>void;
 }
 interface ArticleItemState{
     isExpanded:boolean,
@@ -126,15 +127,27 @@ class ArticleItem extends React.Component<ArticleInfo,ArticleItemState>{
 
     async loadArticle()
     {
+        if(!this.props.metapath){
+            this.setState({ isloaded:false, info:null, html:null });
+            return;
+        }
+        try {
         let res=await fetch(this.props.metapath);
+        if(!res.ok) throw new Error(`加载文章元数据失败: ${res.status}`);
         let json=await res.json() as IContentMeta;
-        let hpath=this.props.metapath.replace(/.json$/,".html");
-        let html=await (await fetch(hpath)).text()
+        let hpath=this.props.metapath.replace(/\.json$/,".html");
+        let htmlResponse=await fetch(hpath);
+        if(!htmlResponse.ok) throw new Error(`加载文章内容失败: ${htmlResponse.status}`);
+        let html=await htmlResponse.text();
         this.setState({
             info:json,
             html:html,
             isloaded:true
         });
+        } catch(error) {
+            console.error(error);
+            this.setState({ isloaded:false, info:null, html:null });
+        }
     }
     async componentDidMount(){
         await this.loadArticle();
@@ -145,7 +158,7 @@ class ArticleItem extends React.Component<ArticleInfo,ArticleItemState>{
         }
     }
     //对外公开的方法
-    public summarySwitch(){
+    public toggleSummary(){
         this.setState({
             isExpanded:!(this.state.isExpanded)
         });
@@ -153,8 +166,8 @@ class ArticleItem extends React.Component<ArticleInfo,ArticleItemState>{
     enterArticle(){
         //进入此篇文章
         //内容地址
-        let hpath=this.props.metapath.replace(/.json$/,".html");
-        this.props.OnEnter(this.state.info,this.state.html,this.props.metapath,hpath);
+        let hpath=this.props.metapath.replace(/\.json$/,".html");
+        this.props.onEnter(this.state.info,this.state.html,this.props.metapath,hpath);
     }
     render(){
         if(!(this.state.isloaded)){
@@ -166,17 +179,17 @@ class ArticleItem extends React.Component<ArticleInfo,ArticleItemState>{
                 article_path:"未知",
                 from_dir:[],
                 modify_time:new Date()
-            }} 
-            summary="加载中......" 
-            OnTitleClick={()=>{}} 
-            OnSummaryClick={()=>{}}
+            }}
+            summary="加载中......"
+            onTitleClick={()=>{}}
+            onSummaryClick={()=>{}}
             isExpanded={this.state.isExpanded} />)
-        } 
+        }
         else{
             return (
             <Item info={this.state.info} summary={this.state.html}
-            OnTitleClick={this.enterArticle.bind(this)} 
-            OnSummaryClick={()=>{}}
+            onTitleClick={this.enterArticle.bind(this)}
+            onSummaryClick={()=>{}}
             isExpanded={this.state.isExpanded}
             />)
         }
@@ -189,7 +202,7 @@ class ArticleList extends React.Component<{metalist:string[]}>
 {
     constructor(props){
         super(props);
-        
+
 
     }
 
@@ -205,7 +218,7 @@ class ArticleList extends React.Component<{metalist:string[]}>
                         width:"80vw",
                         verticalAlign:"top"
                     }}>
-                        <ArticleItem   metapath={v} OnEnter={(...args)=>{
+                        <ArticleItem   metapath={v} onEnter={(...args)=>{
                         alert(JSON.stringify(args));
                         }}/>
                     </div>
@@ -222,13 +235,14 @@ class ArticleList extends React.Component<{metalist:string[]}>
  * 等宽容器，其会将自己的height设置为与scrollWidth相同 进而使其内容物都可以有同样的宽度
  */
 class ScrollWidthContainer extends React.Component<{style?:React.CSSProperties,children:any[]}>{
+    private topRef=React.createRef<HTMLDivElement>();
 
     constructor(props){
         super(props);
     }
     reset()
     {
-        let ele=ReactDOM.findDOMNode(this.refs.top);
+        let ele=this.topRef.current;
         if(ele instanceof HTMLElement){
             ele.style.width=`${ele.scrollWidth}px`;
         }
@@ -237,13 +251,13 @@ class ScrollWidthContainer extends React.Component<{style?:React.CSSProperties,c
     }
     componentDidMount(){
         this.reset();
-        
+
     }
     componentDidUpdate(prevprop,prevstate){
         // this.reset();
     }
     render(){
-        return (<div ref="top" style={this.props.style? this.props.style:{}}>
+        return (<div ref={this.topRef} style={this.props.style? this.props.style:{}}>
             {this.props.children}
         </div>)
     }
@@ -255,7 +269,7 @@ class SummaryItem extends React.PureComponent<SummaryItemProps,{mouseHover:boole
         super(props);
         this.state={mouseHover:false}
     }
-    
+
 
     render(){
         //生成css
@@ -269,7 +283,7 @@ class SummaryItem extends React.PureComponent<SummaryItemProps,{mouseHover:boole
         if(this.state.mouseHover){
             css.boxShadow="0 0 5px 0 gray"
         }
-        return (<div style={css} onClick={this.props.onClick} 
+        return (<div style={css} onClick={this.props.onClick}
         onMouseEnter={()=>this.setState({mouseHover:true})}
         onMouseLeave={()=>this.setState({mouseHover:false})}>
             <div id="title" style={{
@@ -326,6 +340,7 @@ type MainContainerProps={
     catalogPath:string;
 }
 class MainContainer extends React.Component<MainContainerProps,MainContainerStates>{
+    private articleItemRef=React.createRef<ArticleItem>();
     constructor(props:MainContainerProps){
         super(props);
         //初始信息为空
@@ -343,7 +358,7 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
     {
         let r=await fetch(this.props.catalogPath);
         let f=await r.json() as IFiles;
-        
+
         let lst=this.getMetaList();
         //设置内部数据
         this.setState({
@@ -366,8 +381,7 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
     componentDidMount(){
         this.getCatalog();
         //这里直接设置为恒展开
-        let item=this.refs.item as ArticleItem;
-        item.summarySwitch();
+        this.articleItemRef.current?.toggleSummary();
     }
     componentDidUpdate(prevprop,prevstate){
         if(prevprop.catalogPath!=this.props.catalogPath){
@@ -379,7 +393,7 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
             nowArticleMetaPath:key
         });
         //自动跳转到content开头
-        let item=ReactDOM.findDOMNode(this.refs.item);
+        let item=document.querySelector(".item");
         if(item instanceof Element){
             item.scrollIntoView();
         }
@@ -388,7 +402,7 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
     enter(){
         //这里调用其函数展开item
         // let item=this.refs.item as ArticleItem;
-        // item.summarySwitch();
+        // item.toggleSummary();
     }
     render(){
         //侧边栏加内容区
@@ -398,16 +412,16 @@ class MainContainer extends React.Component<MainContainerProps,MainContainerStat
         return (<ScrollWidthContainer style={{
             display:"flex",
         }}>
-            <div ref="left" style={{
+            <div style={{
                 flex:"1"
             }}>
                 <SummaryList  filesInfo={this.state.data} onClick={this.listClick.bind(this)} />
             </div>
-            <div ref="content" style={{
+            <div style={{
                 flex:"5",
                 overflow:"scroll"
             }}>
-                <ArticleItem ref="item" metapath={this.state.nowArticleMetaPath} OnEnter={this.enter.bind(this)} />>
+                <ArticleItem ref={this.articleItemRef} metapath={this.state.nowArticleMetaPath} onEnter={this.enter.bind(this)} />
             </div>
         </ScrollWidthContainer>)
     }
@@ -435,10 +449,11 @@ let Page=(<ScrollWidthContainer style={{
         <h1>我的博客</h1>
         <h3>点击标题展开</h3>
         </div>
-    
+
     <hr style={{marginBottom:"30px"}}></hr>
     <MainContainer catalogPath="../content/files.json">
     </MainContainer>
     </ScrollWidthContainer>);
 
-ReactDOM.render(Page,document.querySelector("#page"));
+const pageRoot=document.querySelector("#page");
+if(pageRoot) createRoot(pageRoot).render(Page);

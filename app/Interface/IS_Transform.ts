@@ -8,9 +8,9 @@ export interface TransformResult
 {
   html:string;
   meta:IArticleMeta;
-  raw:Buffer;
+  raw?:Uint8Array;
   //用于提供额外文件用于html中的代码使用(文件名可以包含相对路径如 ./aa/bb 或aa/bb)
-  files?:{[idx:string]:Buffer}
+  files?:{[idx:string]:Uint8Array}
 }
 
 
@@ -32,9 +32,9 @@ export interface ITransformer{
       description:string;
     };
     //返回模板内容
-    templateContent?(title:string,date:Date):Promise<Buffer>;
+    templateContent?(title:string,date:Date):Promise<Uint8Array>;
     //扩展的初始化函数 在加载时调用
-    init():Promise<void>;
+    init():void|Promise<void>;
 }
 //允许导出一组transformer(同一个文件)
 export type TransformerExports=ITransformer|ITransformer[];

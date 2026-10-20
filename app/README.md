@@ -1,5 +1,5 @@
 # 开发指南
-* 除dev.ts外，其他程序可通过启动yarn blog dev 进行开发，dev程序做如下工作：
+* 除dev.ts外，其他程序可通过启动pnpm blog dev 进行开发，dev程序做如下工作：
   1.  监视app目录和Helper的所有ts文件并实时编译
   2.  根据配置文件设置，监视指定网站中的ts文件并实时编译
   3.  启动启动sync命令，启动开发服务器，并自动同步配置文件指定的site到nowSite目录，同时自动监视文章改动并自动生成content  

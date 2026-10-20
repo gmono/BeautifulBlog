@@ -1,17 +1,18 @@
 "use strict";
+const tslib_1 = require("tslib");
 const transform_1 = require("../transform");
-const fse = require("fs-extra");
+const fse = tslib_1.__importStar(require("fs-extra"));
 const template = require("art-template");
 const utils_1 = require("../lib/utils");
 const path = require("path");
 async function transformPDF(filepath, destpath, config, globalconfig, ...args) {
     let raw = await fse.readFile(filepath);
-    const destpdf = transform_1.getFileFromDest(destpath, "article.pdf");
-    const pdfurl = utils_1.getUrlFromPath(destpdf, config.base_url);
+    const destpdf = (0, transform_1.getFileFromDest)(destpath, "article.pdf");
+    const pdfurl = (0, utils_1.getUrlFromPath)(destpdf, config.base_url);
     let html = template(path.resolve(__dirname, "../../../static/pdf_template.html"), {
         pdfurl: pdfurl
     });
-    let meta = await transform_1.readMetaFromArticle(filepath);
+    let meta = await (0, transform_1.readMetaFromArticle)(filepath);
     if (meta == null) {
         meta = {
             title: path.parse(filepath).name,

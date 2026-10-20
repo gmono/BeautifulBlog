@@ -3,6 +3,7 @@ import IContextInfo from '../../app/Interface/IContextInfo';
 //钩子系统 会被server端程序调用 当
 ///aaa
 class Hooks implements ISiteHooks{
+    public metainfo={ articleExtensions: [] as string[] };
     //脚本执行路径 一般为{blogPath}/nowSite
     public basepath:string=null;
     init(basepath: string, context: IContextInfo) {

@@ -5,13 +5,11 @@ import changesite from "./changesite"
 import generate from "./generator";
 import { IConfig } from "./Interface/IConfig";
 import * as fse from 'fs-extra';
-import del = require("del");
 
 async function sitegen(configname:string="default")
 {
-    //临时全部重新生成处理策略
-    await del("./content");
-    await generate()
+    // 强制重新处理文章，但采用非破坏式刷新，避免主题切换失败清空旧内容。
+    await generate(configname, false, true)
     let config=(await fse.readJSON(`./config/${configname}.json`)) as IConfig
     await changesite(config.site);
     console.log("全部刷新完成");

@@ -4,7 +4,7 @@ import { IGlobalConfig } from "../Interface/IGlobalConfig";
 
 import { TransformResult, ITransformer, TransformerExports } from '../Interface/IS_Transform';
 
-import fm = require("front-matter");
+import fm from "front-matter";
 
 import { IArticleMeta } from "../Interface/IArticleMeta";
 
@@ -12,11 +12,11 @@ import * as cheerio from "cheerio"
 
 import path = require("path");
 
-import * as loadLanguages from 'prismjs/components/'
+const loadLanguages = require('prismjs/components/') as (languages: string[]) => void;
 import * as fse from 'fs-extra';
 import Prism = require("prismjs");
-import * as mk from "marked"
-import * as template from "art-template"
+import { marked } from "marked"
+import template = require("art-template")
 
 function htmlProcessing(html:string):string{
     //解析html并在code的pre标签添加class
@@ -51,26 +51,19 @@ async function transformMD(filepath:string,destpath:string,config:IConfig,global
     let str=(await fse.readFile(filepath)).toString();
     let res=fm<IArticleMeta>(str);
     // console.log(res);
-    mk.setOptions({
-        renderer:new mk.Renderer(),
-    
-        highlight: (code,lang,cbk)=>{
-            const ret=Prism.highlight(code,Prism.languages[lang],lang);
-            // console.log(ret)
-            return ret;
-          },
-          pedantic: false,
-          gfm: true,
-          breaks: false,
-          sanitize: false,
-          smartLists: true,
-          smartypants: false,
-          xhtml: false
-    })
+    marked.setOptions({ gfm: true, breaks: false });
+    marked.use({ renderer: { code({ text: code, lang }) {
+      const language = lang?.split(/\s+/)[0];
+      const grammar = language && Prism.languages[language];
+      const highlighted = grammar
+        ? Prism.highlight(code, grammar, language)
+        : code.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[char]));
+      return `<pre><code${language ? ` class="language-${language}"` : ""}>${highlighted}</code></pre>`;
+    } } });
     //实际内容
-    let content=mk(res.body);
+    let content=await marked.parse(res.body);
     //模板化 改为相对于程序文件的目录（加载静态资源）
-    let html=template(fse.realpathSync(path.resolve(__dirname,"../../static/article_template.html")),{
+    let html=template(fse.realpathSync(path.resolve(__dirname,"../../../static/article_template.html")),{
         content:content,
         cssurl:`${baseurl}/assets/prism.css`
     }) as string;
@@ -99,7 +92,7 @@ export=<TransformerExports>[{
   },
   async templateContent(title,date){
     //返回模板
-    const str= template(path.resolve(__dirname,"../../static/transformer_files/md.md"),{
+    const str= template(path.resolve(__dirname,"../../../static/transformer_files/md.md"),{
       title:title,
       date:JSON.stringify(date),
       simple:"模板内容"
